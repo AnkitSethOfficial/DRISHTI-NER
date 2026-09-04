@@ -633,3 +633,76 @@ input[type=range] {
 @media (max-width: 1023px) {
     .leaflet-control-layers { margin-top: 5rem !important; }
 }
+
+/* ============================================================================
+   Citizen Incident Reporting & AI Vision Risk Assessment Styles
+   ============================================================================ */
+.photo-dropzone {
+    border: 2px dashed rgba(56, 189, 248, 0.35);
+    background: rgba(15, 23, 42, 0.65);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0.75rem;
+    cursor: pointer;
+}
+.photo-dropzone:hover, .photo-dropzone.dragover {
+    border-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+}
+
+.ai-scan-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+.ai-scan-beam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #38bdf8, #10b981, transparent);
+    box-shadow: 0 0 12px #38bdf8, 0 0 22px #10b981;
+    animation: aiScanLoop 2.2s infinite ease-in-out;
+}
+
+@keyframes aiScanLoop {
+    0% { top: 0%; opacity: 0.2; }
+    50% { top: 96%; opacity: 1; }
+    100% { top: 0%; opacity: 0.2; }
+}
+
+.sample-photo-card {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+.sample-photo-card:hover {
+    transform: translateY(-2px);
+    border-color: #38bdf8;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2);
+}
+.sample-photo-card.selected {
+    border-color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+    box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Live Camera Modal Viewfinder */
+.camera-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    background: rgba(11, 17, 32, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.camera-modal.hidden {
+    display: none !important;
+}

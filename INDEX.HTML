@@ -409,78 +409,313 @@
                 </div>
             </div>
 
-            <!-- Tab 3: Dedicated Citizen Hazard Reporting Panel -->
+            <!-- Tab 3: Dedicated Citizen Incident Reporting & AI Vision Risk Assessment Panel -->
             <div id="reportPanel" class="tab-view glass-panel rounded-xl p-5 border border-slate-700/70 shadow-lg min-h-[460px]">
-                <div class="flex justify-between items-start mb-4 pb-3 border-b border-slate-800">
+                <div class="flex flex-wrap justify-between items-start gap-3 mb-5 pb-4 border-b border-slate-800">
                     <div>
-                        <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                            <i data-lucide="flag" class="w-4 h-4 text-emerald-400"></i>
-                            Citizen &amp; Community Hazard Reporting
-                        </h3>
-                        <p class="text-xs text-gray-400 mt-1">Submit ground observations of road fissures, debris fall, or slope movement.</p>
+                        <div class="flex items-center gap-2">
+                            <span class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                            </span>
+                            <div>
+                                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                    Citizen Incident &amp; Hazard Reporting
+                                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold uppercase tracking-wider">
+                                        Field Telemetry &bull; AI Checked
+                                    </span>
+                                </h3>
+                                <p class="text-xs text-gray-400 mt-0.5">
+                                    Capture or upload photos of ground movements, fissures, and rockfalls for real-time AI Risk Evaluation before dispatching to responders.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold uppercase">
-                        AI Verified Field Input
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-medium text-cyan-300 shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            AI Vision Evaluator: Active
+                        </span>
+                    </div>
                 </div>
 
-                <form id="citizenReportForm" class="space-y-3.5 text-xs">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label for="reportLocation" class="block text-gray-300 font-semibold mb-1">Hazard Location / Landmark <span class="text-red-400">*</span></label>
-                            <input id="reportLocation" type="text" required placeholder="e.g., Gangtok 29th Mile, Kurseong" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label for="reportType" class="block text-gray-300 font-semibold mb-1">Hazard Type</label>
-                            <select id="reportType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
-                                <option value="Active Landslide / Debris Fall">Active Landslide / Debris Fall</option>
-                                <option value="Road Surface Fissure / Cracks">Road Surface Fissure / Cracks</option>
-                                <option value="Rockfall Obstruction">Rockfall Obstruction</option>
-                                <option value="Mudflow / Waterlogging">Mudflow / Waterlogging</option>
-                                <option value="Retaining Wall Failure">Retaining Wall Failure</option>
-                            </select>
+                <!-- Main Reporting Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    
+                    <!-- Left Column: Location, Hazard Type, Description -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <form id="citizenReportForm" class="space-y-3.5 text-xs">
+                            
+                            <!-- Location with GPS Auto-fill -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="reportLocation" class="text-gray-300 font-semibold flex items-center gap-1">
+                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                        Incident Location / Landmark <span class="text-red-400">*</span>
+                                    </label>
+                                    <button type="button" id="autoFillGpsBtn" class="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition">
+                                        <i data-lucide="crosshair" class="w-3 h-3"></i> Use Current GPS
+                                    </button>
+                                </div>
+                                <input id="reportLocation" type="text" required placeholder="e.g., Gangtok 29th Mile, Kurseong, NH-10 near Teesta" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition">
+                            </div>
+
+                            <!-- Hazard Type & Severity -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="reportType" class="block text-gray-300 font-semibold mb-1">Incident Classification</label>
+                                    <select id="reportType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="Active Landslide / Debris Fall">Active Landslide / Debris Fall</option>
+                                        <option value="Road Surface Fissure / Cracks">Road Surface Fissure / Cracks</option>
+                                        <option value="Rockfall Obstruction">Rockfall Obstruction</option>
+                                        <option value="Mudflow / Waterlogging">Mudflow / Waterlogging</option>
+                                        <option value="Retaining Wall Failure">Retaining Wall Failure</option>
+                                        <option value="Toe Erosion / River Scour">Toe Erosion / River Scour</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="reportSeverity" class="block text-gray-300 font-semibold mb-1">Observed Severity Tier</label>
+                                    <select id="reportSeverity" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="HIGH">Critical (Carriageway severed / trapped traffic)</option>
+                                        <option value="MODERATE" selected>Moderate (Single lane blocked / debris on road)</option>
+                                        <option value="LOW">Low (Tension cracks / small shoulder slide)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Field Notes / Observations -->
+                            <div>
+                                <label for="reportDescription" class="block text-gray-300 font-semibold mb-1">Field Observations &amp; Threat Indicators</label>
+                                <textarea id="reportDescription" rows="3" placeholder="Describe boulder sizes, rate of debris movement, whether rain is accelerating failure, or trapped vehicles..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 leading-relaxed"></textarea>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="pt-2 flex items-center justify-between gap-3">
+                                <button type="submit" id="submitReportBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-900/30">
+                                    <i data-lucide="send" class="w-4 h-4"></i> Submit Incident Report &amp; Plot on Map
+                                </button>
+                                <button type="button" id="resetReportFormBtn" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-gray-400 rounded-lg transition" title="Clear Form">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Dynamic Report Success Feedback Alert -->
+                        <div id="reportSuccessAlert" class="hidden mt-3 p-3.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">
+                            <div class="flex items-center gap-2 font-bold text-xs">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Hazard Incident Verified &amp; Plotted Live on Map</span>
+                            </div>
+                            <p id="reportSuccessMsg" class="text-[11px] text-gray-300 mt-1 leading-snug"></p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label for="reportSeverity" class="block text-gray-300 font-semibold mb-1">Estimated Severity</label>
-                            <select id="reportSeverity" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
-                                <option value="HIGH">Critical (Road blocked / severe slip)</option>
-                                <option value="MODERATE">Moderate (Single lane blocked / rocks on road)</option>
-                                <option value="LOW">Low (Tension cracks / small slide)</option>
-                            </select>
+                    <!-- Right Column: Photo Upload, Camera & AI Risk Check -->
+                    <div class="lg:col-span-6 space-y-3.5">
+                        <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 space-y-3">
+                            
+                            <!-- Title & Dual Camera / Gallery Buttons -->
+                            <div class="flex items-center justify-between">
+                                <label class="text-gray-200 font-semibold text-xs flex items-center gap-1.5">
+                                    <i data-lucide="camera" class="w-4 h-4 text-sky-400"></i>
+                                    Incident Photo Evidence
+                                    <span class="text-[10px] text-gray-400 font-normal">(Camera or Upload)</span>
+                                </label>
+                                
+                                <div class="flex items-center gap-1.5">
+                                    <!-- Hidden Inputs -->
+                                    <input id="cameraInput" type="file" accept="image/*" capture="environment" class="hidden">
+                                    <input id="galleryInput" type="file" accept="image/*" class="hidden">
+
+                                    <button type="button" id="openCameraBtn" class="px-2.5 py-1.5 bg-sky-600/25 hover:bg-sky-600/40 text-sky-300 rounded-lg border border-sky-500/40 text-[11px] font-semibold transition flex items-center gap-1.5 shadow-sm">
+                                        <i data-lucide="camera" class="w-3.5 h-3.5 text-sky-400"></i> Live Camera
+                                    </button>
+                                    <button type="button" id="openGalleryBtn" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-gray-200 rounded-lg border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1.5">
+                                        <i data-lucide="image" class="w-3.5 h-3.5 text-emerald-400"></i> Upload Image
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Drag & Drop Area (Shown when no image loaded) -->
+                            <div id="photoDropzone" class="photo-dropzone p-5 text-center">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                                        <i data-lucide="cloud-upload" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-200">
+                                            Drop photo here, or click to capture from camera / select file
+                                        </p>
+                                        <p class="text-[10px] text-gray-500 mt-0.5">
+                                            Supports JPG, PNG, WEBP &bull; Directly from mobile camera or desktop
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Photo Preview Container (Shown when an image is selected) -->
+                            <div id="photoPreviewContainer" class="hidden space-y-2.5">
+                                <div class="relative rounded-lg overflow-hidden border border-slate-700 bg-slate-950/70 max-h-[220px] flex items-center justify-center">
+                                    <img id="photoPreviewImg" src="" alt="Incident Preview" class="w-full max-h-[220px] object-cover">
+                                    
+                                    <!-- Scanning Beam Animation Overlay -->
+                                    <div id="aiScanBeamOverlay" class="ai-scan-overlay">
+                                        <div class="ai-scan-beam"></div>
+                                    </div>
+
+                                    <!-- HUD Overlay Badges -->
+                                    <div class="absolute top-2 left-2 flex items-center gap-1.5">
+                                        <span id="photoBadgeTag" class="px-2 py-0.5 rounded bg-black/75 backdrop-blur text-[10px] font-bold text-sky-300 border border-sky-500/40 flex items-center gap-1">
+                                            <i data-lucide="aperture" class="w-3 h-3 text-sky-400"></i> Field Evidence
+                                        </span>
+                                    </div>
+
+                                    <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                                        <button type="button" id="removePhotoBtn" class="px-2 py-1 bg-rose-950/80 hover:bg-rose-900/90 text-rose-300 rounded border border-rose-500/40 text-[10px] font-semibold transition flex items-center gap-1 shadow-sm backdrop-blur">
+                                            <i data-lucide="trash-2" class="w-3 h-3 text-rose-400"></i> Remove
+                                        </button>
+                                    </div>
+
+                                    <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] text-gray-300 bg-black/60 backdrop-blur px-2.5 py-1 rounded border border-white/10">
+                                        <span id="photoMetaText">1280 × 720 &bull; Ready for AI Check</span>
+                                        <span class="text-cyan-300 font-semibold flex items-center gap-1">
+                                            <i data-lucide="sparkles" class="w-3 h-3 text-cyan-400"></i> Drishti Vision v1.4
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Vision Risk Evaluation Interface -->
+                            <div id="aiRiskCard" class="bg-slate-950/80 rounded-lg p-3 border border-slate-800 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                                        <b class="text-white text-xs">AI VISION HAZARD ASSESSMENT</b>
+                                    </div>
+                                    <span id="aiRiskBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-gray-400 border border-slate-700">
+                                        Awaiting Image...
+                                    </span>
+                                </div>
+
+                                <!-- Risk Score Meter -->
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-[11px]">
+                                        <span class="text-gray-400">Evaluated Geotechnical Threat Level:</span>
+                                        <b id="aiRiskPercent" class="text-gray-200">--%</b>
+                                    </div>
+                                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                        <div id="aiRiskMeter" class="h-full rounded-full transition-all duration-700 ease-out" style="width:0%;background:#38bdf8"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Detected Geological Indicators -->
+                                <div id="aiFeaturesList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[10px] text-gray-300 pt-1">
+                                    <div class="bg-slate-900/60 p-1.5 rounded border border-slate-800 flex items-center gap-1.5">
+                                        <span class="text-gray-500">&bull;</span>
+                                        <span id="aiFeatDebris">Debris Displacement: Awaiting photo</span>
+                                    </div>
+                                    <div class="bg-slate-900/60 p-1.5 rounded border border-slate-800 flex items-center gap-1.5">
+                                        <span class="text-gray-500">&bull;</span>
+                                        <span id="aiFeatCarriage">Carriageway Status: Awaiting photo</span>
+                                    </div>
+                                </div>
+
+                                <!-- AI Advisory Box -->
+                                <div id="aiAdvisoryBox" class="p-2 rounded bg-slate-900/90 border border-slate-800 text-[11px] text-gray-300 leading-snug">
+                                    <span class="text-gray-400 font-semibold">AI Safety Guidance:</span>
+                                    <span id="aiAdvisoryText">Upload or capture a photo above to evaluate rockfall mass, ground shear, and road passability.</span>
+                                </div>
+                            </div>
+
+                            <!-- Sample Incident Photos Strip (Quick Testing for Users) -->
+                            <div class="pt-1">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider flex items-center gap-1">
+                                        <i data-lucide="layers" class="w-3 h-3 text-sky-400"></i> Or test with sample incident photos:
+                                    </span>
+                                    <span class="text-[9px] text-gray-500">1-click AI verify</span>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1.5">
+                                    <button type="button" data-sample="rockfall" class="sample-photo-card p-1 rounded-lg bg-slate-950 border border-slate-800 text-left transition hover:border-sky-400">
+                                        <div class="h-10 rounded bg-red-950/40 border border-red-500/30 flex items-center justify-center text-xs">🪨</div>
+                                        <span class="text-[9px] text-gray-300 block truncate mt-1 font-medium">NH-10 Rockfall</span>
+                                        <span class="text-[8px] text-red-400 font-bold block">CRITICAL</span>
+                                    </button>
+                                    <button type="button" data-sample="fissure" class="sample-photo-card p-1 rounded-lg bg-slate-950 border border-slate-800 text-left transition hover:border-sky-400">
+                                        <div class="h-10 rounded bg-amber-950/40 border border-yellow-500/30 flex items-center justify-center text-xs">⚡</div>
+                                        <span class="text-[9px] text-gray-300 block truncate mt-1 font-medium">Road Fissure</span>
+                                        <span class="text-[8px] text-yellow-400 font-bold block">WATCH</span>
+                                    </button>
+                                    <button type="button" data-sample="mudflow" class="sample-photo-card p-1 rounded-lg bg-slate-950 border border-slate-800 text-left transition hover:border-sky-400">
+                                        <div class="h-10 rounded bg-red-950/40 border border-red-500/30 flex items-center justify-center text-xs">🌧️</div>
+                                        <span class="text-[9px] text-gray-300 block truncate mt-1 font-medium">Slurry Mudflow</span>
+                                        <span class="text-[8px] text-red-400 font-bold block">CRITICAL</span>
+                                    </button>
+                                    <button type="button" data-sample="stable" class="sample-photo-card p-1 rounded-lg bg-slate-950 border border-slate-800 text-left transition hover:border-sky-400">
+                                        <div class="h-10 rounded bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-center text-xs">🌿</div>
+                                        <span class="text-[9px] text-gray-300 block truncate mt-1 font-medium">Stable Retaining</span>
+                                        <span class="text-[8px] text-emerald-400 font-bold block">LOW / SAFE</span>
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
-                        <div>
-                            <label for="reportPhoto" class="block text-gray-300 font-semibold mb-1">Upload Photo / Evidence</label>
-                            <input id="reportPhoto" type="file" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-gray-400 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:bg-emerald-600 file:text-white file:cursor-pointer">
-                        </div>
                     </div>
 
-                    <div>
-                        <label for="reportDescription" class="block text-gray-300 font-semibold mb-1">Hazard Details &amp; Observations</label>
-                        <textarea id="reportDescription" rows="3" placeholder="Describe the size of the landslide, weather conditions, whether vehicles are stranded, or any visible widening of fissures..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+
+                <!-- Bottom Section: Recent Community Incident Feed -->
+                <div class="mt-6 pt-4 border-t border-slate-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider">
+                            <i data-lucide="history" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            Recent Citizen Reports &amp; Ground Observations
+                        </h4>
+                        <span id="citizenReportCountBadge" class="text-[10px] text-gray-400">2 Verified Field Incidents</span>
                     </div>
 
-                    <div class="flex items-center justify-between pt-2">
-                        <button type="submit" id="submitReportBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg font-semibold flex items-center gap-2 transition shadow-md">
-                            <i data-lucide="send" class="w-4 h-4"></i> Submit Citizen Hazard Report
-                        </button>
-                        <span class="text-[11px] text-gray-500">Instantly verified and plotted on the map</span>
+                    <div id="recentReportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <!-- Dynamic rendering of citizen reports with photo thumbnails -->
                     </div>
-                </form>
-
-                <!-- Dynamic Report Success Feedback -->
-                <div id="reportSuccessAlert" class="hidden mt-4 p-3.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">
-                    <div class="flex items-center gap-2 font-bold text-xs">
-                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
-                        <span>Hazard Report Verified &amp; Plotted on Map</span>
-                    </div>
-                    <p id="reportSuccessMsg" class="text-[11px] text-gray-300 mt-1"></p>
                 </div>
             </div>
 
         </div>
+
+    <!-- Live Camera Viewfinder Modal -->
+    <div id="cameraModal" class="camera-modal hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-4 max-w-md w-full shadow-2xl space-y-3 relative">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <b class="text-white text-xs font-semibold">LIVE CAMERA VIEWFINDER</b>
+                </div>
+                <button type="button" id="closeCameraModalBtn" class="text-gray-400 hover:text-white transition p-1">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="relative rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-800">
+                <video id="webcamVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                <canvas id="webcamCanvas" class="hidden"></canvas>
+                <!-- Reticle crosshair -->
+                <div class="absolute inset-0 pointer-events-none border border-cyan-400/20 m-4 rounded flex items-center justify-center">
+                    <div class="w-8 h-8 border-t-2 border-b-2 border-l-2 border-r-2 border-cyan-400/50 rounded-full"></div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+                <span class="text-[11px] text-gray-400">Position incident in frame</span>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="switchCameraBtn" class="p-2 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-lg transition" title="Switch Camera">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" id="captureFrameBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/30">
+                        <i data-lucide="camera" class="w-4 h-4"></i> Snap Incident Photo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="incidentToast" class="incident-toast" role="status" aria-live="polite"></div>
 

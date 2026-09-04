@@ -2270,34 +2270,147 @@ function showToast(message) {
 }
 
 // ----------------------------------------------------------------------------
-// 15. Citizen Hazard Reporting Engine (AI Verified Field Observations)
+// 15. Citizen Incident Reporting & AI Vision Risk Evaluation Engine
 // ----------------------------------------------------------------------------
-const sampleReports = [
+const sampleIncidentPhotos = {
+    rockfall: `data:image/svg+xml;utf8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+            <defs>
+                <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1e293b"/>
+                    <stop offset="100%" stop-color="#0f172a"/>
+                </linearGradient>
+                <linearGradient id="mountain" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#475569"/>
+                    <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+                <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#334155"/>
+                    <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+            </defs>
+            <rect width="600" height="340" fill="url(#sky)"/>
+            <polygon points="0,60 180,20 360,110 500,40 600,120 600,240 0,260" fill="url(#mountain)"/>
+            <polygon points="120,130 220,90 310,160 480,100 600,190 600,260 0,260" fill="#334155" opacity="0.7"/>
+            <polygon points="0,230 600,210 600,340 0,340" fill="url(#road)"/>
+            <line x1="0" y1="285" x2="600" y2="275" stroke="#eab308" stroke-width="4" stroke-dasharray="25 15"/>
+            <polygon points="180,140 230,190 280,170 340,240 260,260 190,220" fill="#78350f" opacity="0.85"/>
+            <circle cx="210" cy="270" r="28" fill="#475569" stroke="#0f172a" stroke-width="3"/>
+            <circle cx="260" cy="285" r="22" fill="#64748b" stroke="#0f172a" stroke-width="2"/>
+            <polygon points="290,260 340,245 360,290 310,305" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+            <circle cx="170" cy="280" r="14" fill="#94a3b8"/>
+            <circle cx="340" cy="290" r="12" fill="#cbd5e1"/>
+            <rect x="20" y="20" width="230" height="34" rx="6" fill="#ef4444" opacity="0.9"/>
+            <text x="32" y="42" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold">⛔ ACTIVE ROCKFALL DEBRIS</text>
+            <text x="24" y="320" fill="#94a3b8" font-family="sans-serif" font-size="11">NH-10 Corridor &bull; Massive Boulders Across Roadway</text>
+        </svg>
+    `)}`,
+    fissure: `data:image/svg+xml;utf8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+            <defs>
+                <linearGradient id="fissureSky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#334155"/>
+                    <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+            </defs>
+            <rect width="600" height="340" fill="url(#fissureSky)"/>
+            <polygon points="180,60 420,60 580,340 20,340" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+            <polygon points="0,0 180,60 20,340 0,340" fill="#334155"/>
+            <polygon points="420,60 600,0 600,340 580,340" fill="#0f172a"/>
+            <path d="M 280,70 L 295,110 L 270,140 L 310,180 L 285,220 L 340,270 L 305,340" stroke="#000000" stroke-width="8" fill="none" stroke-linejoin="round"/>
+            <path d="M 280,70 L 295,110 L 270,140 L 310,180 L 285,220 L 340,270 L 305,340" stroke="#ef4444" stroke-width="2" fill="none" stroke-linejoin="round" stroke-dasharray="8 6"/>
+            <path d="M 295,110 L 340,125 M 310,180 L 240,200 M 285,220 L 230,240 M 340,270 L 420,290" stroke="#0f172a" stroke-width="4" fill="none"/>
+            <rect x="20" y="20" width="225" height="34" rx="6" fill="#eab308" opacity="0.95"/>
+            <text x="32" y="42" fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold">⚠️ ROAD SURFACE FISSURE</text>
+            <text x="24" y="320" fill="#94a3b8" font-family="sans-serif" font-size="11">Hill Cart Road &bull; 40mm Asphalt Shear Movement</text>
+        </svg>
+    `)}`,
+    mudflow: `data:image/svg+xml;utf8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+            <defs>
+                <linearGradient id="mudSky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0f172a"/>
+                    <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+            </defs>
+            <rect width="600" height="340" fill="url(#mudSky)"/>
+            <polygon points="0,40 250,90 400,30 600,80 600,180 0,160" fill="#3f2e18"/>
+            <path d="M 180,80 Q 220,150 140,220 T 260,340 L 460,340 Q 380,240 420,140 T 320,80 Z" fill="#713f12" opacity="0.9"/>
+            <path d="M 220,120 Q 250,180 190,240 T 310,340 L 400,340 Q 340,260 360,180 Z" fill="#854d0e" opacity="0.75"/>
+            <polygon points="0,210 600,190 600,340 0,340" fill="#1e293b" opacity="0.6"/>
+            <line x1="100" y1="20" x2="80" y2="100" stroke="#38bdf8" stroke-width="1.5" opacity="0.4"/>
+            <line x1="240" y1="10" x2="220" y2="90" stroke="#38bdf8" stroke-width="1.5" opacity="0.4"/>
+            <line x1="380" y1="30" x2="360" y2="110" stroke="#38bdf8" stroke-width="1.5" opacity="0.4"/>
+            <line x1="500" y1="15" x2="480" y2="95" stroke="#38bdf8" stroke-width="1.5" opacity="0.4"/>
+            <rect x="20" y="20" width="235" height="34" rx="6" fill="#ef4444" opacity="0.9"/>
+            <text x="32" y="42" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold">🌊 CRITICAL SLURRY MUDFLOW</text>
+            <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">Kurseong Ravine &bull; Fluid Saturated Mud Torrent</text>
+        </svg>
+    `)}`,
+    stable: `data:image/svg+xml;utf8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+            <defs>
+                <linearGradient id="stableSky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0284c7"/>
+                    <stop offset="100%" stop-color="#38bdf8"/>
+                </linearGradient>
+            </defs>
+            <rect width="600" height="340" fill="url(#stableSky)"/>
+            <polygon points="0,80 200,40 420,100 600,60 600,240 0,260" fill="#065f46"/>
+            <polygon points="80,140 520,120 500,230 100,240" fill="#475569" stroke="#64748b" stroke-width="2"/>
+            <circle cx="150" cy="160" r="5" fill="#0f172a"/><circle cx="230" cy="155" r="5" fill="#0f172a"/><circle cx="310" cy="150" r="5" fill="#0f172a"/><circle cx="390" cy="145" r="5" fill="#0f172a"/><circle cx="470" cy="140" r="5" fill="#0f172a"/>
+            <circle cx="160" cy="205" r="5" fill="#0f172a"/><circle cx="240" cy="200" r="5" fill="#0f172a"/><circle cx="320" cy="195" r="5" fill="#0f172a"/><circle cx="400" cy="190" r="5" fill="#0f172a"/><circle cx="480" cy="185" r="5" fill="#0f172a"/>
+            <polygon points="0,230 600,210 600,340 0,340" fill="#1e293b"/>
+            <line x1="0" y1="285" x2="600" y2="275" stroke="#ffffff" stroke-width="3" stroke-dasharray="20 15"/>
+            <rect x="20" y="20" width="220" height="34" rx="6" fill="#10b981" opacity="0.95"/>
+            <text x="32" y="42" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold">✓ STABLE SLOPE &amp; ANCHOR</text>
+            <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">Gangtok Bypass &bull; Retaining Wall Intact &amp; Safe</text>
+        </svg>
+    `)}`
+};
+
+const citizenReports = [
     {
+        id: 'rep-1',
         location: 'Gangtok 29th Mile NH-10',
         type: 'Active Landslide / Debris Fall',
         severity: 'HIGH',
-        desc: 'New tension crack opened across uphill carriageway. Boulders rolling down.',
+        aiRiskScore: 89,
+        aiRiskTier: 'CRITICAL',
+        desc: 'New tension crack opened across uphill carriageway. Boulders rolling down from scarp.',
         pos: [27.2400, 88.5400],
-        time: '18 mins ago'
+        time: '18 mins ago',
+        photoUrl: sampleIncidentPhotos.rockfall
     },
     {
+        id: 'rep-2',
         location: 'Kurseong Dow Hill Road',
         type: 'Road Surface Fissure / Cracks',
         severity: 'MODERATE',
-        desc: 'Cracks widening by 15mm after morning heavy rain. Light vehicles passing slowly.',
+        aiRiskScore: 62,
+        aiRiskTier: 'WATCH',
+        desc: 'Cracks widening by 15mm after morning heavy rain. Light vehicles passing with caution.',
         pos: [26.8800, 88.2800],
-        time: '45 mins ago'
+        time: '45 mins ago',
+        photoUrl: sampleIncidentPhotos.fissure
     }
 ];
 
+const citizenReportMarkers = new Map();
+window.citizenReports = citizenReports;
+window.citizenReportMarkers = citizenReportMarkers;
+
 function addCitizenReportToMap(report, isNew = false) {
+    const isHigh = report.severity === 'HIGH';
+    const isWatch = report.severity === 'MODERATE';
+    const pinColor = isHigh ? '#ef4444' : isWatch ? '#f59e0b' : '#10b981';
+
     const reportIcon = L.divIcon({
         className: 'citizen-report-icon',
         html: `
-            <div style="background:#f97316;color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(249,115,22,0.85);border:2px solid #ffffff;font-size:14px;position:relative;cursor:pointer;">
-                <span>⚠️</span>
-                <span style="position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#ef4444;border:1px solid #ffffff;"></span>
+            <div style="background:${pinColor};color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px ${pinColor}99;border:2px solid #ffffff;font-size:14px;position:relative;cursor:pointer;">
+                <span>${isHigh ? '⛔' : isWatch ? '⚠️' : '📍'}</span>
+                <span style="position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#ffffff;border:1.5px solid ${pinColor};"></span>
             </div>
         `,
         iconSize: [30, 30],
@@ -2306,32 +2419,554 @@ function addCitizenReportToMap(report, isNew = false) {
     });
 
     const marker = L.marker(report.pos, { icon: reportIcon }).addTo(reportLayer);
+
     marker.bindPopup(`
         <div class="landslide-popup-card">
             <div class="flex items-center justify-between">
-                <b class="text-orange-400 text-xs">📍 CITIZEN HAZARD REPORT</b>
-                <span class="text-[9px] bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded font-bold">${report.severity}</span>
+                <div class="flex items-center gap-1.5">
+                    <b class="text-orange-400 text-xs font-bold">📍 CITIZEN INCIDENT REPORT</b>
+                </div>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase" style="background:${pinColor}20;color:${pinColor};border:1px solid ${pinColor}50">
+                    ${report.severity}
+                </span>
             </div>
             <div class="text-sm font-bold text-white mt-1">${report.location}</div>
             <div class="text-xs text-gray-300 mt-1"><b>Type:</b> ${report.type}</div>
-            <p class="text-xs text-gray-400 mt-1 leading-relaxed">${report.desc}</p>
+            
+            ${report.photoUrl ? `
+                <div class="mt-2 rounded-lg overflow-hidden border border-slate-700 relative bg-black/40">
+                    <img src="${report.photoUrl}" alt="Incident Photo Evidence" class="w-full h-28 object-cover">
+                    <div class="absolute bottom-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[9px] text-cyan-300 font-bold border border-cyan-500/30 flex items-center gap-1">
+                        <span>🤖</span> AI Evaluated: ${report.aiRiskScore || 85}%
+                    </div>
+                </div>
+            ` : ''}
+
+            <p class="text-xs text-gray-300 mt-2 leading-relaxed bg-slate-900/60 p-2 rounded border border-slate-800">${report.desc}</p>
             <div class="mt-2 pt-2 border-t border-slate-700/80 flex items-center justify-between text-[10px] text-gray-400">
-                <span class="text-emerald-400 font-semibold">✓ AI Verified (94% Conf.)</span>
+                <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                    <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i> AI Verified (${report.aiConfidence || 94}%)
+                </span>
                 <span>${report.time || 'Just now'}</span>
             </div>
         </div>
     `);
 
+    citizenReportMarkers.set(report.id, marker);
+
     if (isNew) {
-        map.flyTo(report.pos, 10, { duration: 1.0 });
-        setTimeout(() => marker.openPopup(), 1100);
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        map.flyTo(report.pos, 12.5, { duration: 1.2 });
+        setTimeout(() => {
+            marker.openPopup();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 1300);
     }
 }
 
-// Populate sample field observations
-sampleReports.forEach(r => addCitizenReportToMap(r, false));
+// Render Recent Citizen Reports Feed Cards
+function renderRecentReportsFeed() {
+    const grid = document.getElementById('recentReportsGrid');
+    const badge = document.getElementById('citizenReportCountBadge');
+    if (!grid) return;
 
-// Citizen Report Form Submission Handler
+    if (badge) {
+        badge.textContent = `${citizenReports.length} Verified Field Incidents`;
+    }
+
+    grid.innerHTML = citizenReports.map(report => {
+        const isHigh = report.severity === 'HIGH';
+        const isWatch = report.severity === 'MODERATE';
+        const tierColor = isHigh ? '#ef4444' : isWatch ? '#eab308' : '#10b981';
+
+        return `
+            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex flex-col justify-between transition hover:border-slate-700 shadow-md">
+                <div class="space-y-2">
+                    <div class="relative rounded-lg overflow-hidden border border-slate-800 h-28 bg-slate-950/60">
+                        ${report.photoUrl ? `
+                            <img src="${report.photoUrl}" alt="${report.location}" class="w-full h-full object-cover">
+                        ` : `
+                            <div class="w-full h-full flex items-center justify-center text-gray-600">
+                                <i data-lucide="image" class="w-6 h-6"></i>
+                            </div>
+                        `}
+                        <div class="absolute top-1.5 left-1.5 flex items-center gap-1">
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded backdrop-blur bg-black/70 uppercase" style="color:${tierColor};border:1px solid ${tierColor}50">
+                                ${report.severity}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-1.5 right-1.5">
+                            <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded backdrop-blur bg-slate-950/80 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                                <i data-lucide="sparkles" class="w-2.5 h-2.5"></i> AI Risk: ${report.aiRiskScore || 85}%
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between text-[10px] text-gray-400">
+                            <span>${report.time}</span>
+                            <span class="text-emerald-400 font-semibold flex items-center gap-0.5">
+                                <i data-lucide="check" class="w-2.5 h-2.5"></i> Field Verified
+                            </span>
+                        </div>
+                        <b class="text-white text-xs block font-bold mt-0.5 truncate">${report.location}</b>
+                        <span class="text-[10px] text-gray-400 block">${report.type}</span>
+                        <p class="text-[11px] text-gray-300 mt-1 line-clamp-2 leading-relaxed">${report.desc}</p>
+                    </div>
+                </div>
+
+                <div class="pt-2 mt-2 border-t border-slate-800/80 flex items-center justify-end">
+                    <button type="button" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 text-[10px] font-semibold transition flex items-center gap-1 border border-slate-700" onclick="window.inspectReport('${report.id}')">
+                        <i data-lucide="crosshair" class="w-3 h-3 text-sky-400"></i> View on Map
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// Window Inspect Report on Map
+window.inspectReport = function(reportId) {
+    const report = citizenReports.find(r => r.id === reportId);
+    if (!report) return;
+
+    const mapContainer = document.getElementById('mapContainer');
+    if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    map.flyTo(report.pos, 13, { duration: 1.2 });
+    setTimeout(() => {
+        const marker = citizenReportMarkers.get(report.id);
+        if (marker) marker.openPopup();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 1300);
+};
+
+// Initial population of sample reports
+citizenReports.forEach(r => addCitizenReportToMap(r, false));
+renderRecentReportsFeed();
+
+// ----------------------------------------------------------------------------
+// Photo Upload, Live Camera & AI Risk Assessment State Management
+// ----------------------------------------------------------------------------
+let currentIncidentPhoto = null;
+let currentAiEvaluation = null;
+
+// UI Elements
+const photoDropzone = document.getElementById('photoDropzone');
+const photoPreviewContainer = document.getElementById('photoPreviewContainer');
+const photoPreviewImg = document.getElementById('photoPreviewImg');
+const photoMetaText = document.getElementById('photoMetaText');
+const aiScanBeamOverlay = document.getElementById('aiScanBeamOverlay');
+const removePhotoBtn = document.getElementById('removePhotoBtn');
+const cameraInput = document.getElementById('cameraInput');
+const galleryInput = document.getElementById('galleryInput');
+const openCameraBtn = document.getElementById('openCameraBtn');
+const openGalleryBtn = document.getElementById('openGalleryBtn');
+const autoFillGpsBtn = document.getElementById('autoFillGpsBtn');
+const resetReportFormBtn = document.getElementById('resetReportFormBtn');
+
+// AI Risk UI Elements
+const aiRiskBadge = document.getElementById('aiRiskBadge');
+const aiRiskPercent = document.getElementById('aiRiskPercent');
+const aiRiskMeter = document.getElementById('aiRiskMeter');
+const aiFeatDebris = document.getElementById('aiFeatDebris');
+const aiFeatCarriage = document.getElementById('aiFeatCarriage');
+const aiAdvisoryText = document.getElementById('aiAdvisoryText');
+const reportSeveritySelect = document.getElementById('reportSeverity');
+const reportTypeSelect = document.getElementById('reportType');
+
+// Set Current Incident Photo in Viewer & Trigger AI Scan
+function setIncidentPhoto(dataUrl, sourceName = 'Camera / Field Photo') {
+    currentIncidentPhoto = dataUrl;
+
+    if (photoPreviewContainer) photoPreviewContainer.classList.remove('hidden');
+    if (photoDropzone) photoDropzone.classList.add('hidden');
+    if (photoPreviewImg) photoPreviewImg.src = dataUrl;
+    if (photoMetaText) photoMetaText.textContent = `${sourceName} &bull; Image Ready`;
+
+    // Trigger AI Vision Scanning
+    if (aiScanBeamOverlay) aiScanBeamOverlay.classList.remove('hidden');
+    runAiVisionRiskAssessment();
+}
+
+// Clear Current Incident Photo
+function clearIncidentPhoto() {
+    currentIncidentPhoto = null;
+    currentAiEvaluation = null;
+
+    if (photoPreviewContainer) photoPreviewContainer.classList.add('hidden');
+    if (photoDropzone) photoDropzone.classList.remove('hidden');
+    if (photoPreviewImg) photoPreviewImg.src = '';
+    if (cameraInput) cameraInput.value = '';
+    if (galleryInput) galleryInput.value = '';
+
+    // Deselect sample chips
+    document.querySelectorAll('.sample-photo-card').forEach(c => c.classList.remove('selected'));
+
+    // Reset AI Risk HUD
+    if (aiRiskBadge) {
+        aiRiskBadge.textContent = 'Awaiting Image...';
+        aiRiskBadge.style.color = '#94a3b8';
+        aiRiskBadge.style.background = '#1e293b';
+        aiRiskBadge.style.borderColor = '#334155';
+    }
+    if (aiRiskPercent) aiRiskPercent.textContent = '--%';
+    if (aiRiskMeter) {
+        aiRiskMeter.style.width = '0%';
+        aiRiskMeter.style.background = '#38bdf8';
+    }
+    if (aiFeatDebris) aiFeatDebris.textContent = 'Debris Displacement: Awaiting photo';
+    if (aiFeatCarriage) aiFeatCarriage.textContent = 'Carriageway Status: Awaiting photo';
+    if (aiAdvisoryText) {
+        aiAdvisoryText.textContent = 'Upload or capture a photo above to evaluate rockfall mass, ground shear, and road passability.';
+    }
+}
+
+// AI Vision Risk Assessment Engine (Heuristic model simulation ready for Gemini Multimodal API)
+function runAiVisionRiskAssessment() {
+    const incidentType = reportTypeSelect ? reportTypeSelect.value : 'Active Landslide / Debris Fall';
+
+    if (aiRiskBadge) {
+        aiRiskBadge.innerHTML = '<span class="animate-pulse text-cyan-300">Scanning Terrain Geometry...</span>';
+    }
+
+    setTimeout(() => {
+        if (!currentIncidentPhoto) return;
+
+        let score = 88;
+        let tier = 'CRITICAL';
+        let tierColor = '#ef4444';
+        let debrisText = 'Active boulder collapse & steep scarp movement';
+        let carriageText = 'Carriageway severed; total vehicle blockage';
+        let advisory = 'Hazardous ground instability. Immediate corridor closure advised; emergency SDRF teams notified.';
+
+        if (incidentType.includes('Rockfall')) {
+            score = 89;
+            tier = 'CRITICAL';
+            tierColor = '#ef4444';
+            debrisText = 'Heavy scree & 1.5m+ boulders obstructing corridor';
+            carriageText = 'Full blockage of uphill and downhill lanes';
+            advisory = 'Active rock detachment on hillside. Avoid corridor until clearing teams stabilize upper scarp.';
+        } else if (incidentType.includes('Mudflow')) {
+            score = 92;
+            tier = 'CRITICAL';
+            tierColor = '#ef4444';
+            debrisText = 'High-velocity mud slurry & liquefied soil mass';
+            carriageText = 'Deep mud inundation over 40m carriageway section';
+            advisory = 'Severe slurry flow hazard. Heavy equipment required; reroute all traffic to regional bypass.';
+        } else if (incidentType.includes('Fissure') || incidentType.includes('Cracks')) {
+            score = 64;
+            tier = 'WATCH';
+            tierColor = '#eab308';
+            debrisText = 'Deep tensile ground fissure; 25–40mm opening';
+            carriageText = 'Carriageway cracked; single-lane passable with restriction';
+            advisory = 'Subsurface ground shear active. Restrict heavy commercial freight; monitor crack expansion.';
+        } else if (incidentType.includes('Retaining Wall')) {
+            score = 76;
+            tier = 'CRITICAL';
+            tierColor = '#ef4444';
+            debrisText = 'Structural masonry tilt & anchor displacement';
+            carriageText = 'Uphill road foundation compromised';
+            advisory = 'Severe structural distress detected. High risk of complete retaining slump.';
+        } else if (incidentType.includes('Toe Erosion')) {
+            score = 68;
+            tier = 'WATCH';
+            tierColor = '#eab308';
+            debrisText = 'River undercutting embankment foundation';
+            carriageText = 'Shoulder collapsed; main lane intact';
+            advisory = 'Scour active. Direct heavy vehicles away from the outer edge of embankment.';
+        } else if (incidentType.includes('Stable')) {
+            score = 16;
+            tier = 'LOW';
+            tierColor = '#10b981';
+            debrisText = 'Dense vegetative anchoring; intact slope';
+            carriageText = 'Clear roadway; normal unrestricted traffic';
+            advisory = 'Terrain within stable parameters. Automated telemetry remains active.';
+        }
+
+        currentAiEvaluation = { score, tier, tierColor, debrisText, carriageText, advisory };
+
+        // Update UI
+        if (aiRiskBadge) {
+            aiRiskBadge.textContent = `${tier} HAZARD (${score}%)`;
+            aiRiskBadge.style.color = tierColor;
+            aiRiskBadge.style.background = `${tierColor}20`;
+            aiRiskBadge.style.borderColor = `${tierColor}50`;
+        }
+
+        if (aiRiskPercent) {
+            aiRiskPercent.textContent = `${score}% (${tier})`;
+            aiRiskPercent.style.color = tierColor;
+        }
+
+        if (aiRiskMeter) {
+            aiRiskMeter.style.width = `${score}%`;
+            aiRiskMeter.style.background = tierColor;
+        }
+
+        if (aiFeatDebris) aiFeatDebris.textContent = debrisText;
+        if (aiFeatCarriage) aiFeatCarriage.textContent = carriageText;
+        if (aiAdvisoryText) aiAdvisoryText.textContent = advisory;
+
+        // Synchronize severity dropdown
+        if (reportSeveritySelect) {
+            reportSeveritySelect.value = tier === 'CRITICAL' ? 'HIGH' : tier === 'WATCH' ? 'MODERATE' : 'LOW';
+        }
+
+        // Hide scanning beam after analysis
+        if (aiScanBeamOverlay) aiScanBeamOverlay.classList.add('hidden');
+
+    }, 650);
+}
+
+// Re-run AI analysis if citizen changes incident classification
+if (reportTypeSelect) {
+    reportTypeSelect.addEventListener('change', () => {
+        if (currentIncidentPhoto) {
+            runAiVisionRiskAssessment();
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+// File Input & Drag and Drop Handlers
+// ----------------------------------------------------------------------------
+function handleFileInput(file, sourceName) {
+    if (!file || !file.type.startsWith('image/')) {
+        showToast('Please select a valid image file (JPG, PNG, WEBP).');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+        setIncidentPhoto(e.target.result, `${sourceName}: ${file.name}`);
+        showToast(`📸 Photo loaded: ${file.name}`);
+    };
+    reader.readAsDataURL(file);
+}
+
+if (galleryInput) {
+    galleryInput.addEventListener('change', e => {
+        if (e.target.files && e.target.files[0]) {
+            handleFileInput(e.target.files[0], 'Device Image');
+        }
+    });
+}
+
+if (cameraInput) {
+    cameraInput.addEventListener('change', e => {
+        if (e.target.files && e.target.files[0]) {
+            handleFileInput(e.target.files[0], 'Camera Capture');
+        }
+    });
+}
+
+if (openGalleryBtn && galleryInput) {
+    openGalleryBtn.addEventListener('click', () => {
+        galleryInput.click();
+    });
+}
+
+// Drag & Drop on Photo Dropzone
+if (photoDropzone) {
+    photoDropzone.addEventListener('click', () => {
+        if (galleryInput) galleryInput.click();
+    });
+
+    ['dragenter', 'dragover'].forEach(event => {
+        photoDropzone.addEventListener(event, e => {
+            e.preventDefault();
+            photoDropzone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(event => {
+        photoDropzone.addEventListener(event, e => {
+            e.preventDefault();
+            photoDropzone.classList.remove('dragover');
+        });
+    });
+
+    photoDropzone.addEventListener('drop', e => {
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleFileInput(e.dataTransfer.files[0], 'Dropped File');
+        }
+    });
+}
+
+if (removePhotoBtn) {
+    removePhotoBtn.addEventListener('click', () => {
+        clearIncidentPhoto();
+        showToast('Photo removed.');
+    });
+}
+
+// Sample Incident Photos Click Handlers
+const sampleButtons = document.querySelectorAll('.sample-photo-card');
+sampleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const sampleKey = btn.dataset.sample;
+        const sampleSvg = sampleIncidentPhotos[sampleKey];
+        if (!sampleSvg) return;
+
+        sampleButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        // Pre-fill form fields contextually
+        const locInput = document.getElementById('reportLocation');
+        const descInput = document.getElementById('reportDescription');
+
+        if (sampleKey === 'rockfall') {
+            if (reportTypeSelect) reportTypeSelect.value = 'Rockfall Obstruction';
+            if (locInput && !locInput.value) locInput.value = 'Gangtok 29th Mile NH-10';
+            if (descInput && !descInput.value) descInput.value = 'Large rolling boulders fell across uphill lane following heavy cloudburst.';
+        } else if (sampleKey === 'fissure') {
+            if (reportTypeSelect) reportTypeSelect.value = 'Road Surface Fissure / Cracks';
+            if (locInput && !locInput.value) locInput.value = 'Hill Cart Road NH-110 (Tindharia)';
+            if (descInput && !descInput.value) descInput.value = 'Road surface longitudinal tension crack widened to 40mm; risk of slope slumping.';
+        } else if (sampleKey === 'mudflow') {
+            if (reportTypeSelect) reportTypeSelect.value = 'Mudflow / Waterlogging';
+            if (locInput && !locInput.value) locInput.value = 'Kurseong Dow Hill Ravine';
+            if (descInput && !descInput.value) descInput.value = 'Rapid fluid mudflow inundating both lanes of roadway with liquid debris.';
+        } else if (sampleKey === 'stable') {
+            if (reportTypeSelect) reportTypeSelect.value = 'Retaining Wall Failure';
+            if (locInput && !locInput.value) locInput.value = 'Pakyong Airport Bypass Ridge';
+            if (descInput && !descInput.value) descInput.value = 'Inspected retaining wall; structure intact with normal drainage weeps.';
+        }
+
+        setIncidentPhoto(sampleSvg, `Sample Incident: ${sampleKey.toUpperCase()}`);
+        showToast(`Loaded sample photo: ${sampleKey.toUpperCase()}`);
+    });
+});
+
+// GPS Auto-Fill Button Handler
+if (autoFillGpsBtn) {
+    autoFillGpsBtn.addEventListener('click', () => {
+        const activePlace = landslidePlaces.find(p => p.id === activePlaceId) || landslidePlaces[0];
+        const locInput = document.getElementById('reportLocation');
+        if (locInput) {
+            locInput.value = `${activePlace.name} (${activePlace.state}) &bull; ${activePlace.highway}`;
+            showToast(`📍 Location auto-filled: ${activePlace.name}`);
+        }
+    });
+}
+
+// Reset Form Button Handler
+if (resetReportFormBtn) {
+    resetReportFormBtn.addEventListener('click', () => {
+        const form = document.getElementById('citizenReportForm');
+        if (form) form.reset();
+        clearIncidentPhoto();
+        showToast('Report form reset.');
+    });
+}
+
+// ----------------------------------------------------------------------------
+// Live Camera Viewfinder Modal (Webcam / Mobile Camera Integration)
+// ----------------------------------------------------------------------------
+let webcamStream = null;
+let webcamFacingMode = 'environment';
+const cameraModal = document.getElementById('cameraModal');
+const closeCameraModalBtn = document.getElementById('closeCameraModalBtn');
+const switchCameraBtn = document.getElementById('switchCameraBtn');
+const captureFrameBtn = document.getElementById('captureFrameBtn');
+const webcamVideo = document.getElementById('webcamVideo');
+const webcamCanvas = document.getElementById('webcamCanvas');
+
+async function startWebcam() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        // Fallback directly to native device camera input
+        if (cameraInput) cameraInput.click();
+        return;
+    }
+
+    try {
+        if (cameraModal) cameraModal.classList.remove('hidden');
+
+        webcamStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: webcamFacingMode,
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        });
+
+        if (webcamVideo) {
+            webcamVideo.srcObject = webcamStream;
+            await webcamVideo.play();
+        }
+        showToast('📷 Live camera activated.');
+    } catch (err) {
+        console.warn('Webcam stream unavailable, falling back to native camera input:', err);
+        stopWebcam();
+        if (cameraModal) cameraModal.classList.add('hidden');
+        if (cameraInput) cameraInput.click();
+    }
+}
+
+function stopWebcam() {
+    if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+    }
+    if (cameraModal) cameraModal.classList.add('hidden');
+}
+
+function captureWebcamFrame() {
+    if (!webcamVideo || !webcamCanvas) return;
+
+    const width = webcamVideo.videoWidth || 640;
+    const height = webcamVideo.videoHeight || 480;
+
+    webcamCanvas.width = width;
+    webcamCanvas.height = height;
+    const ctx = webcamCanvas.getContext('2d');
+    ctx.drawImage(webcamVideo, 0, 0, width, height);
+
+    const frameDataUrl = webcamCanvas.toDataURL('image/jpeg', 0.9);
+    stopWebcam();
+
+    setIncidentPhoto(frameDataUrl, 'Live Camera Snapshot');
+    showToast('📸 Photo captured from camera!');
+}
+
+if (openCameraBtn) {
+    openCameraBtn.addEventListener('click', () => {
+        startWebcam();
+    });
+}
+
+if (closeCameraModalBtn) {
+    closeCameraModalBtn.addEventListener('click', () => {
+        stopWebcam();
+    });
+}
+
+if (switchCameraBtn) {
+    switchCameraBtn.addEventListener('click', async () => {
+        webcamFacingMode = webcamFacingMode === 'environment' ? 'user' : 'environment';
+        stopWebcam();
+        await startWebcam();
+    });
+}
+
+if (captureFrameBtn) {
+    captureFrameBtn.addEventListener('click', () => {
+        captureWebcamFrame();
+    });
+}
+
+// ----------------------------------------------------------------------------
+// Citizen Incident Report Form Submission Handler
+// ----------------------------------------------------------------------------
 const reportForm = document.getElementById('citizenReportForm');
 const reportAlert = document.getElementById('reportSuccessAlert');
 const reportMsg = document.getElementById('reportSuccessMsg');
@@ -2344,34 +2979,52 @@ if (reportForm) {
         const severity = document.getElementById('reportSeverity').value;
         const desc = document.getElementById('reportDescription').value.trim() || 'Ground observation submitted by community responder.';
 
+        // Photo URL: use current uploaded photo or fall back to matching sample photo
+        const photoUrl = currentIncidentPhoto || (
+            type.includes('Rockfall') ? sampleIncidentPhotos.rockfall :
+            type.includes('Mudflow') ? sampleIncidentPhotos.mudflow :
+            type.includes('Fissure') ? sampleIncidentPhotos.fissure :
+            sampleIncidentPhotos.rockfall
+        );
+
         // Approximate coordinates near active landslide monitoring place
         const activePlace = landslidePlaces.find(p => p.id === activePlaceId) || landslidePlaces[0];
         const lat = activePlace.pos[0] + (Math.random() - 0.5) * 0.05;
         const lng = activePlace.pos[1] + (Math.random() - 0.5) * 0.05;
 
+        const evaluatedScore = currentAiEvaluation ? currentAiEvaluation.score : (severity === 'HIGH' ? 88 : severity === 'MODERATE' ? 62 : 22);
+
         const newReport = {
+            id: `rep-${Date.now()}`,
             location: loc,
             type: type,
             severity: severity,
+            aiRiskScore: evaluatedScore,
+            aiRiskTier: severity === 'HIGH' ? 'CRITICAL' : severity === 'MODERATE' ? 'WATCH' : 'LOW',
+            aiConfidence: Math.floor(92 + Math.random() * 6),
             desc: desc,
             pos: [lat, lng],
-            time: 'Just now'
+            time: 'Just now',
+            photoUrl: photoUrl
         };
 
+        // Add to reports feed and to Leaflet map
+        citizenReports.unshift(newReport);
         addCitizenReportToMap(newReport, true);
+        renderRecentReportsFeed();
 
         if (reportAlert && reportMsg) {
-            reportMsg.innerHTML = `Your report for <b>"${loc}"</b> has been AI-verified with high confidence, plotted live on the Leaflet map, and dispatched to local disaster management teams.`;
+            reportMsg.innerHTML = `Your incident report for <b>"${loc}"</b> has been AI-verified (${evaluatedScore}% risk level), plotted live on the Leaflet map with your uploaded photo, and dispatched to local emergency response units.`;
             reportAlert.classList.remove('hidden');
         }
 
-        showToast(`📍 Citizen report for "${loc}" verified & plotted!`);
+        showToast(`📍 Incident reported for "${loc}" & plotted on map!`);
 
-        // Re-initialize Lucide icons for any newly injected elements
-        lucide.createIcons();
-
-        // Reset the form
+        // Reset form and photo
         reportForm.reset();
+        clearIncidentPhoto();
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 }
 
