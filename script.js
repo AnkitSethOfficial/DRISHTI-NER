@@ -582,34 +582,35 @@ const getLevel = score => score <= 35 ? 'SAFE' : score <= 70 ? 'WATCH' : 'CRITIC
 const levelColors = { SAFE: '#10b981', WATCH: '#eab308', CRITICAL: '#ef4444' };
 
 // Bounding box covering India & the sub-Himalayan North East Region
-// [South-West: Lat 6.0°N, Lng 68.0°E] to [North-East: Lat 37.5°N, Lng 98.0°E]
-const indiaBounds = L.latLngBounds([6.0, 68.0], [37.5, 98.0]);
+const indiaBounds = L.latLngBounds([-5.0, 55.0], [42.0, 115.0]);
 const nerBounds = L.latLngBounds([21.0, 87.0], [29.8, 97.6]);
 
 const map = L.map('map', {
     zoomControl: true,
     attributionControl: true,
-    maxBounds: indiaBounds.pad(0.25),
-    maxBoundsViscosity: 0.85,
     minZoom: 4,
-    maxZoom: 18
+    maxZoom: 19
 }).setView([27.3389, 88.6065], 11); // Initial default view before live GPS lock
 
 const tileLayers = {
     topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19,
+        maxNativeZoom: 16,
         attribution: '&copy; Esri &mdash; National Geographic, DeLorme, NAVTEQ'
     }),
     voyager: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
+        maxNativeZoom: 19,
         attribution: '&copy; CARTO &copy; OpenStreetMap contributors'
     }),
     satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 18,
+        maxZoom: 19,
+        maxNativeZoom: 17,
         attribution: '&copy; Esri &mdash; Earthstar Geographics'
     }),
     osm: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
+        maxNativeZoom: 19,
         attribution: '&copy; OpenStreetMap contributors'
     })
 };
@@ -646,23 +647,133 @@ if (viewEntireNerBtn) {
 // Fullscreen / Complete Map View Handler
 const fsBtn = document.getElementById('fullscreenMapBtn');
 const mapContainer = document.getElementById('mapContainer');
+
+function invalidateMapLayout() {
+    map.invalidateSize({ pan: false });
+}
+
 if (fsBtn && mapContainer) {
     fsBtn.addEventListener('click', () => {
         mapContainer.classList.toggle('fullscreen');
         const isFs = mapContainer.classList.contains('fullscreen');
         const fsText = document.getElementById('fullscreenBtnText');
         if (fsText) fsText.textContent = isFs ? 'Exit Fullscreen' : 'View Map Completely';
-        setTimeout(() => map.invalidateSize(), 300);
+        
+        // Comprehensive multi-phase invalidateSize to guarantee tile rendering across all browsers & screen sizes
+        invalidateMapLayout();
+        requestAnimationFrame(invalidateMapLayout);
+        setTimeout(invalidateMapLayout, 50);
+        setTimeout(invalidateMapLayout, 150);
+        setTimeout(invalidateMapLayout, 300);
+        setTimeout(invalidateMapLayout, 600);
     });
 }
+
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && mapContainer && mapContainer.classList.contains('fullscreen')) {
         mapContainer.classList.remove('fullscreen');
         const fsText = document.getElementById('fullscreenBtnText');
         if (fsText) fsText.textContent = 'View Map Completely';
-        setTimeout(() => map.invalidateSize(), 300);
+        invalidateMapLayout();
+        setTimeout(invalidateMapLayout, 150);
+        setTimeout(invalidateMapLayout, 300);
     }
 });
+
+// Automatic native ResizeObserver to keep Leaflet tiles perfectly rendered on any resize/fullscreen change
+if (window.ResizeObserver) {
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+        const mapObserver = new ResizeObserver(() => {
+            invalidateMapLayout();
+        });
+        mapObserver.observe(mapEl);
+    }
+}
+window.addEventListener('resize', () => {
+    invalidateMapLayout();
+});
+
+// ----------------------------------------------------------------------------
+// 4.1 India Focus Blackout Mask (Inverse Boundary Mask Outside India)
+// ----------------------------------------------------------------------------
+let indiaMaskLayer = null;
+let indiaBorderLayer = null;
+let maskState = 'solid'; // 'solid' (0.90), 'tint' (0.55), 'off' (0)
+
+if (typeof indiaTerritoryRings !== 'undefined' && Array.isArray(indiaTerritoryRings)) {
+    // Outer polygon wrapping the globe strictly within Web Mercator EPSG:3857 limit (85.0511)
+    const worldOuterRing = [
+        [85.0, -180.0],
+        [85.0, 180.0],
+        [-85.0, 180.0],
+        [-85.0, -180.0]
+    ];
+
+    // Inverse cutout mask: outer world + India territory as cutout holes
+    const maskCoords = [worldOuterRing, ...indiaTerritoryRings];
+
+    // Hardware-accelerated canvas renderer for seamless high-zoom rendering
+    const maskCanvasRenderer = L.canvas({ padding: 0.5 });
+
+    indiaMaskLayer = L.polygon(maskCoords, {
+        renderer: maskCanvasRenderer,
+        fillColor: '#000000',
+        fillOpacity: 0.90,
+        stroke: true,
+        color: '#0284c7',
+        weight: 1.8,
+        opacity: 0.85,
+        interactive: false
+    }).addTo(map);
+
+    // Glowing border outline along India's sovereign boundary
+    indiaBorderLayer = L.polyline(indiaTerritoryRings[0], {
+        renderer: maskCanvasRenderer,
+        color: '#38bdf8',
+        weight: 2.2,
+        opacity: 0.95,
+        interactive: false,
+        dashArray: '5 5',
+        lineCap: 'round',
+        lineJoin: 'round'
+    }).addTo(map);
+}
+
+// Toggle India Blackout Mask Button
+const toggleMaskBtn = document.getElementById('toggleMaskBtn');
+const maskBtnText = document.getElementById('maskBtnText');
+
+if (toggleMaskBtn) {
+    toggleMaskBtn.addEventListener('click', () => {
+        if (!indiaMaskLayer) return;
+
+        if (maskState === 'solid') {
+            maskState = 'tint';
+            indiaMaskLayer.setStyle({ fillOpacity: 0.55, opacity: 0.6 });
+            if (maskBtnText) maskBtnText.textContent = 'India Focus: TINT';
+            toggleMaskBtn.classList.remove('text-cyan-300');
+            toggleMaskBtn.classList.add('text-yellow-300');
+            if (typeof showToast === 'function') showToast('🌓 India Mask: Medium Tint (55%)');
+        } else if (maskState === 'tint') {
+            maskState = 'off';
+            indiaMaskLayer.setStyle({ fillOpacity: 0, opacity: 0 });
+            if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.2 });
+            if (maskBtnText) maskBtnText.textContent = 'India Focus: OFF';
+            toggleMaskBtn.classList.remove('text-yellow-300');
+            toggleMaskBtn.classList.add('text-gray-400');
+            if (typeof showToast === 'function') showToast('🌐 India Mask: Disabled (Open Global Relief)');
+        } else {
+            maskState = 'solid';
+            indiaMaskLayer.setStyle({ fillOpacity: 0.90, opacity: 0.85 });
+            if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.95 });
+            if (maskBtnText) maskBtnText.textContent = 'India Focus: ON';
+            toggleMaskBtn.classList.remove('text-gray-400');
+            toggleMaskBtn.classList.add('text-cyan-300');
+            if (typeof showToast === 'function') showToast('🇮🇳 India Mask: Active (Blackout Outside India)');
+        }
+    });
+}
 
 // ----------------------------------------------------------------------------
 // 5. Layer Groups and Custom Leaflet Pulsing Markers

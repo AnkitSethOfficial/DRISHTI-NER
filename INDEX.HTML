@@ -12,6 +12,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏔️</text></svg>">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="p-4">
@@ -236,7 +239,11 @@
                             </select>
                         </div>
 
-                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <div class="flex items-center gap-1 flex-wrap">
+                            <button id="toggleMaskBtn" title="Toggle Blackout Mask Outside India" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded border border-cyan-500/40 text-xs font-semibold transition flex items-center gap-1 shadow-sm">
+                                <i data-lucide="shield" class="w-3.5 h-3.5 text-cyan-400"></i>
+                                <span id="maskBtnText">India Focus: ON</span>
+                            </button>
                             <button id="locateUserBtn" title="Detect my current location & calculate hazard tier" class="px-2 py-1 bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-300 rounded border border-emerald-500/40 text-xs font-semibold transition flex items-center gap-1 shadow-sm">
                                 <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400"></i>
                                 <span>Locate Me</span>
@@ -477,8 +484,9 @@
 
     <div id="incidentToast" class="incident-toast" role="status" aria-live="polite"></div>
 
-    <!-- Leaflet JS -->
+    <!-- Leaflet JS & India Geospatial Boundary -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="india-boundary.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
