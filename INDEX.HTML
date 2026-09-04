@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRISHTI-NER | Landslide Monitoring</title>
+    <title>DRISHTI-NER | Landslide Hazard Platform</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -17,214 +17,385 @@
 <body class="p-4">
 
     <!-- Header Section -->
-    <header class="flex flex-wrap items-center justify-between mb-6 gap-4">
+    <header class="flex flex-wrap items-center justify-between mb-5 gap-4">
         <div class="flex items-center gap-3">
-            <div class="bg-emerald-500 p-2 rounded-lg">
-                <i data-lucide="mountain-snow" class="text-white"></i>
+            <div class="bg-emerald-500 p-2.5 rounded-lg shadow-lg shadow-emerald-500/20">
+                <i data-lucide="mountain-snow" class="text-white w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">DRISHTI-NER</h1>
-                <p data-i18n="subtitle" class="text-xs text-gray-400">AI-Enabled Landslide Early Warning & Lifeline Monitoring Platform</p>
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    DRISHTI-NER
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold uppercase tracking-wider">AI Early Warning</span>
+                </h1>
+                <p data-i18n="subtitle" class="text-xs text-gray-400">AI-Enabled Landslide Early Warning &amp; Terrain Monitoring Platform (NER)</p>
             </div>
         </div>
 
         <nav class="top-navigation glass-panel rounded-lg p-1 order-3 lg:order-none w-full lg:w-auto" aria-label="Primary navigation">
             <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                <button data-nav="dashboard" class="top-nav-item active" aria-current="page">Dashboard</button>
-                <button data-nav="map" class="top-nav-item">Live Map</button>
-                <button data-nav="risk" class="top-nav-item">Risk Analysis</button>
-                <button data-nav="incidents" class="top-nav-item">Incidents</button>
-                <button data-nav="response" class="top-nav-item">Response Center</button>
-                <button data-nav="reports" class="top-nav-item">Reports</button>
-                <button data-nav="alerts" class="top-nav-alert" aria-label="Emergency alerts" title="Emergency alerts"><i data-lucide="bell" class="w-4 h-4"></i><span class="top-nav-alert-dot"></span></button>
+                <button data-nav="map" class="top-nav-item active" aria-current="page"><i data-lucide="map" class="w-3.5 h-3.5 inline mr-1"></i> Live Terrain Map</button>
+                <button data-nav="risk" class="top-nav-item"><i data-lucide="activity" class="w-3.5 h-3.5 inline mr-1"></i> Geotechnical Model</button>
+                <button data-nav="hotspots" class="top-nav-item"><i data-lucide="map-pin" class="w-3.5 h-3.5 inline mr-1"></i> Landslide Directory</button>
+                <button data-nav="reportPanel" class="top-nav-item"><i data-lucide="flag" class="w-3.5 h-3.5 inline mr-1"></i> Citizen Report</button>
             </div>
         </nav>
 
-        <div class="header-controls flex items-center gap-4 text-sm">
-            <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+        <div class="header-controls flex items-center gap-3 text-sm">
+            <div class="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700/80">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span class="text-gray-300"><span data-i18n="feeds">IMD & Satellite Feeds</span>: <b class="text-emerald-400" data-i18n="active">ACTIVE</b></span>
+                <span class="text-gray-300 text-xs">Geospatial Telemetry: <b class="text-emerald-400">ACTIVE</b></span>
             </div>
-            <select id="languageSelector" aria-label="Language" class="bg-slate-800 border border-slate-700 rounded-md px-2 py-1">
+            <select id="languageSelector" aria-label="Language" class="bg-slate-800 text-gray-200 border border-slate-700 rounded-md px-2 py-1 text-xs">
                 <option value="en">English (EN)</option>
                 <option value="bn">বাংলা (BN)</option>
                 <option value="hi">हिन्दी (HI)</option>
                 <option value="as">অসমীয়া (AS)</option>
                 <option value="ne">नेपाली (NE)</option>
             </select>
-            <button class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition">
-                <i data-lucide="presentation" class="w-4 h-4"></i> <span data-i18n="pitch">Pitch & Architecture</span>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode">
+                <i data-lucide="sun" class="theme-sun w-4 h-4"></i>
+                <i data-lucide="moon" class="theme-moon w-4 h-4"></i>
+                <span class="theme-label">Light</span>
             </button>
-            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><i data-lucide="sun" class="theme-sun w-4 h-4"></i><i data-lucide="moon" class="theme-moon w-4 h-4"></i><span class="theme-label">Light</span></button>
         </div>
     </header>
 
-    <div class="dashboard-grid grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- TOP SECTION: Left (Rain & Geotechnical Analytics) + Right (Square Leaflet Map) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6 items-start">
         
-        <!-- Left Column: Controls & Map -->
-        <div class="dashboard-left lg:col-span-7 space-y-6 self-start lg:sticky lg:top-4">
+        <!-- LEFT COLUMN: Rain Hazard Simulator + Geotechnical Model + Precipitation Forecast -->
+        <div id="riskPanelContainer" class="lg:col-span-6 space-y-4">
             
-            <!-- Rainfall Simulator -->
-            <div class="glass-panel p-5 rounded-xl">
-                <div class="flex justify-between items-center mb-4">
+            <!-- 1. Interactive Rainfall Hazard Simulator Card -->
+            <div class="glass-panel p-4 rounded-xl border border-slate-700/70 shadow-lg">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                     <div class="flex items-center gap-2">
-                        <i data-lucide="sliders-horizontal" class="w-5 h-5 text-emerald-400"></i>
-                        <h2 data-i18n="simulator" class="font-semibold">Interactive Rainfall Hazard Simulator</h2>
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-emerald-400"></i>
+                        <h2 class="font-semibold text-xs text-white uppercase tracking-wider">Interactive Rainfall Hazard Simulator</h2>
                     </div>
-                    <button id="resetSimulator" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
-                        <i data-lucide="refresh-ccw" class="w-3 h-3"></i> Reset to Live Feeds
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-bold uppercase tracking-wider">PROTOTYPE</span>
+                        <button id="resetSimulator" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
+                            <i data-lucide="refresh-ccw" class="w-3 h-3"></i> Reset
+                        </button>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                    <div class="col-span-1">
-                        <div class="flex justify-between text-xs mb-2">
-                            <span class="text-gray-400">Simulated 24h Rainfall:</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center pt-2 border-t border-slate-800">
+                    <div class="sm:col-span-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">Simulated 24h Precipitation:</span>
                             <span class="text-yellow-400 font-bold" id="rainfallVal">45 mm</span>
                         </div>
                         <input type="range" min="0" max="150" value="45" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" id="rainfallSlider">
                         <div class="flex justify-between text-[10px] text-gray-500 mt-1 uppercase">
                             <span>0mm (Dry)</span>
-                            <span>50mm (Mod)</span>
+                            <span>50mm (Moderate)</span>
                             <span>120mm+ (Cloudburst)</span>
                         </div>
                     </div>
-                    <div class="text-center border-l border-slate-700">
-                        <p class="text-[10px] text-gray-400 uppercase">Calculated Risk Tier</p>
-                        <p id="simRiskTier" class="text-yellow-500 font-bold text-lg flex items-center justify-center gap-1">
-                            <span id="simRiskDot" class="w-3 h-3 bg-yellow-500 rounded-full inline-block"></span> ADVISORY WATCH
+                    <div class="text-center sm:border-l sm:border-slate-800 pl-2">
+                        <p class="text-[10px] text-gray-400 uppercase">Simulated Risk</p>
+                        <p id="simRiskTier" class="text-yellow-500 font-bold text-xs flex items-center justify-center gap-1 mt-0.5">
+                            <span id="simRiskDot" class="w-2 h-2 bg-yellow-500 rounded-full inline-block"></span> ADVISORY WATCH
                         </p>
-                        <p id="simRiskScore" class="text-xs text-gray-500">(70/100)</p>
-                    </div>
-                    <div class="text-center border-l border-slate-700">
-                        <p class="text-[10px] text-gray-400 uppercase text-red-400">Severed Highways</p>
-                        <p class="text-red-500 font-bold text-xl">1 Corridor</p>
-                        <p class="text-xs text-red-400/70 font-semibold">Affected</p>
+                        <p id="simRiskScore" class="text-xs text-gray-400 font-semibold mt-0.5">(70/100)</p>
+                        <p id="simSeveredRoads" class="hidden">Threshold Controlled</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Map View -->
-            <div class="relative glass-panel rounded-xl overflow-hidden">
-                <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex bg-slate-900/80 p-1 rounded-lg border border-slate-700">
-                    <button data-filter="all" data-i18n="allNer" class="map-filter px-4 py-1 text-xs font-semibold bg-emerald-600 rounded-md">All NER</button>
-                    <button data-filter="critical" data-i18n="criticalOnly" class="map-filter px-4 py-1 text-xs font-semibold hover:bg-slate-700 transition rounded-md">Critical Only</button>
-                    <button data-filter="blocked" data-i18n="blockedRoads" class="map-filter px-4 py-1 text-xs font-semibold hover:bg-slate-700 transition rounded-md">Blocked Roads</button>
-                </div>
-                <div id="map"></div>
-            </div>
-
-            <!-- Live Incident & Response Center -->
-            <section id="incidentCenter" class="glass-panel rounded-xl p-4">
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-                    <div class="flex items-center gap-2"><i data-lucide="radio-tower" class="w-4 h-4 text-emerald-400"></i><h2 class="font-bold text-sm">Live Incident &amp; Response Center</h2></div>
-                    <span class="status-pill px-2 py-1 rounded text-[10px] font-semibold">LIVE</span>
-                </div>
-                <div class="incident-layout grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- 2. AI Geotechnical Landslide Model Panel (#riskPanel) -->
+            <div id="riskPanel" class="glass-panel rounded-xl p-4 border border-slate-700/70 shadow-lg">
+                <div class="flex justify-between items-start mb-2.5">
                     <div>
-                        <div class="flex items-center justify-between mb-2"><h3 class="section-kicker">ACTIVE INCIDENTS</h3><span class="text-[10px] text-gray-500">4 requiring attention</span></div>
-                        <div id="incidentList" class="space-y-2">
-                            <button class="incident-card incident-critical" data-incident="0"><div class="flex justify-between gap-2"><span class="incident-badge badge-critical">CRITICAL</span><span class="text-[10px] text-gray-500">8 min ago</span></div><p class="font-semibold text-xs mt-2">Road blockage detected</p><p class="text-[10px] text-gray-400">NH-10 &bull; Kurseong</p><p class="text-[10px] text-gray-300 mt-1">Fallen debris blocking one lane</p><span class="incident-status text-red-300">Response Required</span></button>
-                            <button class="incident-card incident-high" data-incident="1"><div class="flex justify-between gap-2"><span class="incident-badge badge-high">HIGH</span><span class="text-[10px] text-gray-500">14 min ago</span></div><p class="font-semibold text-xs mt-2">Slope movement reported</p><p class="text-[10px] text-gray-400">NH-29 &bull; Dz&uuml;dza Section</p><p class="text-[10px] text-gray-300 mt-1">Rockfall risk near the carriageway</p><span class="incident-status text-orange-300">Team Dispatched</span></button>
-                            <button class="incident-card incident-moderate" data-incident="2"><div class="flex justify-between gap-2"><span class="incident-badge badge-moderate">MODERATE</span><span class="text-[10px] text-gray-500">22 min ago</span></div><p class="font-semibold text-xs mt-2">Waterlogging reported</p><p class="text-[10px] text-gray-400">NH-06 &bull; Imphal approach</p><p class="text-[10px] text-gray-300 mt-1">Standing water slowing traffic</p><span class="incident-status text-yellow-300">Monitoring</span></button>
-                            <button class="incident-card incident-high" data-incident="3"><div class="flex justify-between gap-2"><span class="incident-badge badge-high">HIGH</span><span class="text-[10px] text-gray-500">31 min ago</span></div><p class="font-semibold text-xs mt-2">Fallen rocks reported</p><p class="text-[10px] text-gray-400">Darjeeling &bull; Hill Cart Road</p><p class="text-[10px] text-gray-300 mt-1">Partial shoulder obstruction</p><span class="incident-status text-orange-300">Team Dispatched</span></button>
-                        </div>
-                        <div class="mt-4"><h3 class="section-kicker mb-2">CITIZEN REPORTS</h3><div id="citizenReports" class="grid grid-cols-2 gap-2"></div></div>
+                        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="cpu" class="w-3.5 h-3.5"></i> AI Geotechnical Landslide Model
+                        </p>
+                        <p class="text-2xl font-bold text-white mt-0.5">
+                            <span id="riskScore">88</span><span class="text-gray-400 text-sm font-normal"> / 100</span>
+                        </p>
                     </div>
-                    <div class="space-y-3">
-                        <div class="impact-section"><h3 class="section-kicker mb-2">ROAD IMPACT STATUS</h3><div class="grid grid-cols-3 gap-2"><div class="impact-stat"><i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-400"></i><b>1</b><span>Open Roads</span><small>Safe for Travel</small></div><div class="impact-stat"><i data-lucide="triangle-alert" class="w-3 h-3 text-orange-400"></i><b>1</b><span>Risky Roads</span><small>Use Caution</small></div><div class="impact-stat"><i data-lucide="octagon-alert" class="w-3 h-3 text-red-400"></i><b>1</b><span>Blocked Roads</span><small>Not Accessible</small></div></div><div class="impact-detail"><span>Affected roads</span><b>2 of 3 corridors</b><span>Last updated 5 min ago</span></div></div>
-                        <div class="response-box"><h3 class="section-kicker mb-3">RESPONSE OPERATIONS</h3><div class="grid grid-cols-2 gap-3 text-xs"><p><span class="text-gray-400">Active teams</span><b class="block text-emerald-300 text-lg">3</b></p><p><span class="text-gray-400">Dispatched</span><b class="block text-orange-300 text-lg">2</b></p><p><span class="text-gray-400">Avg. response ETA</span><b class="block text-white text-lg">18 min</b></p><p><span class="text-gray-400">Roads being cleared</span><b class="block text-red-300 text-lg">1</b></p></div><div class="operation-detail"><span>Teams on field <b>3</b></span><span>Teams in transit <b>2</b></span><span>Est. completion <b>45 min</b></span></div><div class="flex justify-between text-[10px] text-gray-400 mt-3"><span>NH-10 clearing operation</span><span>64%</span></div><div class="metric-bar mt-1"><span class="bg-emerald-500" style="width:64%"></span></div><p class="operation-status"><i data-lucide="loader-circle" class="w-3 h-3 text-emerald-400"></i> Clearing operation in progress</p></div>
-                        <div class="action-box"><div class="flex items-center gap-2"><i data-lucide="siren" class="w-4 h-4 text-red-400"></i><h3 class="font-semibold text-xs text-red-300">Immediate Action Recommended</h3></div><p class="text-[10px] text-gray-300 mt-2">Restrict traffic on NH-10 near the affected corridor and divert vehicles through the recommended alternate route.</p><div class="action-details"><span>Priority <b>HIGH</b></span><span>Affected Corridor <b>NH-10</b></span><span>Recommended Response <b>Traffic Restriction</b></span><span>Alternative Route <b>Via Lava – Algarah – Rishi Road</b></span><span>Response Team <b>BRO Task Force</b></span><span>Estimated Clearance <b>45 min</b></span></div><div class="flex flex-wrap gap-2 mt-3"><button data-demo-action="Dispatch Team" class="action-button bg-emerald-600 hover:bg-emerald-500">Dispatch Team</button><button data-demo-action="Issue Alert" class="action-button bg-red-700 hover:bg-red-600">Issue Alert</button><button id="viewRoute" class="action-button bg-slate-700 hover:bg-slate-600">View Route</button></div></div>
+                    <span id="riskLevel" class="text-xs font-bold text-red-400 border border-red-400/40 bg-red-950/30 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        CRITICAL
+                    </span>
+                </div>
+
+                <div class="metric-bar mb-3"><span id="riskGauge" style="width:88%;background:#ef4444"></span></div>
+
+                <div class="grid grid-cols-4 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 text-center">
+                    <div>
+                        <span class="text-[9px] text-gray-400 uppercase block">24h Rain</span>
+                        <b id="riskRain" class="text-white text-xs font-semibold">112 mm</b>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-gray-400 uppercase block">Slope</span>
+                        <b id="riskSlope" class="text-white text-xs font-semibold">36°</b>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-gray-400 uppercase block">Soil Sat.</span>
+                        <b id="riskSoil" class="text-white text-xs font-semibold">85%</b>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-gray-400 uppercase block">Slip Prob.</span>
+                        <b id="riskProbability" class="text-white text-xs font-semibold">84%</b>
                     </div>
                 </div>
-                <div class="incident-timeline mt-4 pt-3 border-t border-slate-700"><h3 class="section-kicker mb-3">INCIDENT TIMELINE</h3><div class="timeline-track"><div><b>16:02</b><span>Citizen report received</span></div><div><b>16:04</b><span>AI system verified incident</span></div><div><b>16:06</b><span>Road marked HIGH RISK</span></div><div><b>16:08</b><span>Response team dispatched</span></div><div><b>16:12</b><span>Clearing operation started</span></div></div></div>
-                <div id="incidentToast" class="incident-toast" role="status" aria-live="polite"></div>
-            </section>
-        </div>
 
-        <!-- Right Column: Status Cards -->
-        <div class="dashboard-right lg:col-span-5 space-y-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-2">
-                <div class="glass-panel rounded-lg p-3"><p class="text-[10px] text-gray-400">ACTIVE RISK ZONES</p><b id="kpiZones" class="text-xl">12</b></div>
-                <div class="glass-panel rounded-lg p-3"><p class="text-[10px] text-gray-400">HIGH-RISK LOCATIONS</p><b id="kpiHigh" class="text-xl text-orange-400">5</b></div>
-                <div class="glass-panel rounded-lg p-3"><p class="text-[10px] text-gray-400">ACTIVE ALERTS</p><b class="text-xl text-red-400">3</b></div>
-                <div class="glass-panel rounded-lg p-3"><p class="text-[10px] text-gray-400">ROADS AFFECTED</p><b id="kpiRoads" class="text-xl text-yellow-400">2</b></div>
-            </div>
-            <div id="riskPanel" class="glass-panel rounded-xl p-4">
-                <div class="flex justify-between items-start"><div><p class="text-[10px] text-emerald-400 tracking-widest">AI LANDSLIDE RISK <span class="data-demo">DEMO MODEL</span></p><p><span id="riskScore" class="text-3xl font-bold">82</span><span class="text-gray-400"> / 100</span></p></div><span id="riskLevel" class="text-xs text-red-400 border border-red-400/30 px-2 py-1 rounded">CRITICAL</span></div>
-                <div class="metric-bar mt-3"><span id="riskGauge" style="width:82%;background:#ef4444"></span></div>
-                <div class="grid grid-cols-2 gap-3 mt-4 text-xs"><p>Rainfall <b id="riskRain" class="block text-white text-sm">96 mm</b></p><p>Slope <b id="riskSlope" class="block text-white text-sm">34°</b></p><p>Soil Moisture <b id="riskSoil" class="block text-white text-sm">81%</b></p><p>Landslide Probability <b id="riskProbability" class="block text-white text-sm">78%</b></p></div>
-                <div class="mt-4 pt-3 border-t border-slate-700 flex justify-between text-xs"><span>Prediction <b id="riskPrediction" class="block text-red-400">HIGH RISK</b></span><span class="text-right">Expected Window <b id="riskWindow" class="block text-white">12–24 hours</b></span></div>
-            </div>
-            <div class="glass-panel rounded-xl p-4"><div class="flex flex-wrap justify-between items-center gap-2"><h3 class="font-bold text-sm">Rainfall Forecast <span class="data-demo">DEMO DATA</span></h3><span class="text-[10px] text-gray-500">Last updated: 5 min ago</span></div><svg id="forecastChart" class="forecast-chart mt-2" viewBox="0 0 500 110" role="img" aria-label="24 hour rainfall forecast"><line class="forecast-grid" x1="10" y1="20" x2="490" y2="20"></line><line class="forecast-grid" x1="10" y1="55" x2="490" y2="55"></line><line class="forecast-grid" x1="10" y1="90" x2="490" y2="90"></line><polyline id="forecastLine" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline><g id="forecastPoints"></g><g id="forecastLabels"></g></svg></div>
-            <div class="glass-panel rounded-xl p-4"><div class="flex flex-wrap justify-between items-center gap-2"><h3 class="font-bold text-sm">AI Landslide Prediction</h3><span class="data-demo">FRONTEND SIMULATION</span></div><div class="grid grid-cols-3 gap-3 mt-4 text-xs"><span>Rainfall<div class="metric-bar mt-2"><span style="width:90%;background:#38bdf8"></span></div></span><span>Slope<div class="metric-bar mt-2"><span style="width:72%;background:#f59e0b"></span></div></span><span>Soil Moisture<div class="metric-bar mt-2"><span style="width:84%;background:#10b981"></span></div></span></div><p class="mt-4 text-xs">Prediction: <b class="text-red-400">HIGH RISK</b> <span class="float-right">Next 12–24 Hours</span></p></div>
-            <div class="glass-panel rounded-xl p-4"><div class="flex flex-wrap items-center justify-between gap-2"><label for="regionSelector" class="text-xs font-semibold text-gray-300">Select Region</label><select id="regionSelector" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs"><option>Gangtok</option><option>Darjeeling</option><option>Shillong</option><option>Kohima</option><option>Aizawl</option><option>Itanagar</option><option>Guwahati</option></select></div><div class="flex justify-between text-[10px] text-gray-500 mt-4"><span>Now</span><span>6h</span><span>12h</span><span>24h</span></div><div class="metric-bar mt-2"><span id="timelineBar" style="width:82%;background:#ef4444"></span></div><div id="timelineValues" class="grid grid-cols-4 gap-2 mt-2 text-center text-xs font-semibold"><span>82</span><span>78</span><span>71</span><span>64</span></div><p class="data-demo mt-2">RISK TIMELINE · DEMO PROJECTION</p></div>
-            <!-- Tabs Menu -->
-            <div class="flex gap-2 overflow-x-auto scrollbar-hide">
-                <button data-tab="roads" class="tab-button flex items-center gap-2 bg-emerald-600 px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
-                    <i data-lucide="route" class="w-4 h-4"></i> <span data-i18n="roadLifelines">Road Lifelines</span>
-                </button>
-                <button data-tab="reports" class="tab-button flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 whitespace-nowrap transition">
-                    <i data-lucide="users" class="w-4 h-4"></i> <span data-i18n="citizenReport">Citizen Report</span>
-                </button>
-                <button data-tab="alerts" class="tab-button flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 whitespace-nowrap transition">
-                    <i data-lucide="megaphone" class="w-4 h-4"></i> <span data-i18n="emergencyAlert">Emergency Alert</span>
-                </button>
-            </div>
-
-            <!-- List of Arteries -->
-            <div id="roads" class="tab-view active glass-panel rounded-xl p-4 min-h-[360px]">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold flex items-center gap-2">
-                        <i data-lucide="activity" class="text-yellow-500 w-5 h-5"></i>
-                        Key Transit Arteries Status (NER)
-                    </h3>
-                    <span class="text-[10px] text-gray-500 italic">Updated 5 min ago</span>
+                <div class="mt-3 pt-2.5 border-t border-slate-800 flex justify-between items-center text-xs">
+                    <div>
+                        <span class="text-gray-400 text-[10px] block uppercase">AI Model Status</span>
+                        <b id="riskPrediction" class="text-red-400 font-bold">CRITICAL HAZARD</b>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-gray-400 text-[10px] block uppercase">Early Warning Window</span>
+                        <b id="riskWindow" class="text-white font-semibold">6–12 hours</b>
+                    </div>
                 </div>
+            </div>
+
+            <!-- 3. Dual Analytics: Precipitation Forecast (SVG Chart) & Place Selector with Sensitivity -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
-                <p class="text-xs text-gray-400 mb-6">Automatic blockage warnings prioritized for BRO (Border Roads Organisation) and SDRF clearing crews.</p>
-
-                <!-- Status Card 1 -->
-                <div class="bg-slate-900/50 border border-slate-700 rounded-lg p-4 mb-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="redo" class="w-4 h-4 text-emerald-400 rotate-45"></i>
-                            <h4 class="font-bold text-sm">NH-10 : Siliguri - Gangtok Lifeline</h4>
-                        </div>
-                        <div class="flex items-center gap-2"><span class="text-[10px] bg-red-900/30 text-red-400 border border-red-500/30 px-2 py-0.5 rounded">Blocked at 29th Mile</span><button data-road-focus="0" class="road-focus text-[10px] text-sky-300 hover:text-white">View on Map</button></div>
+                <!-- Precipitation Forecast SVG Chart -->
+                <div class="glass-panel rounded-xl p-3.5 border border-slate-700/70 shadow-lg">
+                    <div class="flex justify-between items-center gap-2 mb-2">
+                        <h3 class="font-bold text-xs text-gray-200 flex items-center gap-1.5">
+                            <i data-lucide="cloud-rain" class="w-3.5 h-3.5 text-sky-400"></i> Precipitation Forecast
+                        </h3>
+                        <span class="text-[9px] text-gray-500">IMD Doppler</span>
                     </div>
-                    <div class="space-y-2 text-xs">
-                        <p><span class="text-gray-500 uppercase tracking-tighter mr-2">Vulnerability:</span> <span class="text-red-400 font-semibold">High Risk (Active Fissures)</span></p>
-                        <p><span class="text-gray-500 uppercase tracking-tighter mr-2">Alternative:</span> <span class="text-gray-300">Via Lava - Algarah - Reshi Road (+2.5 hrs)</span></p>
-                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-800">
-                            <span class="text-[10px] text-gray-500 uppercase">Clearing Crew: BRO 114 Taskforce</span>
-                            <span class="text-emerald-400 font-bold">Est. 4-6 Hours (BRO Cleared 40%)</span>
+                    <svg id="forecastChart" class="forecast-chart" viewBox="0 0 500 110" role="img" aria-label="24 hour rainfall forecast">
+                        <line class="forecast-grid" x1="10" y1="20" x2="490" y2="20"></line>
+                        <line class="forecast-grid" x1="10" y1="55" x2="490" y2="55"></line>
+                        <line class="forecast-grid" x1="10" y1="90" x2="490" y2="90"></line>
+                        <polyline id="forecastLine" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                        <g id="forecastPoints"></g>
+                        <g id="forecastLabels"></g>
+                    </svg>
+                </div>
+
+                <!-- Quick Select NER Zone & Sensitivity Factors -->
+                <div class="glass-panel rounded-xl p-3.5 border border-slate-700/70 shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center gap-2 mb-1.5">
+                            <label for="regionSelector" class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
+                                <i data-lucide="target" class="w-3.5 h-3.5 text-sky-400"></i> Quick Select Place
+                            </label>
+                            <span class="text-[9px] text-gray-500">Fly to Place</span>
+                        </div>
+                        <select id="regionSelector" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-gray-200 cursor-pointer focus:outline-none focus:border-emerald-500 mb-2"></select>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800">
+                        <div class="grid grid-cols-3 gap-2 text-[10px] text-gray-400">
+                            <div>
+                                <span>Rain Trigger</span>
+                                <div class="metric-bar mt-1"><span id="sensRain" style="width:90%;background:#38bdf8"></span></div>
+                            </div>
+                            <div>
+                                <span>Slope Factor</span>
+                                <div class="metric-bar mt-1"><span id="sensSlope" style="width:76%;background:#f59e0b"></span></div>
+                            </div>
+                            <div>
+                                <span>Pore Pressure</span>
+                                <div class="metric-bar mt-1"><span id="sensPore" style="width:85%;background:#10b981"></span></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] mt-2 pt-1 border-t border-slate-800/80">
+                            <span class="text-gray-400">Sensitivity:</span>
+                            <b id="sensVerdict" class="text-red-400">HIGH SUSCEPTIBILITY</b>
+                        </div>
+                        <div class="hidden">
+                            <span id="timelineBar"></span>
+                            <div id="timelineValues"></div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Status Card 2 -->
-                <div class="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="redo" class="w-4 h-4 text-emerald-400 rotate-45"></i>
-                            <h4 class="font-bold text-sm">NH-29 : Dimapur - Kohima Corridor</h4>
-                        </div>
-                        <div class="flex items-center gap-2"><span class="text-[10px] bg-yellow-900/30 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded">Single-Lane Traffic Allowed</span><button data-road-focus="1" class="road-focus text-[10px] text-sky-300 hover:text-white">View on Map</button></div>
-                    </div>
-                    <div class="space-y-2 text-xs">
-                        <p><span class="text-gray-500 uppercase tracking-tighter mr-2">Vulnerability:</span> <span class="text-yellow-400 font-semibold">Moderate Watch (Dzüdza Section)</span></p>
-                        <p><span class="text-gray-500 uppercase tracking-tighter mr-2">Alternative:</span> <span class="text-gray-300">Via Jotsoma Bypass (Heavy vehicles restricted)</span></p>
-                    </div>
-                </div>
-
-                <div class="road-card bg-slate-900/50 border border-slate-700 rounded-lg p-4 mt-4" data-road="NH-06"><div class="flex justify-between items-start"><h4 class="font-bold text-sm">NH-06 : Silchar - Imphal Corridor</h4><div class="flex items-center gap-2"><span class="text-[10px] text-emerald-400">OPEN</span><button data-road-focus="2" class="road-focus text-[10px] text-sky-300 hover:text-white">View on Map</button></div></div><p class="text-xs text-gray-400 mt-2">Risk: <b class="text-emerald-400">LOW</b> · Alternative route: None required</p></div>
 
             </div>
-            <div id="reports" class="tab-view glass-panel rounded-xl p-4 min-h-[360px]"><div class="flex justify-between items-center mb-4"><h3 class="font-bold">Citizen Hazard Reporting</h3><span class="data-demo">DEMO AI VERIFICATION</span></div><div class="space-y-3 text-xs"><input id="reportImage" type="file" accept="image/*" class="w-full text-gray-400 bg-slate-900 p-2 rounded"><input id="reportLocation" placeholder="Location (e.g. Gangtok)" class="w-full bg-slate-900 border border-slate-700 rounded p-2"><textarea id="reportDescription" placeholder="Describe the hazard" class="w-full bg-slate-900 border border-slate-700 rounded p-2 h-20"></textarea><button id="submitReport" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded font-semibold">Submit Report</button><div id="reportResult" class="hidden border border-emerald-500/30 rounded p-3 text-emerald-300"></div></div></div>
-            <div id="alerts" class="tab-view glass-panel rounded-xl p-4 min-h-[360px]"><div class="flex justify-between items-center mb-4"><h3 class="font-bold">Emergency Alerts</h3><span class="data-demo">DEMO WORKFLOW</span></div><div class="space-y-3 text-xs"><div class="border-l-2 border-red-500 bg-red-950/20 p-3"><b class="text-red-400">CRITICAL</b><p>Darjeeling — Landslide Risk HIGH</p></div><div class="border-l-2 border-orange-500 bg-orange-950/20 p-3"><b class="text-orange-400">WARNING</b><p>Gangtok — Heavy Rainfall Expected</p></div><div class="border-l-2 border-red-500 bg-red-950/20 p-3"><b class="text-red-400">ROAD BLOCKAGE</b><p>NH-10 — 29th Mile</p></div><div class="flex gap-2 pt-2"><button class="alert-demo bg-slate-700 px-3 py-2 rounded">SEND SMS</button><button class="alert-demo bg-slate-700 px-3 py-2 rounded">SEND VOICE ALERT</button><button class="alert-demo bg-slate-700 px-3 py-2 rounded">SEND FCM ALERT</button></div><p id="alertStatus" class="text-yellow-400"></p></div></div>
+
         </div>
+
+        <!-- RIGHT COLUMN: Compact Square Leaflet Map -->
+        <div class="lg:col-span-6">
+            <div id="mapContainer" class="map-container relative glass-panel rounded-xl overflow-hidden border border-slate-700/80 shadow-2xl">
+                <!-- Map Toolbar -->
+                <div class="map-toolbar p-3 bg-slate-900/95 border-b border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <label for="mapLayerSelector" class="text-xs text-gray-400 flex items-center gap-1 flex-shrink-0">
+                                <i data-lucide="map" class="w-3.5 h-3.5 text-sky-400"></i> Basemap:
+                            </label>
+                            <select id="mapLayerSelector" class="bg-slate-800 text-gray-200 text-xs rounded border border-slate-700 px-2.5 py-1 focus:outline-none cursor-pointer truncate max-w-[200px]">
+                                <option value="topo" selected>Esri World Topo (Natural Relief)</option>
+                                <option value="voyager">Carto Voyager (Google Maps Style)</option>
+                                <option value="satellite">Esri Satellite (Aerial Imagery)</option>
+                                <option value="osm">OpenStreetMap Standard</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <button id="fullscreenMapBtn" title="View Map Completely (Fullscreen)" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded border border-sky-500/40 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                                <span id="fullscreenBtnText">View Map Completely</span>
+                            </button>
+                            <button id="resetMapView" title="Reset Map View" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded border border-slate-700 transition flex items-center gap-1 text-xs">
+                                <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Risk Filters -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pt-1 border-t border-slate-800/80">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mr-1 flex items-center gap-1 flex-shrink-0">
+                            <i data-lucide="layers" class="w-3 h-3 text-emerald-400"></i> Filter:
+                        </span>
+                        <button data-filter="all" class="map-filter px-2.5 py-1 text-xs font-semibold bg-emerald-600 rounded-md text-white transition shadow-sm flex-shrink-0">All NER (30)</button>
+                        <button data-filter="CRITICAL" class="map-filter px-2.5 py-1 text-xs font-semibold hover:bg-slate-800 text-red-400 border border-red-500/30 rounded-md transition flex items-center gap-1 flex-shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Red Critical (9)
+                        </button>
+                        <button data-filter="WATCH" class="map-filter px-2.5 py-1 text-xs font-semibold hover:bg-slate-800 text-yellow-400 border border-yellow-500/30 rounded-md transition flex items-center gap-1 flex-shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> Yellow Watch (11)
+                        </button>
+                        <button data-filter="SAFE" class="map-filter px-2.5 py-1 text-xs font-semibold hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 rounded-md transition flex items-center gap-1 flex-shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Green Safe (10)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- The Square Map Element -->
+                <div id="map"></div>
+
+                <!-- Map Bottom Status Bar -->
+                <div class="map-status-bar flex flex-wrap items-center justify-between px-3 py-2 bg-slate-900/95 border-t border-slate-800 text-[10px] text-gray-400">
+                    <span id="activeMapCount" class="text-gray-300 font-medium truncate">30 Landslide Monitoring Zones across NER</span>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Critical</span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-400"></span> Watch</span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Safe</span>
+                        <span class="inline-flex items-center gap-1"><span class="text-sky-400">📍</span> Reports</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- BOTTOM SECTION: Full-Width Tabs for Landslide Directory & Dedicated Citizen Hazard Reporting Panel -->
+    <div class="space-y-4">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex gap-2 border-b border-slate-800 pb-2">
+            <button data-tab="hotspots" class="tab-button flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow-sm">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> <span>Landslide Directory (30 Zones)</span>
+            </button>
+            <button data-tab="reportPanel" class="tab-button flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-gray-400 px-4 py-2 rounded-lg text-xs font-semibold transition">
+                <i data-lucide="flag" class="w-4 h-4 text-emerald-400"></i> <span>Citizen Hazard Reporting</span>
+            </button>
+        </div>
+
+            <!-- Tab 1: Landslide Directory -->
+            <div id="hotspots" class="tab-view active glass-panel rounded-xl p-5 border border-slate-700/70 shadow-lg min-h-[460px]">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                    <div>
+                        <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                            <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
+                            NER Monitored Landslide Zones
+                        </h3>
+                        <p class="text-[11px] text-gray-400">Select any place to focus map view and display geotechnical telemetry</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button data-dir-filter="all" class="dir-filter-btn active text-[10px] px-2.5 py-1 rounded bg-emerald-600 text-white font-semibold">All (30)</button>
+                        <button data-dir-filter="CRITICAL" class="dir-filter-btn text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-red-400 border border-red-500/30 font-semibold">Red (9)</button>
+                        <button data-dir-filter="WATCH" class="dir-filter-btn text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-yellow-500/30 font-semibold">Yellow (11)</button>
+                        <button data-dir-filter="SAFE" class="dir-filter-btn text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-semibold">Green (10)</button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <input id="hotspotSearch" type="text" placeholder="Search by place name, state, or highway corridor..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div id="hotspotsList" class="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                    <!-- Dynamic rendering of 30 places -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Dedicated Citizen Hazard Reporting Panel -->
+            <div id="reportPanel" class="tab-view glass-panel rounded-xl p-5 border border-slate-700/70 shadow-lg min-h-[460px]">
+                <div class="flex justify-between items-start mb-4 pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                            <i data-lucide="flag" class="w-4 h-4 text-emerald-400"></i>
+                            Citizen &amp; Community Hazard Reporting
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1">Submit ground observations of road fissures, debris fall, or slope movement.</p>
+                    </div>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold uppercase">
+                        AI Verified Field Input
+                    </span>
+                </div>
+
+                <form id="citizenReportForm" class="space-y-3.5 text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="reportLocation" class="block text-gray-300 font-semibold mb-1">Hazard Location / Landmark <span class="text-red-400">*</span></label>
+                            <input id="reportLocation" type="text" required placeholder="e.g., Gangtok 29th Mile, Kurseong" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label for="reportType" class="block text-gray-300 font-semibold mb-1">Hazard Type</label>
+                            <select id="reportType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                <option value="Active Landslide / Debris Fall">Active Landslide / Debris Fall</option>
+                                <option value="Road Surface Fissure / Cracks">Road Surface Fissure / Cracks</option>
+                                <option value="Rockfall Obstruction">Rockfall Obstruction</option>
+                                <option value="Mudflow / Waterlogging">Mudflow / Waterlogging</option>
+                                <option value="Retaining Wall Failure">Retaining Wall Failure</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label for="reportSeverity" class="block text-gray-300 font-semibold mb-1">Estimated Severity</label>
+                            <select id="reportSeverity" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                <option value="HIGH">Critical (Road blocked / severe slip)</option>
+                                <option value="MODERATE">Moderate (Single lane blocked / rocks on road)</option>
+                                <option value="LOW">Low (Tension cracks / small slide)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="reportPhoto" class="block text-gray-300 font-semibold mb-1">Upload Photo / Evidence</label>
+                            <input id="reportPhoto" type="file" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-gray-400 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:bg-emerald-600 file:text-white file:cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="reportDescription" class="block text-gray-300 font-semibold mb-1">Hazard Details &amp; Observations</label>
+                        <textarea id="reportDescription" rows="3" placeholder="Describe the size of the landslide, weather conditions, whether vehicles are stranded, or any visible widening of fissures..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <button type="submit" id="submitReportBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg font-semibold flex items-center gap-2 transition shadow-md">
+                            <i data-lucide="send" class="w-4 h-4"></i> Submit Citizen Hazard Report
+                        </button>
+                        <span class="text-[11px] text-gray-500">Instantly verified and plotted on the map</span>
+                    </div>
+                </form>
+
+                <!-- Dynamic Report Success Feedback -->
+                <div id="reportSuccessAlert" class="hidden mt-4 p-3.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">
+                    <div class="flex items-center gap-2 font-bold text-xs">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                        <span>Hazard Report Verified &amp; Plotted on Map</span>
+                    </div>
+                    <p id="reportSuccessMsg" class="text-[11px] text-gray-300 mt-1"></p>
+                </div>
+            </div>
+
+        </div>
+
+    <div id="incidentToast" class="incident-toast" role="status" aria-live="polite"></div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
