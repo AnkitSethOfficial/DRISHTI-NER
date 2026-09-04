@@ -43,6 +43,19 @@ input[type=range] {
 .data-demo { color: #fbbf24; font-size: 10px; letter-spacing: .04em; }
 .metric-bar { height: 6px; background: #334155; border-radius: 999px; overflow: hidden; }
 .metric-bar span { display: block; height: 100%; border-radius: inherit; transition: width .35s ease; }
+.section-kicker { color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.incident-card { display: block; width: 100%; padding: 10px; text-align: left; background: rgba(15, 23, 42, .45); border: 1px solid rgba(148, 163, 184, .16); border-left: 2px solid; border-radius: 7px; transition: background .2s ease, border-color .2s ease; }
+.incident-card:hover, .incident-card.selected { background: rgba(30, 41, 59, .85); border-color: rgba(16, 185, 129, .65); }
+.incident-critical { border-left-color: #ef4444; } .incident-high { border-left-color: #f97316; } .incident-moderate { border-left-color: #eab308; }
+.incident-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
+.badge-critical { color: #fca5a5; background: rgba(127, 29, 29, .35); } .badge-high { color: #fdba74; background: rgba(124, 45, 18, .35); } .badge-moderate { color: #fde047; background: rgba(113, 63, 18, .35); }
+.incident-status { display: block; margin-top: 7px; font-size: 9px; font-weight: 600; }
+.citizen-report, .response-box, .action-box { background: rgba(15, 23, 42, .42); border: 1px solid rgba(148, 163, 184, .14); border-radius: 7px; padding: 9px; }
+.citizen-report { min-width: 0; } .citizen-report b { color: #e2e8f0; font-size: 10px; } .report-dot { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; } .report-high { background: #ef4444; } .report-moderate { background: #f97316; }
+.impact-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 3px; background: rgba(15, 23, 42, .42); border: 1px solid rgba(148, 163, 184, .14); border-radius: 7px; } .impact-stat b { font-size: 18px; } .impact-stat span { color: #94a3b8; font-size: 9px; text-align: center; }
+.action-box { border-color: rgba(239, 68, 68, .3); background: rgba(69, 10, 10, .22); } .action-button { padding: 5px 8px; border-radius: 5px; color: #f8fafc; font-size: 10px; font-weight: 600; transition: background .2s ease; }
+.timeline-track { display: flex; justify-content: space-between; gap: 8px; } .timeline-track > div { position: relative; flex: 1; min-width: 0; padding-top: 12px; border-top: 2px solid #10b981; } .timeline-track > div::before { content: ''; position: absolute; top: -5px; left: 0; width: 8px; height: 8px; border: 2px solid #0f172a; border-radius: 50%; background: #10b981; } .timeline-track b, .timeline-track span { display: block; } .timeline-track b { color: #6ee7b7; font-size: 10px; } .timeline-track span { color: #94a3b8; font-size: 9px; line-height: 1.3; margin-top: 3px; }
+.incident-toast { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 2000; max-width: 280px; padding: 10px 12px; background: rgba(15, 23, 42, .96); border: 1px solid rgba(16, 185, 129, .5); border-radius: 7px; box-shadow: 0 8px 24px rgba(0,0,0,.3); color: #d1fae5; font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .2s ease, transform .2s ease; } .incident-toast.visible { opacity: 1; transform: translateY(0); }
 .tab-view { display: none; }
 .tab-view.active { display: block; }
 .leaflet-control-layers { background: rgba(15, 23, 42, .92); border: 1px solid rgba(148,163,184,.35); border-radius: 8px; color: #f8fafc; font-size: 11px; box-shadow: 0 8px 22px rgba(0,0,0,.35); }
@@ -61,3 +74,4 @@ input[type=range] {
 @media (min-width: 1024px) { .dashboard-left { position: sticky; top: 1rem; align-self: start; } }
 @media (max-width: 1023px) { .dashboard-grid { grid-template-columns: minmax(0, 1fr) !important; } .dashboard-left, .dashboard-right { grid-column: auto !important; width: 100%; } }
 @media (max-width: 640px) { body { padding: .75rem; max-width: 100vw; } #map { height: 390px; } .leaflet-control-layers { max-width: 150px; } .forecast-chart { height: 78px; } }
+@media (max-width: 640px) { .timeline-track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 12px; } .timeline-track > div { border-top-width: 1px; } .incident-toast { right: .75rem; bottom: .75rem; left: .75rem; max-width: none; } }
