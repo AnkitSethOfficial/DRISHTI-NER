@@ -581,13 +581,19 @@ const landslidePlaces = [
 const getLevel = score => score <= 35 ? 'SAFE' : score <= 70 ? 'WATCH' : 'CRITICAL';
 const levelColors = { SAFE: '#10b981', WATCH: '#eab308', CRITICAL: '#ef4444' };
 
-// ----------------------------------------------------------------------------
-// 4. Initialize Leaflet.js Map with Multi-Basemap Tiles (Terrain Topo Default)
-// ----------------------------------------------------------------------------
+// Bounding box covering India & the sub-Himalayan North East Region
+// [South-West: Lat 6.0°N, Lng 68.0°E] to [North-East: Lat 37.5°N, Lng 98.0°E]
+const indiaBounds = L.latLngBounds([6.0, 68.0], [37.5, 98.0]);
+const nerBounds = L.latLngBounds([21.0, 87.0], [29.8, 97.6]);
+
 const map = L.map('map', {
     zoomControl: true,
-    attributionControl: true
-}).setView([26.2, 92.8], 7);
+    attributionControl: true,
+    maxBounds: indiaBounds.pad(0.25),
+    maxBoundsViscosity: 0.85,
+    minZoom: 4,
+    maxZoom: 18
+}).setView([27.3389, 88.6065], 11); // Initial default view before live GPS lock
 
 const tileLayers = {
     topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -621,11 +627,19 @@ if (layerSelector) {
     });
 }
 
-// Reset Map View Button
+// Reset Map View Button (Re-focus on user's location)
 const resetBtn = document.getElementById('resetMapView');
 if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-        map.flyTo([26.2, 92.8], 7, { duration: 1.2 });
+        locateUser(true);
+    });
+}
+
+// View Entire NER Macro Button
+const viewEntireNerBtn = document.getElementById('viewEntireNerBtn');
+if (viewEntireNerBtn) {
+    viewEntireNerBtn.addEventListener('click', () => {
+        map.flyToBounds(nerBounds, { duration: 1.2 });
     });
 }
 
@@ -659,6 +673,186 @@ const safeLayer = L.layerGroup().addTo(map);
 const roadLayer = L.layerGroup().addTo(map);
 const halosLayer = L.layerGroup().addTo(map);
 const reportLayer = L.layerGroup().addTo(map);
+const userLocationLayer = L.layerGroup().addTo(map);
+
+// ----------------------------------------------------------------------------
+// 5.1 Geolocation User Tracking & Hazard Tier Calculation Engine
+// ----------------------------------------------------------------------------
+let userMarker = null;
+let userAccuracyCircle = null;
+
+function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+function evaluateUserHazardZone(lat, lng) {
+    let closestPlace = landslidePlaces[0];
+    let minDistance = Infinity;
+
+    landslidePlaces.forEach(place => {
+        const d = calculateDistanceKm(lat, lng, place.pos[0], place.pos[1]);
+        if (d < minDistance) {
+            minDistance = d;
+            closestPlace = place;
+        }
+    });
+
+    return { closestPlace, distanceKm: Math.round(minDistance) };
+}
+
+function updateUserLocationUI(lat, lng, accuracy = 20) {
+    userLocationLayer.clearLayers();
+
+    const userIcon = L.divIcon({
+        className: 'user-gps-marker',
+        html: `
+            <div class="user-gps-pin">
+                <div class="user-gps-pulse"></div>
+                <div class="user-gps-core"></div>
+            </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+
+    const { closestPlace, distanceKm } = evaluateUserHazardZone(lat, lng);
+
+    let hazardTier = 'SAFE';
+    let hazardColor = '#10b981';
+    let statusText = '';
+    let badgeText = '';
+
+    if (distanceKm <= 15) {
+        hazardTier = closestPlace.category;
+        hazardColor = closestPlace.color;
+        statusText = `Near ${closestPlace.name} (${closestPlace.state}) &bull; ${distanceKm} km`;
+        badgeText = `${hazardTier} HAZARD ZONE`;
+    } else if (distanceKm <= 45) {
+        hazardTier = closestPlace.category === 'CRITICAL' ? 'WATCH' : 'SAFE';
+        hazardColor = hazardTier === 'WATCH' ? '#eab308' : '#10b981';
+        statusText = `${distanceKm} km from ${closestPlace.name} (${closestPlace.state})`;
+        badgeText = `${hazardTier}: APPROACHING HILL CORRIDOR`;
+    } else {
+        hazardTier = 'SAFE';
+        hazardColor = '#10b981';
+        statusText = `Active GPS &bull; Nearest NER Zone: ${closestPlace.name} (${distanceKm} km)`;
+        badgeText = `🟢 SAFE FOOTHILLS REGION`;
+    }
+
+    const locText = document.getElementById('userLocationText');
+    const badge = document.getElementById('userHazardZoneBadge');
+    const gpsDot = document.getElementById('gpsDot');
+
+    if (locText) {
+        locText.innerHTML = `<span class="text-gray-400">Your Location:</span> <b class="text-white">${statusText}</b>`;
+    }
+    if (badge) {
+        badge.textContent = badgeText;
+        badge.style.color = hazardColor;
+        badge.style.borderColor = hazardColor + '60';
+        badge.style.backgroundColor = hazardColor + '18';
+    }
+    if (gpsDot) {
+        gpsDot.style.backgroundColor = hazardColor;
+    }
+
+    userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(userLocationLayer);
+    userMarker.bindPopup(`
+        <div class="landslide-popup-card">
+            <div class="flex items-center justify-between">
+                <b class="text-cyan-400 text-xs">📍 YOUR CURRENT LOCATION</b>
+                <span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:${hazardColor}20;color:${hazardColor};border:1px solid ${hazardColor}50">
+                    ${badgeText}
+                </span>
+            </div>
+            <div class="text-xs text-gray-300 mt-2 leading-relaxed">
+                <b>Coordinates:</b> ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E<br>
+                <b>Nearest Sector:</b> ${closestPlace.name} (${closestPlace.state})<br>
+                <b>Proximity:</b> ${distanceKm} km to active monitoring zone<br>
+                <b>Geology:</b> ${closestPlace.geology}
+            </div>
+            <p class="text-[10px] text-gray-400 mt-1.5 pt-1.5 border-t border-slate-700">
+                ${hazardTier === 'CRITICAL' ? '⚠️ High risk of rockfall and debris accumulation on slopes. Exercise extreme caution.' : 'Normal monitoring conditions. Safe from immediate slope movement.'}
+            </p>
+        </div>
+    `);
+
+    userAccuracyCircle = L.circle([lat, lng], {
+        radius: Math.min(accuracy * 12, 1500),
+        color: '#06b6d4',
+        weight: 1,
+        fillColor: '#06b6d4',
+        fillOpacity: 0.08
+    }).addTo(userLocationLayer);
+
+    if (distanceKm <= 50) {
+        updateRiskPanel(closestPlace);
+    }
+}
+
+function locateUser(zoomToUser = true) {
+    const locText = document.getElementById('userLocationText');
+    if (locText) {
+        locText.innerHTML = `<span class="text-gray-400">GPS Status:</span> <span class="text-cyan-400 animate-pulse font-semibold">Locking onto your live coordinates...</span>`;
+    }
+
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy || 20;
+
+                // Dynamically extend bounds so Leaflet never restricts the user's location
+                if (!indiaBounds.contains([lat, lng])) {
+                    indiaBounds.extend([lat, lng]);
+                    map.setMaxBounds(indiaBounds.pad(0.3));
+                }
+
+                updateUserLocationUI(lat, lng, accuracy);
+
+                if (zoomToUser) {
+                    map.setView([lat, lng], 14);
+                    setTimeout(() => {
+                        if (userMarker) userMarker.openPopup();
+                    }, 450);
+                }
+            },
+            error => {
+                console.warn('Geolocation unavailable / denied:', error.message);
+                // Graceful fallback for permission denial
+                updateUserLocationUI(27.3389, 88.6065, 30);
+                if (locText) {
+                    locText.innerHTML = `<span class="text-amber-400">GPS Access Denied:</span> <span class="text-gray-300">Click 'Locate Me' or allow browser location. Focus: Gangtok (NH-10)</span>`;
+                }
+                if (zoomToUser) {
+                    map.setView([27.3389, 88.6065], 11);
+                }
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    } else {
+        updateUserLocationUI(27.3389, 88.6065, 30);
+        if (locText) {
+            locText.innerHTML = `<span class="text-gray-400">Focus:</span> <b class="text-white">Gangtok 29th Mile (NH-10)</b> <span class="text-[10px] text-gray-500">(Geolocation not supported)</span>`;
+        }
+    }
+}
+
+// Locate Me button listener
+const locateUserBtn = document.getElementById('locateUserBtn');
+if (locateUserBtn) {
+    locateUserBtn.addEventListener('click', () => {
+        locateUser(true);
+    });
+}
 
 // Map place instances
 const placeMarkerMap = new Map();
@@ -732,65 +926,373 @@ landslidePlaces.forEach(place => {
 });
 
 // ----------------------------------------------------------------------------
-// 6. Highway Arteries and Detour Polylines
+// 6. Expanded National Highway Corridors & Real-Time Blockages (15 Routes)
 // ----------------------------------------------------------------------------
 const roads = [
+    // 1. NH-10 (Sikkim Lifeline)
     {
+        id: 'nh10',
         name: 'NH-10 — Siliguri to Gangtok Corridor',
-        coords: [[26.73, 88.40], [26.90, 88.35], [27.04, 88.45], [27.10, 88.52], [27.34, 88.61]],
+        highwayCode: 'NH-10',
+        state: 'Sikkim / West Bengal',
+        coords: [[26.73, 88.40], [26.85, 88.42], [27.04, 88.45], [27.10, 88.52], [27.34, 88.61]],
         status: 'BLOCKED AT 29TH MILE',
         risk: 'CRITICAL',
         color: '#ef4444',
-        blockage: '29th Mile / Active Fissures',
-        alternative: 'Via Lava – Algarah – Reshi Road (+2.5 hrs)'
+        blockage: '29th Mile & Sethi Jhora: Active slope slip, rolling boulders, and Teesta under-cutting',
+        clearingEta: 'SDRF / BRO Project Swastik clearing active (Est. 14 hrs)',
+        alternative: 'Via Lava – Algarah – Rhenock – Reshi Road (+2.5 hrs for light vehicles)',
+        agency: 'BRO Project Swastik & Sikkim PWD',
+        blockagePoint: [27.08, 88.49],
+        blockageSeverity: 'CRITICAL'
     },
+    // 2. NH-110 (Old Hill Cart Road)
     {
-        name: 'NH-29 — Dimapur to Kohima Lifeline',
-        coords: [[25.91, 93.73], [25.80, 93.85], [25.68, 94.11]],
-        status: 'SINGLE-LANE TRAFFIC',
-        risk: 'HIGH WATCH',
+        id: 'nh110',
+        name: 'NH-110 (Hill Cart Road) — Siliguri to Darjeeling',
+        highwayCode: 'NH-110',
+        state: 'West Bengal',
+        coords: [[26.73, 88.41], [26.82, 88.35], [26.88, 88.28], [26.98, 88.27], [27.04, 88.26]],
+        status: 'SEVERED AT PAGLA JHORA',
+        risk: 'CRITICAL',
+        color: '#ef4444',
+        blockage: 'Pagla Jhora / Tindharia: 40m road formation slumped down mountain ravine',
+        clearingEta: 'Closed for all commercial freight (Est. 48 hrs)',
+        alternative: 'Rerouted via Rohini Road or Pankhabari (Strictly light vehicles)',
+        agency: 'West Bengal PWD NH Division',
+        blockagePoint: [26.88, 88.28],
+        blockageSeverity: 'CRITICAL'
+    },
+    // 3. North Sikkim Highway (NSH)
+    {
+        id: 'nsh',
+        name: 'North Sikkim Highway — Mangan to Chungthang & Lachen',
+        highwayCode: 'NSH',
+        state: 'North Sikkim',
+        coords: [[27.34, 88.61], [27.50, 88.53], [27.60, 88.64], [27.72, 88.55]],
+        status: 'TOTAL CLOSURE AT TOONG GORGE',
+        risk: 'CRITICAL',
+        color: '#ef4444',
+        blockage: 'Toong & Pegong: Glacial surge aftermath; massive rock cliffs collapsed on carriageway',
+        clearingEta: 'Emergency bailey bridge launch in progress by BRO',
+        alternative: 'No overland vehicle route; essential supplies airlifted by IAF',
+        agency: 'Border Roads Organisation (BRO)',
+        blockagePoint: [27.55, 88.58],
+        blockageSeverity: 'CRITICAL'
+    },
+    // 4. Lumding – Haflong – Silchar Corridor (Dima Hasao)
+    {
+        id: 'dima_hasao',
+        name: 'Lumding – Haflong – Silchar Mountain Pass',
+        highwayCode: 'NH-54E / NH-27 Con.',
+        state: 'Assam (Dima Hasao)',
+        coords: [[25.75, 93.18], [25.40, 93.10], [25.17, 93.02], [24.95, 92.90], [24.82, 92.80]],
+        status: 'BLOCKED AT JATINGA MUD SLIDE',
+        risk: 'CRITICAL',
+        color: '#ef4444',
+        blockage: 'Jatinga Lampu: 200m active mudflow buried highway section; hill cut culvert ruptured',
+        clearingEta: 'NHIDCL excavators clearing heavy slurry (Est. 24 hrs)',
+        alternative: 'Via Umrangso – Lanka detour route (+4.5 hrs)',
+        agency: 'National Highways & Infrastructure Development Corp (NHIDCL)',
+        blockagePoint: [25.15, 92.98],
+        blockageSeverity: 'CRITICAL'
+    },
+    // 5. NH-37 / NH-02 (Jiribam to Imphal Lifeline)
+    {
+        id: 'nh37',
+        name: 'NH-37 / NH-02 — Jiribam to Imphal Lifeline',
+        highwayCode: 'NH-37',
+        state: 'Manipur',
+        coords: [[24.80, 93.12], [24.75, 93.35], [24.78, 93.62], [24.81, 93.80], [24.82, 93.94]],
+        status: 'SEVERED AT TUPUL CUTTING',
+        risk: 'CRITICAL',
+        color: '#ef4444',
+        blockage: 'Tupul & Awangkhul: Disang shale slip buried 3 highway bays near railway approach',
+        clearingEta: 'BRO Project Sewak clearing debris (Est. 36 hrs)',
+        alternative: 'Reroute via Old Cachar Road (Restricted to light 4x4 vehicles only)',
+        agency: 'BRO Project Sewak',
+        blockagePoint: [24.78, 93.63],
+        blockageSeverity: 'CRITICAL'
+    },
+    // 6. NH-29 (Dimapur to Kohima Corridor)
+    {
+        id: 'nh29',
+        name: 'NH-29 — Dimapur to Kohima & Mao Corridor',
+        highwayCode: 'NH-29',
+        state: 'Nagaland / Manipur',
+        coords: [[25.91, 93.73], [25.80, 93.85], [25.72, 94.01], [25.68, 94.11], [25.50, 94.12]],
+        status: 'SINGLE-LANE AT DZÜDZA RIVER',
+        risk: 'RESTRICTED',
         color: '#f59e0b',
-        blockage: 'Dzüdza Section Toe Cutting',
-        alternative: 'Via Jotsoma Bypass (Heavy vehicles restricted)'
+        blockage: 'Dzüdza river section & Paglapahar: Severe toe cutting & intermittent mud wash',
+        clearingEta: 'One-way regulated convoy piloted by Kohima Police',
+        alternative: 'Peducha to Tsiesema 10km bypass (Heavy vehicles barred)',
+        agency: 'Nagaland PWD (NH) & Kohima Traffic Police',
+        blockagePoint: [25.71, 94.02],
+        blockageSeverity: 'RESTRICTED'
     },
+    // 7. NH-06 (Guwahati – Shillong – Silchar Corridor)
     {
-        name: 'NH-06 — Silchar to Imphal Highway',
-        coords: [[24.82, 92.80], [24.78, 93.20], [24.75, 93.65], [24.82, 93.94]],
-        status: 'OPEN WITH ADVISORY',
-        risk: 'LOW RISK',
+        id: 'nh06',
+        name: 'NH-06 — Guwahati – Shillong – Silchar Corridor',
+        highwayCode: 'NH-06',
+        state: 'Assam / Meghalaya',
+        coords: [[26.14, 91.75], [25.58, 91.89], [25.44, 92.20], [25.10, 92.40], [24.82, 92.80]],
+        status: 'SLOW TRANSIT AT SONAPUR TUNNEL',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Sonapur Tunnel & Lumshnong: Heavy mud slurry at portal approaches; night transit restricted',
+        clearingEta: 'Continuous clearing; single convoy movement',
+        alternative: 'Exercise high caution during downpours; daytime transit only',
+        agency: 'NHAI & Meghalaya PWD',
+        blockagePoint: [25.12, 92.36],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 8. NH-13 (Trans-Arunachal Highway)
+    {
+        id: 'nh13',
+        name: 'NH-13 (Trans-Arunachal Highway) — Potin to Pasighat',
+        highwayCode: 'NH-13',
+        state: 'Arunachal Pradesh',
+        coords: [[27.12, 93.60], [27.53, 93.83], [27.98, 94.22], [28.06, 95.33]],
+        status: 'CAUTION: MUDWASH AT POTIN',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Potin cuttings (Km 18–34): Loose hill washouts spreading across blind turns',
+        clearingEta: 'Arunachal PWD excavators clearing mud continuously',
+        alternative: 'Daylight driving recommended with high ground clearance vehicles',
+        agency: 'Arunachal Pradesh PWD (Highways)',
+        blockagePoint: [27.35, 93.72],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 9. BCT Road (Balipara–Charduar–Tawang)
+    {
+        id: 'bct_tawang',
+        name: 'BCT Road — Tezpur – Bomdila – Sela Tunnel – Tawang',
+        highwayCode: 'BCT Corridor',
+        state: 'Arunachal Pradesh',
+        coords: [[26.85, 92.70], [27.15, 92.50], [27.26, 92.42], [27.50, 92.10], [27.59, 91.86]],
+        status: 'RESTRICTED AT SELA PASS APPROACH',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Sela Pass approach: Freeze-thaw rockfalls and loose boulder slides along switchbacks',
+        clearingEta: 'BRO Project Vartak dozers maintaining pilot lane',
+        alternative: 'Transit via newly inaugurated Sela Tunnel when cleared of rockwash',
+        agency: 'BRO Project Vartak',
+        blockagePoint: [27.50, 92.10],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 10. NH-54 / NH-306 (Silchar to Aizawl)
+    {
+        id: 'nh54',
+        name: 'NH-54 / NH-306 — Silchar to Aizawl Lifeline',
+        highwayCode: 'NH-306',
+        state: 'Assam / Mizoram',
+        coords: [[24.82, 92.80], [24.30, 92.75], [23.95, 92.70], [23.73, 92.72]],
+        status: 'RESTRICTED AT HUNTHAR SINKING ZONE',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Hunthar slope (Northern Aizawl): Progressive rotational road depression and surface fractures',
+        clearingEta: 'Controlled single-vehicle movement; gross weight restricted to <12 Tonnes',
+        alternative: 'Via Durtlang bypass route (+45 mins)',
+        agency: 'Mizoram PWD & NHIDCL',
+        blockagePoint: [23.76, 92.71],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 11. NH-717A (Alternative Sikkim Access)
+    {
+        id: 'nh717a',
+        name: 'NH-717A — Bagrakote – Labha – Algarah – Gangtok',
+        highwayCode: 'NH-717A',
+        state: 'West Bengal / Sikkim',
+        coords: [[26.88, 88.60], [27.08, 88.66], [27.18, 88.62], [27.28, 88.60], [27.34, 88.61]],
+        status: 'RESTRICTED AT RORATHANG SECTION',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Rorathang embankment: Slope slump along valley flank; single-lane convoy control',
+        clearingEta: 'Passable for light vehicles and emergency ambulances',
+        alternative: 'Official designated alternative bypass to blocked NH-10',
+        agency: 'NHIDCL Sikkim Project',
+        blockagePoint: [27.18, 88.62],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 12. NH-702D (Mokokchung to Mariani)
+    {
+        id: 'nh702d',
+        name: 'NH-702D — Mokokchung to Mariani Corridor',
+        highwayCode: 'NH-702D',
+        state: 'Nagaland / Assam',
+        coords: [[26.66, 94.33], [26.55, 94.40], [26.40, 94.45], [26.32, 94.52]],
+        status: 'SINGLE LANE AT CHANGKI VALLEY',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Changki gorge: Debris roll-down and mud slurry from hillside tea estates',
+        clearingEta: 'Local PWD earthmovers operating; single vehicle transit',
+        alternative: 'Mariani to Mokokchung via Tuli–Amguri route',
+        agency: 'Nagaland PWD (Mechanical)',
+        blockagePoint: [26.55, 94.40],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 13. NH-208A (Tripura Eastern Ridge)
+    {
+        id: 'nh208a',
+        name: 'NH-208A — Kailashahar – Dharmanagar – Kanchanpur',
+        highwayCode: 'NH-208A',
+        state: 'Tripura',
+        coords: [[24.33, 92.01], [24.38, 92.17], [24.08, 92.25], [23.75, 92.28]],
+        status: 'PASSABLE WITH CARE AT JAMPUI',
+        risk: 'RESTRICTED',
+        color: '#f59e0b',
+        blockage: 'Jampui Hills foothills: Lateral surface mudwash and gravel washouts',
+        clearingEta: 'Clear for vehicular transit under 20 km/h speed limit',
+        alternative: 'Slow driving recommended on steep ascent turns',
+        agency: 'Tripura PWD NH Division',
+        blockagePoint: [24.08, 92.25],
+        blockageSeverity: 'RESTRICTED'
+    },
+    // 14. NH-27 (East-West Highway)
+    {
+        id: 'nh27',
+        name: 'NH-27 — East-West Expressway (Siliguri – Guwahati)',
+        highwayCode: 'NH-27',
+        state: 'West Bengal / Assam',
+        coords: [[26.73, 88.40], [26.54, 89.50], [26.51, 90.54], [26.18, 91.74]],
+        status: '4-LANE EXPRESSWAY ALL CLEAR',
+        risk: 'SAFE',
         color: '#10b981',
-        blockage: 'None',
-        alternative: 'Direct corridor operating smoothly'
+        blockage: 'None: Plains corridor, zero slope instability risk',
+        clearingEta: 'Unrestricted 24/7 high-speed commercial transit',
+        alternative: 'Primary heavy logistics lifeline connecting North East to mainland India',
+        agency: 'National Highways Authority of India (NHAI)',
+        blockagePoint: null,
+        blockageSeverity: 'SAFE'
+    },
+    // 15. NH-15 (Brahmaputra North Bank Highway)
+    {
+        id: 'nh15',
+        name: 'NH-15 — Tezpur to North Lakhimpur & Dibrugarh',
+        highwayCode: 'NH-15',
+        state: 'Assam',
+        coords: [[26.63, 92.79], [26.85, 93.62], [27.23, 94.10], [27.47, 94.91]],
+        status: 'HIGHWAY FULLY OPEN',
+        risk: 'SAFE',
+        color: '#10b981',
+        blockage: 'None: Flat Brahmaputra valley floor, fully open across Bogibeel Bridge',
+        clearingEta: 'Clear unrestricted highway',
+        alternative: 'Direct northern axis serving Upper Assam and East Arunachal',
+        agency: 'NHIDCL & Assam PWD',
+        blockagePoint: null,
+        blockageSeverity: 'SAFE'
     }
 ];
 
+const roadLinesMap = new Map();
+const roadMarkersMap = new Map();
+
 const roadLines = roads.map(road => {
-    return L.polyline(road.coords, {
+    const line = L.polyline(road.coords, {
         color: road.color,
         weight: 5,
         opacity: 0.95
     }).addTo(roadLayer).bindPopup(`
         <div class="landslide-popup-card">
-            <b class="text-white text-sm">${road.name}</b>
-            <div class="text-xs mt-1 text-gray-300">Status: <span style="color:${road.color}">${road.status}</span></div>
-            <div class="text-xs text-gray-400 mt-1">Blockage: <b>${road.blockage}</b></div>
-            <div class="text-xs text-emerald-400 mt-1">Alternative: ${road.alternative}</div>
+            <div class="flex items-center justify-between">
+                <b class="text-white text-sm">${road.name}</b>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
+                    ${road.status}
+                </span>
+            </div>
+            <div class="text-xs text-gray-300 mt-2 leading-relaxed">
+                <b>Corridor:</b> ${road.highwayCode} &bull; ${road.state}<br>
+                <b>Authority:</b> ${road.agency}<br>
+                <b>Condition:</b> ${road.blockage}<br>
+                <span class="text-emerald-400"><b>Detour:</b> ${road.alternative}</span>
+            </div>
         </div>
     `);
+
+    roadLinesMap.set(road.id, line);
+
+    // Add blockage point marker if highway is blocked or restricted
+    if (road.blockagePoint) {
+        const isCritical = road.blockageSeverity === 'CRITICAL';
+        const blockageIcon = L.divIcon({
+            className: 'road-blockage-icon',
+            html: `
+                <div class="road-blockage-pin ${isCritical ? 'critical' : 'restricted'}">
+                    <span>${isCritical ? '⛔' : '⚠️'}</span>
+                </div>
+            `,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
+
+        const blockageMarker = L.marker(road.blockagePoint, { icon: blockageIcon }).addTo(roadLayer).bindPopup(`
+            <div class="landslide-popup-card">
+                <div class="flex items-center justify-between">
+                    <b class="${isCritical ? 'text-red-400' : 'text-amber-400'} text-xs font-bold">${isCritical ? '⛔ ROAD SEVERED / BLOCKED' : '⚠️ SINGLE-LANE RESTRICTED'}</b>
+                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
+                        ${road.risk}
+                    </span>
+                </div>
+                <div class="text-sm font-bold text-white mt-1">${road.name}</div>
+                <div class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                    <b>Location:</b> ${road.state}<br>
+                    <b>Agency:</b> ${road.agency}<br>
+                    <b>Obstruction:</b> ${road.blockage}
+                </div>
+                <div class="text-xs text-yellow-400 mt-1 font-semibold"><b>Clearance ETA:</b> ${road.clearingEta}</div>
+                <div class="text-xs text-emerald-400 mt-1 font-semibold"><b>Alternative Route:</b> ${road.alternative}</div>
+            </div>
+        `);
+
+        roadMarkersMap.set(road.id, blockageMarker);
+    }
+
+    return line;
 });
 
-// Detour dashed route
+// Detour dashed bypass route for NH-10 (Lava – Algarah – Reshi Road)
 L.polyline([[27.04, 88.45], [27.16, 88.62], [27.12, 88.75], [27.05, 88.83]], {
     color: '#38bdf8',
     weight: 3,
     dashArray: '7 7',
-    opacity: 0.9
+    opacity: 0.95
 }).addTo(roadLayer).bindPopup(`
     <div class="landslide-popup-card">
-        <b class="text-sky-400">NH-10 Emergency Bypass Route</b>
-        <p class="text-xs text-gray-300 mt-1">Lava &ndash; Algarah &ndash; Reshi Road (Operational for light emergency vehicles)</p>
+        <b class="text-sky-400 text-xs">🛣️ NH-10 EMERGENCY BYPASS ROUTE</b>
+        <p class="text-xs text-gray-300 mt-1">Lava &ndash; Algarah &ndash; Reshi Road (Operational for ambulances and light emergency convoys).</p>
     </div>
 `);
+
+// Window Focus Road Helper for Interactive Cards
+window.focusRoad = function(roadId) {
+    const road = roads.find(r => r.id === roadId);
+    if (!road) return;
+
+    // Scroll map container into view
+    const mapContainer = document.getElementById('mapContainer');
+    if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Target point: blockagePoint if exists, else midpoint of coords
+    const targetPoint = road.blockagePoint || road.coords[Math.floor(road.coords.length / 2)];
+    const zoomLevel = road.blockagePoint ? 13 : 9.5;
+
+    map.flyTo(targetPoint, zoomLevel, { duration: 1.2 });
+
+    setTimeout(() => {
+        const marker = roadMarkersMap.get(road.id);
+        if (marker) {
+            marker.openPopup();
+        } else {
+            const line = roadLinesMap.get(road.id);
+            if (line) line.openPopup(targetPoint);
+        }
+    }, 1300);
+};
 
 // ----------------------------------------------------------------------------
 // 7. Floating Map Legend & Layer Controls
@@ -799,21 +1301,21 @@ const legend = L.control({ position: 'bottomleft' });
 legend.onAdd = () => {
     const div = L.DomUtil.create('div', 'map-legend');
     div.innerHTML = `
-        <b style="font-size:11px;letter-spacing:0.04em">LANDSLIDE HAZARD KEY</b><br>
+        <b style="font-size:11px;letter-spacing:0.04em">LANDSLIDE &amp; HIGHWAY KEY</b><br>
         <span class="legend-dot" style="background:#ef4444"></span><b>Red</b>: Critical Hazard (&gt;70)<br>
         <span class="legend-dot" style="background:#eab308"></span><b>Yellow</b>: Watch Advisory (35–70)<br>
         <span class="legend-dot" style="background:#10b981"></span><b>Green</b>: Low / Safe (&lt;35)<br>
-        <span style="display:inline-block;margin-right:4px;">📍</span><b>Orange</b>: Citizen Reports<br>
-        <span class="legend-line" style="border-color:#ef4444"></span>Blocked Highway (NH-10)<br>
-        <span class="legend-line" style="border-color:#f59e0b"></span>Single-Lane / Watch (NH-29)<br>
-        <span class="legend-line" style="border-color:#10b981"></span>Open Corridor (NH-06)
+        <span style="display:inline-block;margin-right:4px;">📍</span><b>Cyan</b>: Your Location<br>
+        <span style="display:inline-block;margin-right:4px;">⛔</span><b>Red Pin</b>: Blocked Highway (5 Routes)<br>
+        <span style="display:inline-block;margin-right:4px;">⚠️</span><b>Yellow Pin</b>: Single-Lane Watch (6 Routes)<br>
+        <span class="legend-line" style="border-color:#10b981"></span>Open Arteries (NH-27/NH-15)
     `;
     return div;
 };
 legend.addTo(map);
 
 // ----------------------------------------------------------------------------
-// 8. Map Filter Toolbar (All, Critical, Watch, Safe)
+// 8. Map Filter Toolbar (All, Critical, Watch, Safe, Roads)
 // ----------------------------------------------------------------------------
 const mapFilterButtons = document.querySelectorAll('.map-filter');
 mapFilterButtons.forEach(button => {
@@ -835,7 +1337,7 @@ mapFilterButtons.forEach(button => {
             map.addLayer(roadLayer);
             map.addLayer(halosLayer);
             map.addLayer(reportLayer);
-            if (countDisplay) countDisplay.textContent = 'Showing 30 Landslide Monitoring Zones across NER';
+            if (countDisplay) countDisplay.textContent = 'Showing 30 Landslide Monitoring Zones & 15 Corridors';
             map.flyTo([26.2, 92.8], 7, { duration: 0.8 });
         } else if (filter === 'CRITICAL') {
             map.addLayer(criticalLayer);
@@ -858,6 +1360,13 @@ mapFilterButtons.forEach(button => {
             map.addLayer(roadLayer);
             if (countDisplay) countDisplay.textContent = 'Showing 10 Low Hazard / Safe Zones (Green)';
             map.flyTo([25.8, 92.8], 7.5, { duration: 0.8 });
+        } else if (filter === 'ROADS') {
+            map.removeLayer(criticalLayer);
+            map.removeLayer(watchLayer);
+            map.removeLayer(safeLayer);
+            map.addLayer(roadLayer);
+            if (countDisplay) countDisplay.textContent = 'Showing 15 National Highway Corridors (5 Blocked, 6 Restricted)';
+            map.flyTo([26.2, 91.8], 7.2, { duration: 0.8 });
         }
     });
 });
@@ -1049,6 +1558,119 @@ const searchInput = document.getElementById('hotspotSearch');
 if (searchInput) {
     searchInput.addEventListener('input', e => {
         renderHotspotsDirectory(currentDirCategory, e.target.value);
+    });
+}
+
+// ----------------------------------------------------------------------------
+// 10.1 Highway Lifelines & Road Blockages Directory Component
+// ----------------------------------------------------------------------------
+const roadsListContainer = document.getElementById('roadsList');
+let currentRoadFilter = 'all';
+
+function renderRoadsDirectory(filterCategory = 'all', searchQuery = '') {
+    if (!roadsListContainer) return;
+
+    const query = searchQuery.trim().toLowerCase();
+    const filtered = roads.filter(road => {
+        const matchesCategory = (filterCategory === 'all' ||
+            (filterCategory === 'CRITICAL' && road.blockageSeverity === 'CRITICAL') ||
+            (filterCategory === 'RESTRICTED' && road.blockageSeverity === 'RESTRICTED') ||
+            (filterCategory === 'SAFE' && road.blockageSeverity === 'SAFE') ||
+            road.risk === filterCategory);
+
+        const matchesSearch = query === '' ||
+            road.name.toLowerCase().includes(query) ||
+            road.highwayCode.toLowerCase().includes(query) ||
+            road.state.toLowerCase().includes(query) ||
+            road.status.toLowerCase().includes(query) ||
+            road.blockage.toLowerCase().includes(query) ||
+            road.alternative.toLowerCase().includes(query) ||
+            road.agency.toLowerCase().includes(query);
+
+        return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        roadsListContainer.innerHTML = `
+            <div class="text-xs text-gray-500 text-center py-8">
+                <i data-lucide="route" class="w-8 h-8 mx-auto mb-2 opacity-50 text-gray-400"></i>
+                <p>No matching highway corridors found.</p>
+            </div>
+        `;
+        lucide.createIcons();
+        return;
+    }
+
+    roadsListContainer.innerHTML = filtered.map(road => {
+        const isCrit = road.blockageSeverity === 'CRITICAL';
+        const isRest = road.blockageSeverity === 'RESTRICTED';
+        const statusBadgeColor = isCrit ? '#ef4444' : isRest ? '#f59e0b' : '#10b981';
+        const statusIcon = isCrit ? '⛔' : isRest ? '⚠️' : '🟢';
+        const cardClass = isCrit ? 'critical' : isRest ? 'restricted' : 'safe';
+
+        return `
+            <div class="road-card ${cardClass}" id="roadCard-${road.id}">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="text-base">${statusIcon}</span>
+                        <div>
+                            <h4 class="text-xs font-bold text-white leading-tight">${road.name}</h4>
+                            <p class="text-[10px] text-gray-400">${road.state} &bull; <span class="text-cyan-400 font-semibold">${road.agency}</span></p>
+                        </div>
+                    </div>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider" style="background:${statusBadgeColor}20;color:${statusBadgeColor};border:1px solid ${statusBadgeColor}50">
+                        ${road.status}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] text-gray-300 mt-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                    <div>
+                        <span class="text-[9px] text-gray-400 uppercase font-semibold block">Obstruction / Status</span>
+                        <p class="text-gray-200 mt-0.5 leading-snug">${road.blockage}</p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-yellow-400 uppercase font-semibold block">Clearance / Traffic Advisory</span>
+                        <p class="text-gray-200 mt-0.5 leading-snug">${road.clearingEta}</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800 text-[10px]">
+                    <div class="flex items-center gap-1.5 min-w-0 text-emerald-400">
+                        <i data-lucide="corner-up-right" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                        <span class="truncate"><b>Detour:</b> ${road.alternative}</span>
+                    </div>
+                    <button class="px-2.5 py-1 bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 rounded border border-sky-500/40 text-[10px] font-semibold transition flex items-center gap-1 flex-shrink-0" onclick="window.focusRoad('${road.id}')">
+                        <i data-lucide="crosshair" class="w-3 h-3"></i> Inspect on Map
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    lucide.createIcons();
+}
+
+// Road filter buttons
+const roadFilterButtons = document.querySelectorAll('.road-filter-btn');
+roadFilterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        roadFilterButtons.forEach(b => {
+            b.classList.remove('bg-sky-600', 'text-white');
+            b.classList.add('bg-slate-800');
+        });
+        btn.classList.add('bg-sky-600', 'text-white');
+        btn.classList.remove('bg-slate-800');
+        currentRoadFilter = btn.dataset.roadFilter;
+        const searchInput = document.getElementById('roadSearch');
+        renderRoadsDirectory(currentRoadFilter, searchInput ? searchInput.value : '');
+    });
+});
+
+// Road search listener
+const roadSearchInput = document.getElementById('roadSearch');
+if (roadSearchInput) {
+    roadSearchInput.addEventListener('input', e => {
+        renderRoadsDirectory(currentRoadFilter, e.target.value);
     });
 }
 
@@ -1302,6 +1924,7 @@ const navTargets = {
     map: '#mapContainer',
     risk: '#riskPanel',
     hotspots: '#hotspots',
+    roadsPanel: '#roadsPanel',
     reportPanel: '#reportPanel'
 };
 
@@ -1310,7 +1933,7 @@ document.querySelectorAll('.top-nav-item').forEach(button => {
         const navKey = button.dataset.nav;
         const selector = navTargets[navKey];
 
-        if (navKey === 'hotspots' || navKey === 'reportPanel') {
+        if (navKey === 'hotspots' || navKey === 'roadsPanel' || navKey === 'reportPanel') {
             const tabBtn = document.querySelector(`[data-tab="${navKey}"]`);
             if (tabBtn) tabBtn.click();
         }
@@ -1329,8 +1952,12 @@ document.querySelectorAll('.top-nav-item').forEach(button => {
 });
 
 // ----------------------------------------------------------------------------
-// 18. Initial State Setup
+// 18. Initial State Setup (Default Locked on User's Location)
 // ----------------------------------------------------------------------------
 renderHotspotsDirectory('all');
+renderRoadsDirectory('all');
 updateRiskPanel(landslidePlaces[0]);
-setTimeout(() => map.invalidateSize(), 250);
+setTimeout(() => {
+    map.invalidateSize();
+    locateUser(true); // Default map view: locked directly on the user's location
+}, 300);

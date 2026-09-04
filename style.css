@@ -244,6 +244,72 @@ input[type=range] {
     100% { transform: scale(2.0); opacity: 0; }
 }
 
+/* User Live GPS Marker */
+.user-gps-pin {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.user-gps-pulse {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(6, 182, 212, 0.35);
+    border: 2px solid #06b6d4;
+    animation: radar-pulse 2s infinite ease-out;
+}
+.user-gps-core {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    background: #06b6d4;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.9);
+    z-index: 2;
+}
+
+/* Highway Blockage Point Pins */
+.road-blockage-pin {
+    background: #ef4444;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.9);
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+}
+.road-blockage-pin.restricted {
+    background: #f59e0b;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.9);
+}
+.road-blockage-pin::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(239, 68, 68, 0.7);
+    animation: radar-pulse 2s infinite ease-out;
+    pointer-events: none;
+}
+.road-blockage-pin.restricted::after {
+    border-color: rgba(245, 158, 11, 0.7);
+}
+
 /* Custom Leaflet Popups */
 .leaflet-popup-content-wrapper {
     background: rgba(15, 23, 42, 0.96) !important;
@@ -422,6 +488,66 @@ input[type=range] {
 }
 #hotspotsList::-webkit-scrollbar-thumb:hover {
     background: #475569;
+}
+
+/* Highway Road Cards */
+.road-card {
+    padding: 12px 14px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-left: 4px solid;
+    border-radius: 10px;
+    transition: all 0.22s ease;
+}
+.road-card:hover {
+    background: rgba(30, 41, 59, 0.88);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+.road-card.critical {
+    border-left-color: #ef4444;
+}
+.road-card.critical:hover {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 8px 22px rgba(239, 68, 68, 0.18);
+}
+.road-card.restricted {
+    border-left-color: #f59e0b;
+}
+.road-card.restricted:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 8px 22px rgba(245, 158, 11, 0.18);
+}
+.road-card.safe {
+    border-left-color: #10b981;
+}
+.road-card.safe:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.18);
+}
+
+#roadsList::-webkit-scrollbar {
+    width: 6px;
+}
+#roadsList::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 4px;
+}
+#roadsList::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+#roadsList::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+.light-mode .road-card {
+    background: var(--light-surface);
+    border-color: var(--light-border);
+    color: var(--light-text);
+}
+.light-mode .road-card:hover {
+    background: #edf8f3;
 }
 
 @media (max-width: 640px) { body { padding: .75rem; max-width: 100vw; } #map { height: 390px; } .leaflet-control-layers { max-width: 150px; } .forecast-chart { height: 78px; } }
