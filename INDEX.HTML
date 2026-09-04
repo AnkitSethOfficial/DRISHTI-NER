@@ -23,12 +23,24 @@
                 <i data-lucide="mountain-snow" class="text-white"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">DRISHTI-NER <span class="text-xs font-normal border border-emerald-500 text-emerald-500 px-2 py-0.5 rounded ml-2 uppercase">SIH Edition</span></h1>
+                <h1 class="text-2xl font-bold tracking-tight">DRISHTI-NER</h1>
                 <p data-i18n="subtitle" class="text-xs text-gray-400">AI-Enabled Landslide Early Warning & Lifeline Monitoring Platform</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-4 text-sm">
+        <nav class="top-navigation glass-panel rounded-lg p-1 order-3 lg:order-none w-full lg:w-auto" aria-label="Primary navigation">
+            <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+                <button data-nav="dashboard" class="top-nav-item active" aria-current="page">Dashboard</button>
+                <button data-nav="map" class="top-nav-item">Live Map</button>
+                <button data-nav="risk" class="top-nav-item">Risk Analysis</button>
+                <button data-nav="incidents" class="top-nav-item">Incidents</button>
+                <button data-nav="response" class="top-nav-item">Response Center</button>
+                <button data-nav="reports" class="top-nav-item">Reports</button>
+                <button data-nav="alerts" class="top-nav-alert" aria-label="Emergency alerts" title="Emergency alerts"><i data-lucide="bell" class="w-4 h-4"></i><span class="top-nav-alert-dot"></span></button>
+            </div>
+        </nav>
+
+        <div class="header-controls flex items-center gap-4 text-sm">
             <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span class="text-gray-300"><span data-i18n="feeds">IMD & Satellite Feeds</span>: <b class="text-emerald-400" data-i18n="active">ACTIVE</b></span>
@@ -43,6 +55,7 @@
             <button class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-semibold flex items-center gap-2 transition">
                 <i data-lucide="presentation" class="w-4 h-4"></i> <span data-i18n="pitch">Pitch & Architecture</span>
             </button>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><i data-lucide="sun" class="theme-sun w-4 h-4"></i><i data-lucide="moon" class="theme-moon w-4 h-4"></i><span class="theme-label">Light</span></button>
         </div>
     </header>
 
