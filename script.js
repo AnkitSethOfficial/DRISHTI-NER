@@ -1046,16 +1046,31 @@ const roads = [
         name: 'NH-10 — Siliguri to Gangtok Corridor',
         highwayCode: 'NH-10',
         state: 'Sikkim / West Bengal',
-        coords: [[26.73, 88.40], [26.85, 88.42], [27.04, 88.45], [27.10, 88.52], [27.34, 88.61]],
+        coords: [
+            [26.727, 88.428], [26.780, 88.435], [26.840, 88.450], [26.892, 88.472], // Siliguri -> Sevoke
+            [26.928, 88.455], [26.974, 88.435], [27.025, 88.431],                   // Kalijhora -> 29th Mile (Blockage)
+            [27.065, 88.498], [27.086, 88.457], [27.135, 88.485],                   // Teesta Bazaar -> Melli
+            [27.177, 88.528], [27.200, 88.520], [27.234, 88.499],                   // Rangpo -> Singtam
+            [27.265, 88.545], [27.294, 88.585], [27.318, 88.601], [27.3389, 88.6065] // Ranipool -> Gangtok
+        ],
         status: 'BLOCKED AT 29TH MILE',
         risk: 'CRITICAL',
         color: '#ef4444',
         blockage: '29th Mile & Sethi Jhora: Active slope slip, rolling boulders, and Teesta under-cutting',
         clearingEta: 'SDRF / BRO Project Swastik clearing active (Est. 14 hrs)',
-        alternative: 'Via Lava – Algarah – Rhenock – Reshi Road (+2.5 hrs for light vehicles)',
+        alternative: 'Via Lava – Algarah – Rhenock – Pakyong bypass (+2.5 hrs for light vehicles)',
         agency: 'BRO Project Swastik & Sikkim PWD',
-        blockagePoint: [27.08, 88.49],
-        blockageSeverity: 'CRITICAL'
+        blockagePoint: [27.025, 88.431],
+        blockageSeverity: 'CRITICAL',
+        hasDetour: true,
+        detourName: 'Lava – Algarah – Reshi – Pakyong Bypass (NH-717A)',
+        detourCoords: [
+            [26.892, 88.472], [26.920, 88.580], [26.960, 88.700], // Sevoke -> Bagrakote -> Gorubathan
+            [27.040, 88.685], [27.080, 88.660], [27.110, 88.580], // Lava -> Algarah
+            [27.150, 88.610], [27.175, 88.640], [27.200, 88.610], // Pedong -> Reshi -> Rorathang
+            [27.240, 88.590], [27.294, 88.585], [27.3389, 88.6065] // Pakyong -> Ranipool -> Gangtok
+        ],
+        detourVehicleType: 'Light Vehicles, Ambulances & Essential 4x4s'
     },
     // 2. NH-110 (Old Hill Cart Road)
     {
@@ -1063,16 +1078,31 @@ const roads = [
         name: 'NH-110 (Hill Cart Road) — Siliguri to Darjeeling',
         highwayCode: 'NH-110',
         state: 'West Bengal',
-        coords: [[26.73, 88.41], [26.82, 88.35], [26.88, 88.28], [26.98, 88.27], [27.04, 88.26]],
+        coords: [
+            [26.727, 88.410], [26.755, 88.385], [26.790, 88.360], // Siliguri -> Sukna
+            [26.815, 88.350], [26.830, 88.345], [26.855, 88.330], // Rongtong -> Tindharia
+            [26.878, 88.328],                                     // Pagla Jhora (Blockage)
+            [26.885, 88.315], [26.882, 88.278],                   // Mahanadi -> Kurseong
+            [26.910, 88.285], [26.920, 88.290], [26.938, 88.288], // Tung -> Dilaram
+            [26.965, 88.280], [26.990, 88.270], [27.010, 88.258], // Sonada -> Jorebungalow / Ghum
+            [27.025, 88.260], [27.0410, 88.2663]                  // Batasia Loop -> Darjeeling
+        ],
         status: 'SEVERED AT PAGLA JHORA',
         risk: 'CRITICAL',
         color: '#ef4444',
         blockage: 'Pagla Jhora / Tindharia: 40m road formation slumped down mountain ravine',
         clearingEta: 'Closed for all commercial freight (Est. 48 hrs)',
-        alternative: 'Rerouted via Rohini Road or Pankhabari (Strictly light vehicles)',
+        alternative: 'Rerouted via Rohini Toll Road or Pankhabari (Strictly light vehicles)',
         agency: 'West Bengal PWD NH Division',
-        blockagePoint: [26.88, 88.28],
-        blockageSeverity: 'CRITICAL'
+        blockagePoint: [26.878, 88.328],
+        blockageSeverity: 'CRITICAL',
+        hasDetour: true,
+        detourName: 'Rohini Road Scenic Mountain Bypass',
+        detourCoords: [
+            [26.790, 88.360], [26.805, 88.330], [26.820, 88.305], // Sukna -> Rohini Toll Gate
+            [26.845, 88.290], [26.865, 88.280], [26.882, 88.278]  // Switchbacks -> Kurseong
+        ],
+        detourVehicleType: 'Light Passenger Cars & Taxis (<3.5 Tonnes)'
     },
     // 3. North Sikkim Highway (NSH)
     {
@@ -1080,16 +1110,29 @@ const roads = [
         name: 'North Sikkim Highway — Mangan to Chungthang & Lachen',
         highwayCode: 'NSH',
         state: 'North Sikkim',
-        coords: [[27.34, 88.61], [27.50, 88.53], [27.60, 88.64], [27.72, 88.55]],
+        coords: [
+            [27.3389, 88.6065], [27.370, 88.615], [27.408, 88.595], [27.425, 88.580], // Gangtok -> Phodong
+            [27.465, 88.555], [27.5050, 88.5300],                                     // Mangan
+            [27.525, 88.545], [27.550, 88.580],                                       // Singhik -> Toong Gorge (Blockage)
+            [27.575, 88.610], [27.605, 88.645],                                       // Naga Falls -> Chungthang
+            [27.635, 88.610], [27.660, 88.580], [27.695, 88.560], [27.725, 88.550]   // Munshithang -> Lachen
+        ],
         status: 'TOTAL CLOSURE AT TOONG GORGE',
         risk: 'CRITICAL',
         color: '#ef4444',
         blockage: 'Toong & Pegong: Glacial surge aftermath; massive rock cliffs collapsed on carriageway',
         clearingEta: 'Emergency bailey bridge launch in progress by BRO',
-        alternative: 'No overland vehicle route; essential supplies airlifted by IAF',
+        alternative: 'Dzongu – Shipgyer emergency footbridge link; IAF relief supply airdrop active',
         agency: 'Border Roads Organisation (BRO)',
-        blockagePoint: [27.55, 88.58],
-        blockageSeverity: 'CRITICAL'
+        blockagePoint: [27.550, 88.580],
+        blockageSeverity: 'CRITICAL',
+        hasDetour: true,
+        detourName: 'Dzongu Valley Emergency River Link',
+        detourCoords: [
+            [27.505, 88.530], [27.515, 88.510], [27.540, 88.525], // Mangan -> Passingdang
+            [27.565, 88.550], [27.590, 88.595], [27.605, 88.645]  // Shipgyer -> Chungthang Bailey
+        ],
+        detourVehicleType: 'Pedestrian & Emergency Porter Relief Trail'
     },
     // 4. Lumding – Haflong – Silchar Corridor (Dima Hasao)
     {
@@ -1097,16 +1140,32 @@ const roads = [
         name: 'Lumding – Haflong – Silchar Mountain Pass',
         highwayCode: 'NH-54E / NH-27 Con.',
         state: 'Assam (Dima Hasao)',
-        coords: [[25.75, 93.18], [25.40, 93.10], [25.17, 93.02], [24.95, 92.90], [24.82, 92.80]],
+        coords: [
+            [25.750, 93.180], [25.680, 93.165], [25.600, 93.155], [25.550, 93.145], // Lumding -> Langting
+            [25.480, 93.135], [25.400, 93.120], [25.340, 93.100],                   // Maibang
+            [25.260, 93.060], [25.180, 93.020],                                     // Mahur -> Haflong
+            [25.130, 92.990],                                                       // Jatinga Lampu (Blockage)
+            [25.070, 92.940], [25.020, 92.880], [24.950, 92.850],                   // Harangajao
+            [24.910, 92.830], [24.850, 92.815], [24.820, 92.800]                    // Balacherra -> Silchar
+        ],
         status: 'BLOCKED AT JATINGA MUD SLIDE',
         risk: 'CRITICAL',
         color: '#ef4444',
         blockage: 'Jatinga Lampu: 200m active mudflow buried highway section; hill cut culvert ruptured',
         clearingEta: 'NHIDCL excavators clearing heavy slurry (Est. 24 hrs)',
-        alternative: 'Via Umrangso – Lanka detour route (+4.5 hrs)',
+        alternative: 'Via Umrangso – Lanka detour corridor (+4.5 hrs bypass)',
         agency: 'National Highways & Infrastructure Development Corp (NHIDCL)',
-        blockagePoint: [25.15, 92.98],
-        blockageSeverity: 'CRITICAL'
+        blockagePoint: [25.130, 92.990],
+        blockageSeverity: 'CRITICAL',
+        hasDetour: true,
+        detourName: 'Umrangso – Lanka Foothill Bypass',
+        detourCoords: [
+            [25.750, 93.180], [25.850, 93.050], [25.920, 92.950], // Lumding -> Lanka
+            [25.780, 92.850], [25.650, 92.780], [25.520, 92.740], // Kheroni -> Umrangso
+            [25.380, 92.710], [25.260, 92.760], [25.020, 92.880], // Umrangso -> Harangajao
+            [24.820, 92.800]                                       // -> Silchar
+        ],
+        detourVehicleType: 'All Commercial Trucks & Essential Supply Convoys'
     },
     // 5. NH-37 / NH-02 (Jiribam to Imphal Lifeline)
     {
@@ -1114,7 +1173,13 @@ const roads = [
         name: 'NH-37 / NH-02 — Jiribam to Imphal Lifeline',
         highwayCode: 'NH-37',
         state: 'Manipur',
-        coords: [[24.80, 93.12], [24.75, 93.35], [24.78, 93.62], [24.81, 93.80], [24.82, 93.94]],
+        coords: [
+            [24.800, 93.120], [24.785, 93.180], [24.770, 93.250], [24.750, 93.350], // Jiribam -> Barak Bridge
+            [24.755, 93.410], [24.760, 93.460], [24.770, 93.550],                   // Kambiron -> Nungba -> Khongsang
+            [24.780, 93.630],                                                       // Tupul Cutting (Blockage)
+            [24.790, 93.700], [24.800, 93.780], [24.810, 93.850],                   // Noney -> Awangkhul -> Kotlen
+            [24.820, 93.890], [24.820, 93.940]                                      // New Keithelmanbi -> Imphal
+        ],
         status: 'SEVERED AT TUPUL CUTTING',
         risk: 'CRITICAL',
         color: '#ef4444',
@@ -1122,8 +1187,16 @@ const roads = [
         clearingEta: 'BRO Project Sewak clearing debris (Est. 36 hrs)',
         alternative: 'Reroute via Old Cachar Road (Restricted to light 4x4 vehicles only)',
         agency: 'BRO Project Sewak',
-        blockagePoint: [24.78, 93.63],
-        blockageSeverity: 'CRITICAL'
+        blockagePoint: [24.780, 93.630],
+        blockageSeverity: 'CRITICAL',
+        hasDetour: true,
+        detourName: 'Old Cachar Road Mountain Bypass',
+        detourCoords: [
+            [24.760, 93.460], [24.710, 93.490], [24.670, 93.530], // Nungba -> Khoupum Valley
+            [24.650, 93.620], [24.630, 93.760], [24.750, 93.880], // Bishnupur Pass
+            [24.820, 93.940]                                       // -> Imphal
+        ],
+        detourVehicleType: 'Light 4x4 Jeeps & Ambulances Only'
     },
     // 6. NH-29 (Dimapur to Kohima Corridor)
     {
@@ -1131,7 +1204,13 @@ const roads = [
         name: 'NH-29 — Dimapur to Kohima & Mao Corridor',
         highwayCode: 'NH-29',
         state: 'Nagaland / Manipur',
-        coords: [[25.91, 93.73], [25.80, 93.85], [25.72, 94.01], [25.68, 94.11], [25.50, 94.12]],
+        coords: [
+            [25.907, 93.727], [25.860, 93.750], [25.820, 93.780], [25.790, 93.850], // Dimapur -> Paglapahar
+            [25.760, 93.930], [25.740, 93.980],                                     // Medziphema -> Piphema
+            [25.710, 94.020],                                                       // Dzüdza River (Blockage)
+            [25.700, 94.050], [25.690, 94.080], [25.670, 94.110],                   // Peducha -> Zubza -> Kohima
+            [25.640, 94.115], [25.600, 94.120], [25.550, 94.122], [25.500, 94.120]   // Kigwema -> Viswema -> Mao
+        ],
         status: 'SINGLE-LANE AT DZÜDZA RIVER',
         risk: 'RESTRICTED',
         color: '#f59e0b',
@@ -1139,8 +1218,15 @@ const roads = [
         clearingEta: 'One-way regulated convoy piloted by Kohima Police',
         alternative: 'Peducha to Tsiesema 10km bypass (Heavy vehicles barred)',
         agency: 'Nagaland PWD (NH) & Kohima Traffic Police',
-        blockagePoint: [25.71, 94.02],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [25.710, 94.020],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Peducha – Tsiesema Bypass Road',
+        detourCoords: [
+            [25.700, 94.040], [25.725, 94.055], [25.740, 94.070], // Peducha -> Tsiesema Village
+            [25.725, 94.095], [25.670, 94.110]                     // -> Kohima Secretariat / High Court
+        ],
+        detourVehicleType: 'Light Vehicles, Sedans, Ambulances'
     },
     // 7. NH-06 (Guwahati – Shillong – Silchar Corridor)
     {
@@ -1148,16 +1234,28 @@ const roads = [
         name: 'NH-06 — Guwahati – Shillong – Silchar Corridor',
         highwayCode: 'NH-06',
         state: 'Assam / Meghalaya',
-        coords: [[26.14, 91.75], [25.58, 91.89], [25.44, 92.20], [25.10, 92.40], [24.82, 92.80]],
+        coords: [
+            [26.120, 91.820], [26.100, 91.890], [25.980, 91.885], [25.900, 91.880], // Guwahati -> Jorabat -> Nongpoh
+            [25.750, 91.890], [25.660, 91.900], [25.560, 92.050],                   // Umsning -> Umiam -> Shillong Bypass
+            [25.500, 92.140], [25.440, 92.200], [25.320, 92.330], [25.260, 92.360], // Mawryngkneng -> Jowai -> Khliehriat
+            [25.120, 92.360],                                                       // Sonapur Tunnel (Restricted)
+            [25.040, 92.380], [24.980, 92.440], [24.900, 92.560], [24.820, 92.800]   // Umkiang -> Malidor -> Badarpur -> Silchar
+        ],
         status: 'SLOW TRANSIT AT SONAPUR TUNNEL',
         risk: 'RESTRICTED',
         color: '#f59e0b',
         blockage: 'Sonapur Tunnel & Lumshnong: Heavy mud slurry at portal approaches; night transit restricted',
         clearingEta: 'Continuous clearing; single convoy movement',
-        alternative: 'Exercise high caution during downpours; daytime transit only',
+        alternative: 'Daytime piloted convoy over mountain crest bypass track',
         agency: 'NHAI & Meghalaya PWD',
-        blockagePoint: [25.12, 92.36],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [25.120, 92.360],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Sonapur Crest Relief Bypass',
+        detourCoords: [
+            [25.135, 92.350], [25.140, 92.365], [25.125, 92.375], [25.105, 92.365] // Ridge bypass
+        ],
+        detourVehicleType: 'One-Way Alternating Convoy'
     },
     // 8. NH-13 (Trans-Arunachal Highway)
     {
@@ -1165,7 +1263,11 @@ const roads = [
         name: 'NH-13 (Trans-Arunachal Highway) — Potin to Pasighat',
         highwayCode: 'NH-13',
         state: 'Arunachal Pradesh',
-        coords: [[27.12, 93.60], [27.53, 93.83], [27.98, 94.22], [28.06, 95.33]],
+        coords: [
+            [27.150, 93.650], [27.250, 93.680], [27.420, 93.750], [27.530, 93.830], // Potin -> Yazali -> Ziro
+            [27.650, 93.950], [27.750, 94.050], [27.880, 94.150], [27.980, 94.220], // Tamen -> Raga -> Daporijo
+            [28.020, 94.750], [28.170, 94.800], [28.210, 95.000], [28.060, 95.330]   // Bame -> Aalo -> Pangin -> Pasighat
+        ],
         status: 'CAUTION: MUDWASH AT POTIN',
         risk: 'RESTRICTED',
         color: '#f59e0b',
@@ -1173,8 +1275,14 @@ const roads = [
         clearingEta: 'Arunachal PWD excavators clearing mud continuously',
         alternative: 'Daylight driving recommended with high ground clearance vehicles',
         agency: 'Arunachal Pradesh PWD (Highways)',
-        blockagePoint: [27.35, 93.72],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [27.250, 93.680],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Kimin – Ziro Valley Foothill Link',
+        detourCoords: [
+            [27.150, 93.650], [27.200, 93.800], [27.320, 93.860], [27.530, 93.830] // Kimin -> Ziro
+        ],
+        detourVehicleType: 'SUVs & High-Clearance Transports'
     },
     // 9. BCT Road (Balipara–Charduar–Tawang)
     {
@@ -1182,16 +1290,27 @@ const roads = [
         name: 'BCT Road — Tezpur – Bomdila – Sela Tunnel – Tawang',
         highwayCode: 'BCT Corridor',
         state: 'Arunachal Pradesh',
-        coords: [[26.85, 92.70], [27.15, 92.50], [27.26, 92.42], [27.50, 92.10], [27.59, 91.86]],
+        coords: [
+            [26.850, 92.700], [27.010, 92.650], [27.120, 92.550], [27.210, 92.480], // Balipara -> Bhalukpong -> Tenga
+            [27.260, 92.420], [27.350, 92.240], [27.420, 92.180], [27.480, 92.120], // Bomdila -> Dirang -> Baisakhi
+            [27.500, 92.100],                                                       // Sela Pass Ridge (Restricted)
+            [27.530, 92.050], [27.580, 91.980], [27.590, 91.860]                    // Jaswant Garh -> Jang -> Tawang
+        ],
         status: 'RESTRICTED AT SELA PASS APPROACH',
         risk: 'RESTRICTED',
         color: '#f59e0b',
         blockage: 'Sela Pass approach: Freeze-thaw rockfalls and loose boulder slides along switchbacks',
         clearingEta: 'BRO Project Vartak dozers maintaining pilot lane',
-        alternative: 'Transit via newly inaugurated Sela Tunnel when cleared of rockwash',
+        alternative: 'Transit via newly inaugurated Sela Tunnel bypass',
         agency: 'BRO Project Vartak',
-        blockagePoint: [27.50, 92.10],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [27.500, 92.100],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Sela Twin-Tube Tunnel All-Weather Bypass',
+        detourCoords: [
+            [27.475, 92.130], [27.495, 92.115], [27.510, 92.085], [27.525, 92.055] // Sela Tunnel route
+        ],
+        detourVehicleType: 'All Weather Permitted Motor Vehicles'
     },
     // 10. NH-54 / NH-306 (Silchar to Aizawl)
     {
@@ -1199,7 +1318,11 @@ const roads = [
         name: 'NH-54 / NH-306 — Silchar to Aizawl Lifeline',
         highwayCode: 'NH-306',
         state: 'Assam / Mizoram',
-        coords: [[24.82, 92.80], [24.30, 92.75], [23.95, 92.70], [23.73, 92.72]],
+        coords: [
+            [24.820, 92.800], [24.680, 92.780], [24.520, 92.760], [24.480, 92.760], // Silchar -> Lailapur -> Vairengte
+            [24.300, 92.730], [24.220, 92.680], [24.030, 92.670], [23.880, 92.660], // Bilkhawthlir -> Kolasib -> Kawnpui
+            [23.800, 92.660], [23.760, 92.710], [23.730, 92.720]                    // Sairang -> Hunthar (Blockage) -> Aizawl
+        ],
         status: 'RESTRICTED AT HUNTHAR SINKING ZONE',
         risk: 'RESTRICTED',
         color: '#f59e0b',
@@ -1207,8 +1330,14 @@ const roads = [
         clearingEta: 'Controlled single-vehicle movement; gross weight restricted to <12 Tonnes',
         alternative: 'Via Durtlang bypass route (+45 mins)',
         agency: 'Mizoram PWD & NHIDCL',
-        blockagePoint: [23.76, 92.71],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [23.760, 92.710],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Durtlang Eastern Ridge Bypass',
+        detourCoords: [
+            [23.810, 92.715], [23.785, 92.735], [23.760, 92.745], [23.735, 92.730] // Durtlang ridge road
+        ],
+        detourVehicleType: 'Cars, Minibuses & Emergency Vehicles'
     },
     // 11. NH-717A (Alternative Sikkim Access)
     {
@@ -1216,24 +1345,39 @@ const roads = [
         name: 'NH-717A — Bagrakote – Labha – Algarah – Gangtok',
         highwayCode: 'NH-717A',
         state: 'West Bengal / Sikkim',
-        coords: [[26.88, 88.60], [27.08, 88.66], [27.18, 88.62], [27.28, 88.60], [27.34, 88.61]],
+        coords: [
+            [26.880, 88.600], [26.960, 88.700], [27.040, 88.685], [27.080, 88.660], // Bagrakote -> Gorubathan -> Lava
+            [27.110, 88.580], [27.150, 88.610], [27.175, 88.640],                   // Algarah -> Pedong -> Reshi
+            [27.200, 88.610],                                                       // Rorathang (Restricted)
+            [27.240, 88.590], [27.294, 88.585], [27.3389, 88.6065]                  // Pakyong -> Ranipool -> Gangtok
+        ],
         status: 'RESTRICTED AT RORATHANG SECTION',
         risk: 'RESTRICTED',
         color: '#f59e0b',
         blockage: 'Rorathang embankment: Slope slump along valley flank; single-lane convoy control',
         clearingEta: 'Passable for light vehicles and emergency ambulances',
-        alternative: 'Official designated alternative bypass to blocked NH-10',
+        alternative: 'Rhenock – Rongli – Machong – Pakyong hill link road',
         agency: 'NHIDCL Sikkim Project',
-        blockagePoint: [27.18, 88.62],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [27.200, 88.610],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Rongli – Machong Ridge Bypass',
+        detourCoords: [
+            [27.175, 88.640], [27.210, 88.670], [27.235, 88.640], [27.240, 88.590] // Rongli -> Pakyong
+        ],
+        detourVehicleType: 'Light Vehicles, Taxis, Ambulances'
     },
-    // 12. NH-702D (Mokokchung to Mariani)
+    // 12. NH-702D (Mokokchung to Mariani Corridor)
     {
         id: 'nh702d',
         name: 'NH-702D — Mokokchung to Mariani Corridor',
         highwayCode: 'NH-702D',
         state: 'Nagaland / Assam',
-        coords: [[26.66, 94.33], [26.55, 94.40], [26.40, 94.45], [26.32, 94.52]],
+        coords: [
+            [26.660, 94.330], [26.610, 94.360], [26.580, 94.380],                   // Mariani -> New Sonowal
+            [26.540, 94.410],                                                       // Changki Valley (Restricted)
+            [26.470, 94.440], [26.380, 94.480], [26.320, 94.520]                    // Longnak -> Mopungchuket -> Mokokchung
+        ],
         status: 'SINGLE LANE AT CHANGKI VALLEY',
         risk: 'RESTRICTED',
         color: '#f59e0b',
@@ -1241,8 +1385,14 @@ const roads = [
         clearingEta: 'Local PWD earthmovers operating; single vehicle transit',
         alternative: 'Mariani to Mokokchung via Tuli–Amguri route',
         agency: 'Nagaland PWD (Mechanical)',
-        blockagePoint: [26.55, 94.40],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [26.540, 94.410],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Amguri – Tuli Alternate Axis',
+        detourCoords: [
+            [26.660, 94.330], [26.800, 94.520], [26.700, 94.650], [26.520, 94.620], [26.320, 94.520] // Amguri -> Tuli -> Mokokchung
+        ],
+        detourVehicleType: 'All Vehicles & Freight Transports'
     },
     // 13. NH-208A (Tripura Eastern Ridge)
     {
@@ -1250,16 +1400,27 @@ const roads = [
         name: 'NH-208A — Kailashahar – Dharmanagar – Kanchanpur',
         highwayCode: 'NH-208A',
         state: 'Tripura',
-        coords: [[24.33, 92.01], [24.38, 92.17], [24.08, 92.25], [23.75, 92.28]],
+        coords: [
+            [24.330, 92.010], [24.280, 92.050], [24.160, 92.030],                   // Kailashahar -> Kumarghat
+            [24.380, 92.170], [24.250, 92.180],                                     // Dharmanagar -> Panisagar
+            [24.080, 92.250],                                                       // Kanchanpur (Restricted)
+            [23.950, 92.270], [23.750, 92.280]                                      // Jampui Hills -> Anandabazar
+        ],
         status: 'PASSABLE WITH CARE AT JAMPUI',
         risk: 'RESTRICTED',
         color: '#f59e0b',
         blockage: 'Jampui Hills foothills: Lateral surface mudwash and gravel washouts',
         clearingEta: 'Clear for vehicular transit under 20 km/h speed limit',
-        alternative: 'Slow driving recommended on steep ascent turns',
+        alternative: 'Kumarghat – Machmara – Damcherra bypass road',
         agency: 'Tripura PWD NH Division',
-        blockagePoint: [24.08, 92.25],
-        blockageSeverity: 'RESTRICTED'
+        blockagePoint: [24.080, 92.250],
+        blockageSeverity: 'RESTRICTED',
+        hasDetour: true,
+        detourName: 'Machmara – Damcherra Bypass',
+        detourCoords: [
+            [24.160, 92.030], [24.100, 92.120], [24.020, 92.210], [23.950, 92.270] // Kumarghat -> Jampui
+        ],
+        detourVehicleType: 'Light Vehicles (<5 Tonnes)'
     },
     // 14. NH-27 (East-West Highway)
     {
@@ -1267,7 +1428,12 @@ const roads = [
         name: 'NH-27 — East-West Expressway (Siliguri – Guwahati)',
         highwayCode: 'NH-27',
         state: 'West Bengal / Assam',
-        coords: [[26.73, 88.40], [26.54, 89.50], [26.51, 90.54], [26.18, 91.74]],
+        coords: [
+            [26.730, 88.400], [26.650, 88.580], [26.520, 88.720], [26.560, 88.820], // Siliguri -> Jalpaiguri -> Mainaguri
+            [26.600, 89.010], [26.520, 89.200], [26.490, 89.520], [26.480, 89.850], // Dhupguri -> Falakata -> Alipurduar
+            [26.470, 89.920], [26.490, 90.220], [26.510, 90.540], [26.510, 90.700], // Srirampur -> Bongaigaon -> Bijni
+            [26.430, 90.960], [26.440, 91.440], [26.450, 91.620], [26.150, 91.680]   // Howly -> Nalbari -> Rangia -> Guwahati
+        ],
         status: '4-LANE EXPRESSWAY ALL CLEAR',
         risk: 'SAFE',
         color: '#10b981',
@@ -1276,7 +1442,8 @@ const roads = [
         alternative: 'Primary heavy logistics lifeline connecting North East to mainland India',
         agency: 'National Highways Authority of India (NHAI)',
         blockagePoint: null,
-        blockageSeverity: 'SAFE'
+        blockageSeverity: 'SAFE',
+        hasDetour: false
     },
     // 15. NH-15 (Brahmaputra North Bank Highway)
     {
@@ -1284,7 +1451,11 @@ const roads = [
         name: 'NH-15 — Tezpur to North Lakhimpur & Dibrugarh',
         highwayCode: 'NH-15',
         state: 'Assam',
-        coords: [[26.63, 92.79], [26.85, 93.62], [27.23, 94.10], [27.47, 94.91]],
+        coords: [
+            [26.630, 92.790], [26.720, 92.950], [26.740, 93.150], [26.780, 93.450], // Tezpur -> Biswanath Chariali
+            [26.880, 93.620], [26.980, 93.850], [27.030, 93.900], [27.230, 94.100], // Gohpur -> Narayanpur -> N. Lakhimpur
+            [27.420, 94.350], [27.480, 94.570], [27.400, 94.850], [27.470, 94.910]   // Gogamukh -> Dhemaji -> Bogibeel -> Dibrugarh
+        ],
         status: 'HIGHWAY FULLY OPEN',
         risk: 'SAFE',
         color: '#10b981',
@@ -1293,19 +1464,23 @@ const roads = [
         alternative: 'Direct northern axis serving Upper Assam and East Arunachal',
         agency: 'NHIDCL & Assam PWD',
         blockagePoint: null,
-        blockageSeverity: 'SAFE'
+        blockageSeverity: 'SAFE',
+        hasDetour: false
     }
 ];
 
 const roadLinesMap = new Map();
 const roadMarkersMap = new Map();
+const detourLinesMap = new Map();
+const activeDetourLayer = L.layerGroup().addTo(map);
+const activeDetourRoadIds = new Set();
+window.activeDetourLayer = activeDetourLayer;
+window.activeDetourRoadIds = activeDetourRoadIds;
 
-const roadLines = roads.map(road => {
-    const line = L.polyline(road.coords, {
-        color: road.color,
-        weight: 5,
-        opacity: 0.95
-    }).addTo(roadLayer).bindPopup(`
+// Dynamic Popup Content Generators
+function createHighwayPopupContent(road) {
+    const isDetourActive = activeDetourRoadIds.has(road.id);
+    return `
         <div class="landslide-popup-card">
             <div class="flex items-center justify-between">
                 <b class="text-white text-sm">${road.name}</b>
@@ -1319,12 +1494,97 @@ const roadLines = roads.map(road => {
                 <b>Condition:</b> ${road.blockage}<br>
                 <span class="text-emerald-400"><b>Detour:</b> ${road.alternative}</span>
             </div>
+            ${road.hasDetour ? `
+                <button id="road-detour-btn-${road.id}" class="mt-2.5 w-full py-1.5 ${isDetourActive ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-500/40' : 'bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border-sky-500/40'} rounded border text-[10px] font-semibold transition flex items-center justify-center gap-1.5" onclick="window.toggleDetour('${road.id}')">
+                    <i data-lucide="${isDetourActive ? 'eye-off' : 'corner-up-right'}" class="w-3 h-3 ${isDetourActive ? 'text-rose-400' : 'text-sky-400'}"></i>
+                    ${isDetourActive ? 'Hide Alternative Road' : 'Show Alternative Road'}
+                </button>
+            ` : ''}
         </div>
-    `);
+    `;
+}
+
+function createBlockagePopupContent(road) {
+    const isCritical = road.blockageSeverity === 'CRITICAL';
+    const isDetourActive = activeDetourRoadIds.has(road.id);
+    return `
+        <div class="landslide-popup-card">
+            <div class="flex items-center justify-between">
+                <b class="${isCritical ? 'text-red-400' : 'text-amber-400'} text-xs font-bold">${isCritical ? '⛔ ROAD SEVERED / BLOCKED' : '⚠️ SINGLE-LANE RESTRICTED'}</b>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
+                    ${road.risk}
+                </span>
+            </div>
+            <div class="text-sm font-bold text-white mt-1">${road.name}</div>
+            <div class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                <b>Location:</b> ${road.state}<br>
+                <b>Agency:</b> ${road.agency}<br>
+                <b>Obstruction:</b> ${road.blockage}
+            </div>
+            <div class="text-xs text-yellow-400 mt-1 font-semibold"><b>Clearance ETA:</b> ${road.clearingEta}</div>
+            <div class="text-xs text-emerald-400 mt-1 font-semibold"><b>Alternative Route:</b> ${road.alternative}</div>
+            ${road.hasDetour ? `
+                <button id="blockage-detour-btn-${road.id}" class="mt-2.5 w-full py-1.5 ${isDetourActive ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-500/40' : 'bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border-sky-500/40'} rounded border text-[10px] font-semibold transition flex items-center justify-center gap-1.5 shadow-sm" onclick="window.toggleDetour('${road.id}')">
+                    <i data-lucide="${isDetourActive ? 'eye-off' : 'corner-up-right'}" class="w-3.5 h-3.5 ${isDetourActive ? 'text-rose-400' : 'text-sky-400'}"></i>
+                    ${isDetourActive ? 'Hide Alternative Road' : 'Show Alternative Road'}
+                </button>
+            ` : ''}
+        </div>
+    `;
+}
+
+function createDetourPopupContent(road) {
+    return `
+        <div class="landslide-popup-card">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-sky-400">🛣️</span>
+                    <b class="text-sky-400 text-xs font-bold">ALTERNATIVE DETOUR ROUTE</b>
+                </div>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-500/40">
+                    DOTTED BLUE
+                </span>
+            </div>
+            <div class="text-sm font-bold text-white mt-1">${road.detourName}</div>
+            <div class="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                <b>Bypasses Obstruction on:</b> <span class="text-white">${road.name}</span><br>
+                <b>Advisory:</b> ${road.alternative}<br>
+                <b>Permitted Traffic:</b> <span class="text-cyan-300 font-semibold">${road.detourVehicleType || 'Light vehicles & emergency transport'}</span>
+            </div>
+            <button class="mt-2.5 w-full py-1.5 bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 rounded border border-rose-500/40 text-[10px] font-semibold transition flex items-center justify-center gap-1.5 shadow-sm" onclick="window.toggleDetour('${road.id}')">
+                <i data-lucide="eye-off" class="w-3.5 h-3.5 text-rose-400"></i> Hide Alternative Road
+            </button>
+        </div>
+    `;
+}
+
+const roadLines = roads.map(road => {
+    // 1. Main Highway Polyline with natural curvature
+    const line = L.polyline(road.coords, {
+        color: road.color,
+        weight: 5,
+        opacity: 0.95,
+        lineCap: 'round',
+        lineJoin: 'round'
+    }).addTo(roadLayer).bindPopup(() => createHighwayPopupContent(road));
 
     roadLinesMap.set(road.id, line);
 
-    // Add blockage point marker if highway is blocked or restricted
+    // 2. Prepare Dotted Blue Alternative Detour Polyline (HIDDEN BY DEFAULT - rendered ONLY on user click)
+    if (road.hasDetour && road.detourCoords) {
+        const detourLine = L.polyline(road.detourCoords, {
+            color: '#38bdf8', // Electric Sky Blue
+            weight: 3.5,
+            dashArray: '6, 8', // Distinct dotted line
+            opacity: 0.95,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).bindPopup(() => createDetourPopupContent(road));
+
+        detourLinesMap.set(road.id, detourLine);
+    }
+
+    // 3. Add blockage point marker if highway is blocked or restricted
     if (road.blockagePoint) {
         const isCritical = road.blockageSeverity === 'CRITICAL';
         const blockageIcon = L.divIcon({
@@ -1339,24 +1599,9 @@ const roadLines = roads.map(road => {
             popupAnchor: [0, -14]
         });
 
-        const blockageMarker = L.marker(road.blockagePoint, { icon: blockageIcon }).addTo(roadLayer).bindPopup(`
-            <div class="landslide-popup-card">
-                <div class="flex items-center justify-between">
-                    <b class="${isCritical ? 'text-red-400' : 'text-amber-400'} text-xs font-bold">${isCritical ? '⛔ ROAD SEVERED / BLOCKED' : '⚠️ SINGLE-LANE RESTRICTED'}</b>
-                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
-                        ${road.risk}
-                    </span>
-                </div>
-                <div class="text-sm font-bold text-white mt-1">${road.name}</div>
-                <div class="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                    <b>Location:</b> ${road.state}<br>
-                    <b>Agency:</b> ${road.agency}<br>
-                    <b>Obstruction:</b> ${road.blockage}
-                </div>
-                <div class="text-xs text-yellow-400 mt-1 font-semibold"><b>Clearance ETA:</b> ${road.clearingEta}</div>
-                <div class="text-xs text-emerald-400 mt-1 font-semibold"><b>Alternative Route:</b> ${road.alternative}</div>
-            </div>
-        `);
+        const blockageMarker = L.marker(road.blockagePoint, { icon: blockageIcon })
+            .addTo(roadLayer)
+            .bindPopup(() => createBlockagePopupContent(road));
 
         roadMarkersMap.set(road.id, blockageMarker);
     }
@@ -1364,18 +1609,45 @@ const roadLines = roads.map(road => {
     return line;
 });
 
-// Detour dashed bypass route for NH-10 (Lava – Algarah – Reshi Road)
-L.polyline([[27.04, 88.45], [27.16, 88.62], [27.12, 88.75], [27.05, 88.83]], {
-    color: '#38bdf8',
-    weight: 3,
-    dashArray: '7 7',
-    opacity: 0.95
-}).addTo(roadLayer).bindPopup(`
-    <div class="landslide-popup-card">
-        <b class="text-sky-400 text-xs">🛣️ NH-10 EMERGENCY BYPASS ROUTE</b>
-        <p class="text-xs text-gray-300 mt-1">Lava &ndash; Algarah &ndash; Reshi Road (Operational for ambulances and light emergency convoys).</p>
-    </div>
-`);
+// Synchronize Detour Button UI state across directory cards and open popups
+function updateDetourButtonUI(roadId, isActive) {
+    const cardBtn = document.getElementById(`card-detour-btn-${roadId}`);
+    if (cardBtn) {
+        if (isActive) {
+            cardBtn.className = 'px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 rounded border border-rose-400/40 text-[10px] font-semibold transition flex items-center gap-1';
+            cardBtn.title = 'Hide Alternative Detour Route';
+            cardBtn.innerHTML = '<i data-lucide="eye-off" class="w-3 h-3 text-rose-400"></i> Hide Alternative Road';
+        } else {
+            cardBtn.className = 'px-2.5 py-1 bg-sky-500/20 hover:bg-sky-500/35 text-sky-300 rounded border border-sky-400/40 text-[10px] font-semibold transition flex items-center gap-1';
+            cardBtn.title = 'Show Alternative Road on Map';
+            cardBtn.innerHTML = '<i data-lucide="route" class="w-3 h-3 text-sky-400"></i> Show Alternative Road';
+        }
+    }
+
+    const roadPopupBtn = document.getElementById(`road-detour-btn-${roadId}`);
+    if (roadPopupBtn) {
+        if (isActive) {
+            roadPopupBtn.className = 'mt-2.5 w-full py-1.5 bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 rounded border border-rose-500/40 text-[10px] font-semibold transition flex items-center justify-center gap-1.5';
+            roadPopupBtn.innerHTML = '<i data-lucide="eye-off" class="w-3 h-3 text-rose-400"></i> Hide Alternative Road';
+        } else {
+            roadPopupBtn.className = 'mt-2.5 w-full py-1.5 bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 rounded border border-sky-500/40 text-[10px] font-semibold transition flex items-center justify-center gap-1.5';
+            roadPopupBtn.innerHTML = '<i data-lucide="corner-up-right" class="w-3 h-3 text-sky-400"></i> Show Alternative Road';
+        }
+    }
+
+    const blockagePopupBtn = document.getElementById(`blockage-detour-btn-${roadId}`);
+    if (blockagePopupBtn) {
+        if (isActive) {
+            blockagePopupBtn.className = 'mt-2.5 w-full py-1.5 bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 rounded border border-rose-500/40 text-[10px] font-semibold transition flex items-center justify-center gap-1.5 shadow-sm';
+            blockagePopupBtn.innerHTML = '<i data-lucide="eye-off" class="w-3.5 h-3.5 text-rose-400"></i> Hide Alternative Road';
+        } else {
+            blockagePopupBtn.className = 'mt-2.5 w-full py-1.5 bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 rounded border border-sky-500/40 text-[10px] font-semibold transition flex items-center justify-center gap-1.5 shadow-sm';
+            blockagePopupBtn.innerHTML = '<i data-lucide="corner-up-right" class="w-3.5 h-3.5 text-sky-400"></i> Show Alternative Road';
+        }
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 
 // Window Focus Road Helper for Interactive Cards
 window.focusRoad = function(roadId) {
@@ -1402,8 +1674,90 @@ window.focusRoad = function(roadId) {
             const line = roadLinesMap.get(road.id);
             if (line) line.openPopup(targetPoint);
         }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }, 1300);
 };
+
+// Window Toggle Detour Helper (Shows / Hides Alternative Dotted Detour on Map)
+window.toggleDetour = function(roadId) {
+    const road = roads.find(r => r.id === roadId);
+    if (!road || !road.detourCoords) return;
+
+    const dLine = detourLinesMap.get(road.id);
+    if (!dLine) return;
+
+    const isCurrentlyActive = activeDetourRoadIds.has(road.id);
+
+    if (isCurrentlyActive) {
+        // HIDE ALTERNATIVE ROAD
+        activeDetourLayer.removeLayer(dLine);
+        activeDetourRoadIds.delete(road.id);
+        map.closePopup();
+
+        updateDetourButtonUI(road.id, false);
+
+        if (typeof showToast === 'function') {
+            showToast(`🛣️ Alternative Detour hidden for ${road.highwayCode}`);
+        }
+    } else {
+        // SHOW ALTERNATIVE ROAD
+        activeDetourLayer.addLayer(dLine);
+        activeDetourRoadIds.add(road.id);
+
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        const detourBounds = L.latLngBounds(road.detourCoords);
+        map.flyToBounds(detourBounds.pad(0.25), { duration: 1.2 });
+
+        setTimeout(() => {
+            const midPoint = road.detourCoords[Math.floor(road.detourCoords.length / 2)];
+            dLine.openPopup(midPoint);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 1300);
+
+        updateDetourButtonUI(road.id, true);
+
+        if (typeof showToast === 'function') {
+            showToast(`🛣️ Showing Alternative Road: ${road.detourName}`);
+        }
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+};
+
+// Window Focus Detour (backward compatible alias)
+window.focusDetour = function(roadId) {
+    if (!activeDetourRoadIds.has(roadId)) {
+        window.toggleDetour(roadId);
+    } else {
+        const road = roads.find(r => r.id === roadId);
+        if (!road || !road.detourCoords) return;
+        const dLine = detourLinesMap.get(road.id);
+        const detourBounds = L.latLngBounds(road.detourCoords);
+        map.flyToBounds(detourBounds.pad(0.25), { duration: 1.2 });
+        setTimeout(() => {
+            if (dLine) {
+                const midPoint = road.detourCoords[Math.floor(road.detourCoords.length / 2)];
+                dLine.openPopup(midPoint);
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 1300);
+    }
+};
+
+window.hideDetour = function(roadId) {
+    if (activeDetourRoadIds.has(roadId)) {
+        window.toggleDetour(roadId);
+    }
+};
+
+// Re-render Lucide icons on any Leaflet popup open
+map.on('popupopen', () => {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+});
 
 // ----------------------------------------------------------------------------
 // 7. Floating Map Legend & Layer Controls
@@ -1419,7 +1773,8 @@ legend.onAdd = () => {
         <span style="display:inline-block;margin-right:4px;">📍</span><b>Cyan</b>: Your Location<br>
         <span style="display:inline-block;margin-right:4px;">⛔</span><b>Red Pin</b>: Blocked Highway (5 Routes)<br>
         <span style="display:inline-block;margin-right:4px;">⚠️</span><b>Yellow Pin</b>: Single-Lane Watch (6 Routes)<br>
-        <span class="legend-line" style="border-color:#10b981"></span>Open Arteries (NH-27/NH-15)
+        <span class="legend-line" style="border-top:3px solid #10b981"></span><b>Solid Green</b>: Open Arteries (NH-27/15)<br>
+        <span class="legend-line" style="border-top:3px dashed #38bdf8"></span><b>Blue Dotted</b>: Alternative Detour Road (Click to Show)
     `;
     return div;
 };
@@ -1446,6 +1801,7 @@ mapFilterButtons.forEach(button => {
             map.addLayer(watchLayer);
             map.addLayer(safeLayer);
             map.addLayer(roadLayer);
+            map.addLayer(activeDetourLayer);
             map.addLayer(halosLayer);
             map.addLayer(reportLayer);
             if (countDisplay) countDisplay.textContent = 'Showing 30 Landslide Monitoring Zones & 15 Corridors';
@@ -1455,6 +1811,7 @@ mapFilterButtons.forEach(button => {
             map.removeLayer(watchLayer);
             map.removeLayer(safeLayer);
             map.addLayer(roadLayer);
+            map.addLayer(activeDetourLayer);
             if (countDisplay) countDisplay.textContent = 'Showing 9 Critical / Severe Risk Zones (Red)';
             map.flyTo([26.5, 91.5], 7.5, { duration: 0.8 });
         } else if (filter === 'WATCH') {
@@ -1462,6 +1819,7 @@ mapFilterButtons.forEach(button => {
             map.addLayer(watchLayer);
             map.removeLayer(safeLayer);
             map.addLayer(roadLayer);
+            map.addLayer(activeDetourLayer);
             if (countDisplay) countDisplay.textContent = 'Showing 11 Advisory Watch Zones (Yellow)';
             map.flyTo([25.8, 92.8], 7.5, { duration: 0.8 });
         } else if (filter === 'SAFE') {
@@ -1469,6 +1827,7 @@ mapFilterButtons.forEach(button => {
             map.removeLayer(watchLayer);
             map.addLayer(safeLayer);
             map.addLayer(roadLayer);
+            map.addLayer(activeDetourLayer);
             if (countDisplay) countDisplay.textContent = 'Showing 10 Low Hazard / Safe Zones (Green)';
             map.flyTo([25.8, 92.8], 7.5, { duration: 0.8 });
         } else if (filter === 'ROADS') {
@@ -1476,6 +1835,7 @@ mapFilterButtons.forEach(button => {
             map.removeLayer(watchLayer);
             map.removeLayer(safeLayer);
             map.addLayer(roadLayer);
+            map.addLayer(activeDetourLayer);
             if (countDisplay) countDisplay.textContent = 'Showing 15 National Highway Corridors (5 Blocked, 6 Restricted)';
             map.flyTo([26.2, 91.8], 7.2, { duration: 0.8 });
         }
@@ -1750,9 +2110,16 @@ function renderRoadsDirectory(filterCategory = 'all', searchQuery = '') {
                         <i data-lucide="corner-up-right" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate"><b>Detour:</b> ${road.alternative}</span>
                     </div>
-                    <button class="px-2.5 py-1 bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 rounded border border-sky-500/40 text-[10px] font-semibold transition flex items-center gap-1 flex-shrink-0" onclick="window.focusRoad('${road.id}')">
-                        <i data-lucide="crosshair" class="w-3 h-3"></i> Inspect on Map
-                    </button>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        ${road.hasDetour ? `
+                            <button id="card-detour-btn-${road.id}" class="px-2.5 py-1 ${activeDetourRoadIds.has(road.id) ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-400/40' : 'bg-sky-500/20 hover:bg-sky-500/35 text-sky-300 border-sky-400/40'} rounded border text-[10px] font-semibold transition flex items-center gap-1" onclick="window.toggleDetour('${road.id}')" title="${activeDetourRoadIds.has(road.id) ? 'Hide Alternative Detour Route' : 'Show Alternative Road on Map'}">
+                                <i data-lucide="${activeDetourRoadIds.has(road.id) ? 'eye-off' : 'route'}" class="w-3 h-3 ${activeDetourRoadIds.has(road.id) ? 'text-rose-400' : 'text-sky-400'}"></i> ${activeDetourRoadIds.has(road.id) ? 'Hide Alternative Road' : 'Show Alternative Road'}
+                            </button>
+                        ` : ''}
+                        <button class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-gray-200 rounded border border-slate-700 text-[10px] font-semibold transition flex items-center gap-1" onclick="window.focusRoad('${road.id}')" title="Inspect Road Corridor and Blockage">
+                            <i data-lucide="crosshair" class="w-3 h-3 text-cyan-400"></i> Inspect Road
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
