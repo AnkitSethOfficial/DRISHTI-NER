@@ -1050,14 +1050,27 @@ function createPopupContent(place) {
     `;
 }
 
+// Baseline dynamic score normalization for all 30 places using formula:
+landslidePlaces.forEach(place => {
+    const rScore = Math.min(100, Math.round((Number(place.rain || 0) / 120) * 100));
+    const sScore = Math.min(100, Math.round((Number(place.slope || 0) / 45) * 100));
+    const mScore = Math.min(100, Math.round(Number(place.soil || 50)));
+    const initScore = Math.min(100, Math.max(5, Math.round(0.50 * rScore + 0.35 * sScore + 0.15 * mScore)));
+    place.score = initScore;
+    place.category = initScore >= 70 ? 'CRITICAL' : initScore >= 40 ? 'WATCH' : 'SAFE';
+    place.color = levelColors[place.category] || (initScore >= 70 ? '#ef4444' : initScore >= 40 ? '#f59e0b' : '#10b981');
+});
+
 // Render all 30 landslide places on the Leaflet map
 landslidePlaces.forEach(place => {
+    const pinClass = place.category.toLowerCase();
+    const color = place.color;
     const icon = L.divIcon({
         className: 'landslide-custom-icon',
         html: `
-            <div class="landslide-pin ${place.category.toLowerCase()}">
-                <div class="landslide-pulse"></div>
-                <div class="landslide-pin-inner"></div>
+            <div class="landslide-pin ${pinClass} ${place.category === 'CRITICAL' ? 'red' : place.category === 'WATCH' ? 'yellow' : 'green'}">
+                <div class="landslide-pulse" style="background:${color}33;border-color:${color}"></div>
+                <div class="landslide-pin-inner" style="background-color:${color};box-shadow:0 0 10px ${color}"></div>
             </div>
         `,
         iconSize: [28, 28],
@@ -1077,20 +1090,80 @@ landslidePlaces.forEach(place => {
     }
 
     // Add subtle risk watershed circle
-    L.circle(place.pos, {
-        radius: place.score * 80,
+    const halo = L.circle(place.pos, {
+        radius: Math.max(600, place.score * 70),
         color: place.color,
         weight: 1,
         fillColor: place.color,
-        fillOpacity: place.category === 'CRITICAL' ? 0.12 : place.category === 'WATCH' ? 0.08 : 0.04
+        fillOpacity: place.category === 'CRITICAL' ? 0.14 : place.category === 'WATCH' ? 0.08 : 0.03
     }).addTo(halosLayer);
 
     marker.on('click', () => {
         selectLandslidePlace(place.id, false);
     });
 
-    placeMarkerMap.set(place.id, { marker, place });
+    placeMarkerMap.set(place.id, { marker, halo, place });
 });
+
+// ----------------------------------------------------------------------------
+// Dynamic Map Marker & Risk Zone Visuals Updater
+// ----------------------------------------------------------------------------
+function updatePlaceMapVisuals(place) {
+    if (!place || !place.id) return;
+    const entry = placeMarkerMap.get(place.id);
+    if (!entry) return;
+    const { marker, halo } = entry;
+
+    // Strict geotechnical scoring: 0.50 * Rain + 0.35 * Slope + 0.15 * AMI
+    const score = Number(place.score || 0);
+    const riskCategory = score >= 70 ? 'CRITICAL' : score >= 40 ? 'WATCH' : 'SAFE';
+    const color = levelColors[riskCategory] || (score >= 70 ? '#ef4444' : score >= 40 ? '#f59e0b' : '#10b981');
+
+    place.category = riskCategory;
+    place.color = color;
+
+    // 1. Dynamically update marker pin icon to match the actual score
+    if (marker) {
+        const pinClass = riskCategory.toLowerCase();
+        const newIcon = L.divIcon({
+            className: 'landslide-custom-icon',
+            html: `
+                <div class="landslide-pin ${pinClass} ${riskCategory === 'CRITICAL' ? 'red' : riskCategory === 'WATCH' ? 'yellow' : 'green'}">
+                    <div class="landslide-pulse" style="background:${color}33;border-color:${color}"></div>
+                    <div class="landslide-pin-inner" style="background-color:${color};box-shadow:0 0 10px ${color}"></div>
+                </div>
+            `,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
+        marker.setIcon(newIcon);
+
+        // 2. Move marker to the appropriate layer group
+        if (typeof criticalLayer !== 'undefined' && typeof watchLayer !== 'undefined' && typeof safeLayer !== 'undefined') {
+            criticalLayer.removeLayer(marker);
+            watchLayer.removeLayer(marker);
+            safeLayer.removeLayer(marker);
+            if (riskCategory === 'CRITICAL') {
+                criticalLayer.addLayer(marker);
+            } else if (riskCategory === 'WATCH') {
+                watchLayer.addLayer(marker);
+            } else {
+                safeLayer.addLayer(marker);
+            }
+        }
+    }
+
+    // 3. Dynamically update the risk watershed circle (halo)
+    if (halo) {
+        halo.setStyle({
+            color: color,
+            fillColor: color,
+            fillOpacity: riskCategory === 'CRITICAL' ? 0.14 : (riskCategory === 'WATCH' ? 0.08 : 0.03)
+        });
+        halo.setRadius(Math.max(600, score * 70));
+    }
+}
 
 // ----------------------------------------------------------------------------
 // 6. Expanded National Highway Corridors & Real-Time Blockages (15 Routes)
@@ -1851,6 +1924,9 @@ mapFilterButtons.forEach(button => {
 
         const filter = button.dataset.filter;
         const countDisplay = document.getElementById('activeMapCount');
+        const critCount = landslidePlaces.filter(p => p.category === 'CRITICAL').length;
+        const watchCount = landslidePlaces.filter(p => p.category === 'WATCH').length;
+        const safeCount = landslidePlaces.filter(p => p.category === 'SAFE').length;
 
         if (filter === 'all') {
             map.addLayer(criticalLayer);
@@ -1860,7 +1936,7 @@ mapFilterButtons.forEach(button => {
             map.addLayer(activeDetourLayer);
             map.addLayer(halosLayer);
             map.addLayer(reportLayer);
-            if (countDisplay) countDisplay.textContent = 'Showing 30 Landslide Monitoring Zones & 15 Corridors';
+            if (countDisplay) countDisplay.textContent = `Showing 30 Landslide Monitoring Zones across NER (${critCount} Critical, ${watchCount} Watch, ${safeCount} Safe)`;
             map.flyTo([26.2, 92.8], 7, { duration: 0.8 });
         } else if (filter === 'CRITICAL') {
             map.addLayer(criticalLayer);
@@ -1868,7 +1944,7 @@ mapFilterButtons.forEach(button => {
             map.removeLayer(safeLayer);
             map.addLayer(roadLayer);
             map.addLayer(activeDetourLayer);
-            if (countDisplay) countDisplay.textContent = 'Showing 9 Critical / Severe Risk Zones (Red)';
+            if (countDisplay) countDisplay.textContent = `Showing ${critCount} Critical Hazard Zones (Red • Score ≥70)`;
             map.flyTo([26.5, 91.5], 7.5, { duration: 0.8 });
         } else if (filter === 'WATCH') {
             map.removeLayer(criticalLayer);
@@ -1876,7 +1952,7 @@ mapFilterButtons.forEach(button => {
             map.removeLayer(safeLayer);
             map.addLayer(roadLayer);
             map.addLayer(activeDetourLayer);
-            if (countDisplay) countDisplay.textContent = 'Showing 11 Advisory Watch Zones (Yellow)';
+            if (countDisplay) countDisplay.textContent = `Showing ${watchCount} Advisory Watch Zones (Yellow • Score 40–69)`;
             map.flyTo([25.8, 92.8], 7.5, { duration: 0.8 });
         } else if (filter === 'SAFE') {
             map.removeLayer(criticalLayer);
@@ -2050,6 +2126,9 @@ function updateRiskPanel(place) {
     place.score = dynamicScore;
     place.category = dynamicRisk;
     place.color = color;
+
+    // Dynamically update map marker pin and risk watershed halo
+    updatePlaceMapVisuals(place);
 
     // Highlight card in directory and update its live score and metrics
     document.querySelectorAll('.hotspot-card').forEach(card => {
@@ -2847,6 +2926,118 @@ if (togglePastForecastBtn) {
     togglePastForecastBtn.addEventListener('click', () => {
         const activePlace = landslidePlaces.find(p => p.id === activePlaceId) || landslidePlaces[0];
         fetchOpenMeteoTelemetry(activePlace.pos[0], activePlace.pos[1], activePlace.id);
+    });
+}
+
+// ----------------------------------------------------------------------------
+// 13.4 Real-Time Threat Stream Engine (Batch Synchronizer Across All 30 Stations)
+// ----------------------------------------------------------------------------
+async function syncAllPlacesRealTimeThreat() {
+    const syncBtn = document.getElementById('syncAllThreatsBtn');
+    const syncBtnText = document.getElementById('syncThreatsBtnText');
+    const syncStatus = document.getElementById('realtimeThreatSyncStatus');
+
+    if (syncBtnText) syncBtnText.textContent = 'Syncing...';
+    if (syncBtn) syncBtn.disabled = true;
+    if (syncStatus) {
+        syncStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block animate-ping mr-1"></span>Threat Stream: Polling...';
+        syncStatus.className = 'text-yellow-300 font-mono text-[9px] flex items-center gap-1';
+    }
+
+    try {
+        const lats = landslidePlaces.map(p => p.pos[0].toFixed(4)).join(',');
+        const lngs = landslidePlaces.map(p => p.pos[1].toFixed(4)).join(',');
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&hourly=precipitation,soil_moisture_9_to_27cm&forecast_days=1&timezone=auto`;
+
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`Open-Meteo multi-location HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        const results = Array.isArray(data) ? data : [data];
+        let criticalCount = 0;
+        let watchCount = 0;
+        let safeCount = 0;
+
+        landslidePlaces.forEach((place, idx) => {
+            const item = results[idx];
+            if (!item || !item.hourly) return;
+
+            const precip = item.hourly.precipitation || [];
+            const sm9Arr = item.hourly.soil_moisture_9_to_27cm || [];
+            const liveRain = Math.round(precip.reduce((sum, p) => sum + (p || 0), 0) * 10) / 10;
+            const sm9 = typeof sm9Arr[0] === 'number' ? sm9Arr[0] : 0.325;
+
+            const rScore = Math.min(100, Math.round((liveRain / 120) * 100));
+            const sScore = Math.min(100, Math.round((place.slope / 45) * 100));
+            const sat = Math.min(100, Math.round((sm9 / 0.45) * 100));
+            const ami = Math.min(100, Math.round(0.70 * sat + 0.30 * 25));
+
+            const dynamicScore = Math.min(100, Math.max(5, Math.round(0.50 * rScore + 0.35 * sScore + 0.15 * ami)));
+            const dynamicRisk = dynamicScore >= 70 ? 'CRITICAL' : dynamicScore >= 40 ? 'WATCH' : 'SAFE';
+            const color = levelColors[dynamicRisk] || (dynamicScore >= 70 ? '#ef4444' : dynamicScore >= 40 ? '#f59e0b' : '#10b981');
+
+            place.rain = liveRain;
+            place.soil = ami;
+            place.volMoisture = Math.round(sm9 * 1000) / 1000;
+            place.saturationPct = sat;
+            place.score = dynamicScore;
+            place.category = dynamicRisk;
+            place.color = color;
+
+            if (dynamicRisk === 'CRITICAL') criticalCount++;
+            else if (dynamicRisk === 'WATCH') watchCount++;
+            else safeCount++;
+
+            updatePlaceMapVisuals(place);
+        });
+
+        // Update filter count badges
+        const countCrit = document.getElementById('filterCountCritical');
+        const countWatch = document.getElementById('filterCountWatch');
+        const countSafe = document.getElementById('filterCountSafe');
+        if (countCrit) countCrit.textContent = criticalCount;
+        if (countWatch) countWatch.textContent = watchCount;
+        if (countSafe) countSafe.textContent = safeCount;
+
+        // Re-render directory cards to reflect real-time threat ratings
+        if (typeof renderHotspotsDirectory === 'function') {
+            renderHotspotsDirectory(currentDirCategory || 'all');
+        }
+
+        // Update active place panel
+        const activePlace = landslidePlaces.find(p => p.id === activePlaceId) || landslidePlaces[0];
+        if (activePlace) {
+            updateRiskPanel(activePlace);
+        }
+
+        if (syncStatus) {
+            syncStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1"></span>Threat Stream: LIVE (${criticalCount} Critical, ${watchCount} Watch, ${safeCount} Safe)`;
+            syncStatus.className = 'text-emerald-400 font-mono text-[9px] flex items-center gap-1';
+        }
+
+        if (typeof showToast === 'function') {
+            showToast(`🛰️ Live Threat Thread Synced: ${criticalCount} Critical, ${watchCount} Watch, ${safeCount} Safe zones across NER`);
+        }
+
+    } catch (err) {
+        console.warn('Real-time threat sync fallback:', err);
+        if (syncStatus) {
+            syncStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block mr-1"></span>Threat Stream: CACHED';
+            syncStatus.className = 'text-sky-300 font-mono text-[9px] flex items-center gap-1';
+        }
+        // Fallback: recompute with formula on place properties
+        landslidePlaces.forEach(p => updatePlaceMapVisuals(p));
+    } finally {
+        if (syncBtnText) syncBtnText.textContent = 'Live Threat Sync';
+        if (syncBtn) syncBtn.disabled = false;
+    }
+}
+
+// Live Threat Sync Button Click Listener
+const syncAllThreatsBtn = document.getElementById('syncAllThreatsBtn');
+if (syncAllThreatsBtn) {
+    syncAllThreatsBtn.addEventListener('click', () => {
+        syncAllPlacesRealTimeThreat();
     });
 }
 
@@ -3687,6 +3878,10 @@ if (typeof fetchOpenMeteoTelemetry === 'function' && landslidePlaces[0].pos) {
 // Immediately fetch ISRO Bhuvan CartoDEM 30m elevation and slope telemetry
 if (typeof fetchBhuvanDemTelemetry === 'function' && landslidePlaces[0].pos) {
     fetchBhuvanDemTelemetry(landslidePlaces[0].pos[0], landslidePlaces[0].pos[1], landslidePlaces[0].id);
+}
+// Immediately synchronize real-time threat stream across all 30 stations
+if (typeof syncAllPlacesRealTimeThreat === 'function') {
+    syncAllPlacesRealTimeThreat();
 }
 setTimeout(() => {
     map.invalidateSize();
