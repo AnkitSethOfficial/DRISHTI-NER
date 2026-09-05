@@ -145,6 +145,9 @@ body {
 .light-mode .text-gray-400, .light-mode .text-gray-500 { color: var(--light-text-muted); }
 .light-mode .text-gray-300 { color: var(--light-text-secondary); }
 .light-mode .text-white { color: var(--light-text); }
+.light-mode #fullscreenBtnText,
+.light-mode .map-filter[data-filter="all"] { color: #ffffff; }
+.light-mode .map-filter[data-filter="all"]:hover { color: var(--light-text); }
 .light-mode .text-emerald-300, .light-mode .text-emerald-400 { color: var(--light-green); }
 .light-mode .text-red-300, .light-mode .text-red-400 { color: var(--light-red); }
 .light-mode .text-orange-300, .light-mode .text-orange-400 { color: var(--light-orange); }
@@ -198,6 +201,10 @@ input[type=range] {
 }
 
 .map-legend { background: rgba(15, 23, 42, .92); color: #e2e8f0; padding: 10px 12px; line-height: 1.7; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.28); font-size: 11px; }
+.map-toolbar > .flex:first-child { flex-wrap: wrap; justify-content: flex-start; }
+.map-toolbar > .flex:first-child > div:first-child { min-width: 0; }
+.map-toolbar #mapLayerSelector { flex: 0 1 200px; min-width: 0; }
+.map-toolbar > .flex:first-child > div:last-child { flex: 0 0 auto; }
 .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
 .legend-line { display: inline-block; width: 22px; border-top: 3px solid; margin: 0 6px 3px 0; }
 .data-demo { color: #fbbf24; font-size: 10px; letter-spacing: .04em; }
@@ -782,6 +789,8 @@ input[type=range] {
     .leaflet-control-layers { margin-top: 3.5rem !important; max-height: 180px; overflow-y: auto; }
     #hotspotsList { max-height: 300px; }
     .tab-button { flex: 1 1 auto; justify-content: center; min-width: max-content; }
+    .map-toolbar > .flex:first-child > div:first-child { flex: 1 1 100%; }
+    .map-toolbar > .flex:first-child > div:last-child { width: 100%; justify-content: flex-end; }
 }
 
 @media (min-width: 1024px) and (max-width: 1399px) {
