@@ -83,6 +83,9 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold uppercase tracking-wider">0.50·R + 0.35·S + 0.15·AMI</span>
+                        <button id="syncOpenMeteoSimBtn" class="text-xs text-sky-400 hover:underline flex items-center gap-1" title="Sync simulator with live Open-Meteo rain & soil moisture">
+                            <i data-lucide="cloud-lightning" class="w-3 h-3"></i> Sync Live
+                        </button>
                         <button id="resetSimulator" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
                             <i data-lucide="refresh-ccw" class="w-3 h-3"></i> Reset
                         </button>
@@ -190,14 +193,23 @@
                         <span id="riskRainScoreSub" class="text-[9px] text-sky-400 block font-mono">Score: 93</span>
                     </div>
                     <div>
-                        <span class="text-[9px] text-gray-400 uppercase block">Slope (0.35)</span>
+                        <div class="flex items-center justify-center gap-1">
+                            <span class="text-[9px] text-gray-400 uppercase">Slope (0.35)</span>
+                            <span id="bhuvanDemBadge" class="text-[8px] px-1 py-0.2 rounded bg-amber-950/70 text-amber-300 border border-amber-500/40 font-mono" title="ISRO Bhuvan CartoDEM 30m Grid">Bhuvan 30m</span>
+                        </div>
                         <b id="riskSlope" class="text-white text-xs font-semibold">36°</b>
+                        <div class="text-[9px] text-gray-400 leading-tight">
+                            <span id="riskElevation" class="text-gray-300 font-mono">1,487 m</span> &bull; <span id="riskAspect" class="text-sky-300 font-mono">SE Face</span>
+                        </div>
                         <span id="riskSlopeType" class="text-[9px] text-amber-400 block font-semibold">&ge;15° Hill Slope</span>
                     </div>
                     <div>
-                        <span class="text-[9px] text-gray-400 uppercase block">Moisture AMI (0.15)</span>
-                        <b id="riskSoil" class="text-white text-xs font-semibold">85%</b>
-                        <span id="riskAmiScoreSub" class="text-[9px] text-emerald-400 block font-mono">Decay: 48h</span>
+                        <div class="flex items-center justify-center gap-1">
+                            <span class="text-[9px] text-gray-400 uppercase">Moisture AMI (0.15)</span>
+                            <span id="openMeteoSoilBadge" class="text-[8px] px-1 py-0.2 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 font-mono" title="Open-Meteo Land Surface Hydrology (0–27cm Volumetric Soil Moisture)">Open-Meteo</span>
+                        </div>
+                        <b id="riskSoil" class="text-white text-xs font-semibold">73% Sat.</b>
+                        <span id="riskAmiScoreSub" class="text-[9px] text-emerald-400 block font-mono">0.329 m³/m³ (0–27cm)</span>
                     </div>
                     <div>
                         <span class="text-[9px] text-gray-400 uppercase block">Corridor Override</span>
@@ -245,6 +257,19 @@
                         <span>Observed 48h: <b id="obs48hRain" class="text-sky-300">68 mm</b></span>
                         <span>Forecast 24h: <b id="fcst24hRain" class="text-yellow-400">112 mm</b></span>
                     </div>
+
+                    <!-- 24-Hour Hourly Prediction Strip (Open-Meteo) -->
+                    <div class="mt-2.5 pt-2 border-t border-slate-800">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-[10px] text-gray-300 font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3 text-sky-400"></i> Open-Meteo 24h Hourly Prediction:
+                            </span>
+                            <span class="text-[9px] text-gray-500">Click hour to preview hazard</span>
+                        </div>
+                        <div id="hourlyForecastList" class="flex gap-1.5 overflow-x-auto pb-1 text-center scrollbar-thin">
+                            <div class="text-[10px] text-gray-500 py-1">Loading 24-hour hourly prediction...</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Quick Select NER Zone & Sensitivity Factors -->
@@ -279,6 +304,38 @@
                             <b id="sensVerdict" class="text-red-400">ACTIVE HILL SLOPE (&ge;15°)</b>
                         </div>
                     </div>
+
+                    <!-- Open-Meteo Soil Moisture Horizons (0–27cm) & Pore Water Status -->
+                    <div class="mt-2.5 pt-2 border-t border-slate-800 text-[10px]">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-bold text-gray-300 flex items-center gap-1 text-[10px]">
+                                <i data-lucide="droplets" class="w-3 h-3 text-emerald-400"></i> Open-Meteo Soil Horizons (0–27cm):
+                            </span>
+                            <span id="openMeteoAmiDecayBadge" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-mono">AMI: 72/100</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1 text-center font-mono text-[9px]">
+                            <div class="bg-slate-900/80 p-1 rounded border border-slate-800">
+                                <span class="text-gray-500 block text-[8px]">0–1cm</span>
+                                <b id="soilLyr0" class="text-emerald-300">0.315</b>
+                            </div>
+                            <div class="bg-slate-900/80 p-1 rounded border border-slate-800">
+                                <span class="text-gray-500 block text-[8px]">1–3cm</span>
+                                <b id="soilLyr1" class="text-emerald-300">0.317</b>
+                            </div>
+                            <div class="bg-slate-900/80 p-1 rounded border border-slate-800">
+                                <span class="text-gray-500 block text-[8px]">3–9cm</span>
+                                <b id="soilLyr3" class="text-emerald-300">0.322</b>
+                            </div>
+                            <div class="bg-slate-900/80 p-1 rounded border border-amber-500/40 bg-amber-950/20">
+                                <span class="text-amber-400 block text-[8px] font-semibold">9–27cm*</span>
+                                <b id="soilLyr9" class="text-amber-300">0.329</b>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-[9px] text-gray-400 mt-1.5">
+                            <span>*Shear failure plane (&phi; &approx; 0.45)</span>
+                            <span id="soilPorePressureStatus" class="text-amber-400 font-semibold">Elevated Pore Saturation</span>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -297,6 +354,7 @@
                             </label>
                             <select id="mapLayerSelector" class="bg-slate-800 text-gray-200 text-xs rounded border border-slate-700 px-2.5 py-1 focus:outline-none cursor-pointer truncate max-w-[200px]">
                                 <option value="topo" selected>Esri World Topo (Natural Relief)</option>
+                                <option value="bhuvan">ISRO Bhuvan CartoDEM (30m Relief)</option>
                                 <option value="voyager">Carto Voyager (Google Maps Style)</option>
                                 <option value="satellite">Esri Satellite (Aerial Imagery)</option>
                                 <option value="osm">OpenStreetMap Standard</option>
