@@ -200,6 +200,121 @@ header > div:first-child > div:last-child p { display: block; width: 100%; clear
 .light-mode .timeline-track b { color: var(--light-green); }
 .light-mode .timeline-track span { color: var(--light-text-secondary); }
 
+/* Light-mode contrast for the complete CAP alert gateway. */
+.light-mode #alertsPanel {
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .bg-slate-900\/80,
+.light-mode #alertsPanel .bg-slate-900\/95 {
+    background: var(--light-surface-soft);
+    border-color: var(--light-border);
+}
+.light-mode #alertsPanel .bg-slate-900,
+.light-mode #alertsPanel .bg-slate-950 {
+    background: #eef4f8;
+    border-color: var(--light-border);
+}
+.light-mode #alertsPanel .text-white,
+.light-mode #alertsPanel h3,
+.light-mode #alertsPanel h4 {
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .text-gray-300,
+.light-mode #alertsPanel .text-gray-400,
+.light-mode #alertsPanel .text-gray-500 {
+    color: var(--light-text-secondary);
+}
+.light-mode #alertsPanel .border-slate-700,
+.light-mode #alertsPanel .border-slate-800 {
+    border-color: var(--light-border);
+}
+.light-mode #alertsPanel .text-amber-300,
+.light-mode #alertsPanel .text-amber-400 {
+    color: #9a4d00;
+}
+.light-mode #alertsPanel > div:first-child h3 > span {
+    background: #fff1cf;
+    border-color: #d99a22;
+    color: #7a3d00;
+}
+.light-mode #alertsPanel > div:first-child > div:last-child > span {
+    background: #e8f7ee;
+    border-color: #75b98e;
+    color: #086638;
+}
+.light-mode #alertsPanel select {
+    background: var(--light-surface);
+    color: var(--light-text);
+    border-color: var(--light-border-strong);
+}
+.light-mode #alertsPanel select option {
+    background: var(--light-surface);
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .bg-slate-950 label {
+    background: #e8f0f5;
+    border-color: var(--light-border);
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .bg-slate-950 label span,
+.light-mode #alertsPanel label > span.text-white {
+    color: var(--light-text) !important;
+}
+.light-mode #alertsPanel #triggerBroadcastBtn {
+    background: #c56a00;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(154, 77, 0, .2);
+}
+.light-mode #alertsPanel #triggerBroadcastBtn:hover {
+    background: #a95500;
+}
+.light-mode #alertsPanel #copyCapBtn,
+.light-mode #alertsPanel #capFormatJsonBtn {
+    background: #dce7ee !important;
+    border: 1px solid var(--light-border-strong);
+    color: var(--light-text-secondary) !important;
+}
+.light-mode #alertsPanel #copyCapBtn:hover,
+.light-mode #alertsPanel #capFormatJsonBtn:hover {
+    background: #cbdbe5;
+    color: var(--light-text);
+}
+.light-mode #alertsPanel #capTemplateLangTag {
+    background: #fff1cf !important;
+    border-color: #d99a22 !important;
+    color: #7a3d00 !important;
+}
+.light-mode #alertsPanel #capSmsPreview,
+.light-mode #alertsPanel #capCodeBlock {
+    background: #f7fafc !important;
+    border-color: var(--light-border-strong) !important;
+    color: #075985 !important;
+}
+.light-mode #alertsPanel #capSmsPreview + div {
+    color: var(--light-text-secondary);
+}
+.light-mode #alertsPanel #capSmsPreview + div b,
+.light-mode #alertsPanel #capSmsPreview + div .text-emerald-400 {
+    color: var(--light-green);
+}
+.light-mode #alertsPanel #capFormatXmlBtn {
+    background: #087443 !important;
+    color: #ffffff !important;
+}
+.light-mode #alertsPanel #dispatchCountTag {
+    color: var(--light-text-secondary);
+}
+.light-mode #alertsPanel #dispatchLogsList {
+    color: var(--light-text);
+}
+.light-mode #alertsPanel #dispatchLogsList > * {
+    border-color: var(--light-border) !important;
+}
+.light-mode #alertsPanel #dispatchLogsList .text-gray-400,
+.light-mode #alertsPanel #dispatchLogsList .text-gray-500 {
+    color: var(--light-text-secondary);
+}
+
 /* Custom Slider Styling */
 input[type=range] {
     accent-color: #10b981;
