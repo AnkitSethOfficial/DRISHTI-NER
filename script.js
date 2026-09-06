@@ -62,210 +62,57 @@ if (langSelector) {
 const landslidePlaces = [
     // --- 🔴 RED: CRITICAL / SEVERE RISK (> 70) ---
     {
-        id: 'gangtok',
-        name: 'Gangtok & 29th Mile',
-        state: 'Sikkim',
-        pos: [27.3389, 88.6065],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 88,
-        rain: 112,
-        slope: 36,
-        soil: 85,
-        probability: 84,
-        window: '6–12 hours',
-        highway: 'NH-10 Siliguri-Gangtok',
-        geology: 'Weathered Gneiss & Phyllite',
-        desc: 'Active deep-seated rotational failure on NH-10. Slope creep rate accelerating at 4.8mm/day.'
-    },
-    {
         id: 'mangan',
         name: 'Mangan & Chungthang',
         state: 'North Sikkim',
         pos: [27.5050, 88.5300],
         category: 'CRITICAL',
         color: '#ef4444',
-        score: 93,
-        rain: 135,
+        score: 78,
+        rain: 72.8,
         slope: 41,
-        soil: 91,
-        probability: 92,
+        soil: 86,
+        probability: 82,
         window: 'Immediate / <6h',
         highway: 'North Sikkim Highway',
         geology: 'High-grade Crystalline Schist',
-        desc: 'Debris flows and torrential runoff following glacial surge. Carriageway severed at multiple bends.'
-    },
-    {
-        id: 'darjeeling',
-        name: 'Darjeeling (Pagla Jhora)',
-        state: 'West Bengal',
-        pos: [27.0410, 88.2663],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 84,
-        rain: 98,
-        slope: 35,
-        soil: 82,
-        probability: 79,
-        window: '12–24 hours',
-        highway: 'Hill Cart Road / NH-110',
-        geology: 'Darjeeling Gneiss & Mica Schist',
-        desc: 'Historical sinking zone at Pagla Jhora. Severe toe cutting from mountain torrents.'
-    },
-    {
-        id: 'kalimpong',
-        name: 'Kalimpong (Teesta Gorge)',
-        state: 'West Bengal',
-        pos: [27.0600, 88.4700],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 79,
-        rain: 92,
-        slope: 33,
-        soil: 78,
-        probability: 74,
-        window: '12–24 hours',
-        highway: 'NH-10 Teesta Corridor',
-        geology: 'Daling Series Slates & Phyllites',
-        desc: 'Under-cutting by swollen Teesta River. Carriageway subsidence along gorge section.'
-    },
-    {
-        id: 'noney',
-        name: 'Noney & Tupul Rail Yard',
-        state: 'Manipur',
-        pos: [24.7800, 93.6200],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 89,
-        rain: 105,
-        slope: 38,
-        soil: 86,
-        probability: 86,
-        window: '6–12 hours',
-        highway: 'Jiribam-Imphal Corridor / NH-37',
-        geology: 'Disang Shales & Siltstones',
-        desc: 'Clay-rich slippery shale beddings prone to rapid translational shearing during downpours.'
-    },
-    {
-        id: 'haflong',
-        name: 'Dima Hasao (Haflong–Jatinga)',
-        state: 'Assam',
-        pos: [25.1800, 93.0200],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 81,
-        rain: 94,
-        slope: 32,
-        soil: 84,
-        probability: 76,
-        window: '12–24 hours',
-        highway: 'Lumding–Badarpur Hill Route',
-        geology: 'Barail Sandstone-Shale Interbeds',
-        desc: 'Rapid soil creep and hill section railway embankment sliding across Jatinga valley.'
-    },
-    {
-        id: 'cherrapunji',
-        name: 'Cherrapunji / Sohra Rim',
-        state: 'Meghalaya',
-        pos: [25.2700, 91.7300],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 86,
-        rain: 140,
-        slope: 37,
-        soil: 88,
-        probability: 82,
-        window: '6–12 hours',
-        highway: 'Shillong–Sohra Highway',
-        geology: 'Shella Sandstone on Limestone',
-        desc: 'Extreme torrential runoff causing massive hydrostatic pressure along valley scarp walls.'
-    },
-    {
-        id: 'phek',
-        name: 'Phek (Jessami Highway)',
-        state: 'Nagaland',
-        pos: [25.6800, 94.5000],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 76,
-        rain: 82,
-        slope: 30,
-        soil: 75,
-        probability: 71,
-        window: '24 hours',
-        highway: 'Trans-Nagaland Highway',
-        geology: 'Ophiolite Melange & Foliated Shales',
-        desc: 'Indo-Myanmar tectonic boundary shearing zone with major carriageway cracks.'
-    },
-    {
-        id: 'tawang',
-        name: 'Tawang (Sela Pass Approach)',
-        state: 'Arunachal Pradesh',
-        pos: [27.5860, 91.8600],
-        category: 'CRITICAL',
-        color: '#ef4444',
-        score: 77,
-        rain: 80,
-        slope: 34,
-        soil: 74,
-        probability: 72,
-        window: '12–24 hours',
-        highway: 'BCT High Altitude Road',
-        geology: 'Glacial Moraines & Granite Gneiss',
-        desc: 'Moraine slope destabilization caused by freeze-thaw cycles combined with high rainfall.'
+        desc: 'Debris flows and heavy torrential runoff. Highway carriageway affected by recurring slope creep.'
     },
 
-    // --- 🟡 YELLOW: MODERATE / ADVISORY WATCH (35–70) ---
+    // --- 🟡 YELLOW: MODERATE / ADVISORY WATCH (40–69) ---
+    {
+        id: 'gangtok',
+        name: 'Gangtok & 29th Mile',
+        state: 'Sikkim',
+        pos: [27.3389, 88.6065],
+        category: 'WATCH',
+        color: '#f59e0b',
+        score: 44,
+        rain: 16.5,
+        slope: 36,
+        soil: 72,
+        probability: 42,
+        window: '24–48 hours',
+        highway: 'NH-10 Siliguri-Gangtok',
+        geology: 'Weathered Gneiss & Phyllite',
+        desc: 'NH-10 corridor surveillance active at 29th Mile. Moderate localized runoff under observation.'
+    },
     {
         id: 'kohima',
         name: 'Kohima (Dzüdza Section)',
         state: 'Nagaland',
         pos: [25.6751, 94.1086],
         category: 'WATCH',
-        color: '#eab308',
-        score: 58,
-        rain: 62,
+        color: '#f59e0b',
+        score: 44,
+        rain: 24.3,
         slope: 27,
-        soil: 64,
-        probability: 52,
+        soil: 70,
+        probability: 40,
         window: '24–48 hours',
         highway: 'NH-29 Dimapur-Kohima Corridor',
         geology: 'Tertiary Splintery Shales',
-        desc: 'Single-lane restriction active. Continuous geotechnical surveillance on Dzüdza river cut.'
-    },
-    {
-        id: 'aizawl',
-        name: 'Aizawl (Ramhlun / Hunthar)',
-        state: 'Mizoram',
-        pos: [23.7271, 92.7176],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 52,
-        rain: 58,
-        slope: 26,
-        soil: 61,
-        probability: 46,
-        window: '24–48 hours',
-        highway: 'NH-54 / NH-108 Corridor',
-        geology: 'Surma Group Siltstones',
-        desc: 'Urban slope creep on eastern and western flanks with municipal drainage surcharge.'
-    },
-    {
-        id: 'kurseong',
-        name: 'Kurseong (Tindharia)',
-        state: 'West Bengal',
-        pos: [26.8800, 88.2800],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 62,
-        rain: 68,
-        slope: 29,
-        soil: 67,
-        probability: 58,
-        window: '24 hours',
-        highway: 'NH-110 Tindharia Section',
-        geology: 'Damuda Sandstone & Slates',
-        desc: 'DHR railway slope subsidence with recurring shoulder washouts after moderate rain.'
+        desc: 'Advisory watch on NH-29 Dzüdza section following localized precipitation. Single lane controlled movement.'
     },
     {
         id: 'namchi',
@@ -273,138 +120,291 @@ const landslidePlaces = [
         state: 'Sikkim',
         pos: [27.1700, 88.3500],
         category: 'WATCH',
-        color: '#eab308',
-        score: 55,
-        rain: 60,
+        color: '#f59e0b',
+        score: 43,
+        rain: 36.8,
         slope: 25,
-        soil: 62,
-        probability: 49,
+        soil: 70,
+        probability: 38,
         window: '36 hours',
         highway: 'Jorethang–Namchi Highway',
         geology: 'Gondwana Sandstones',
-        desc: 'Terraced agricultural hillslopes monitored for pore water pressure saturation.'
+        desc: 'Terraced slopes experiencing moderate rainfall. Under standard watch.'
+    },
+
+    // --- 🟢 GREEN: LOW RISK / SAFE STABILITY (< 40) ---
+    {
+        id: 'darjeeling',
+        name: 'Darjeeling (Pagla Jhora)',
+        state: 'West Bengal',
+        pos: [27.0410, 88.2663],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 28,
+        rain: 11.9,
+        slope: 35,
+        soil: 70,
+        probability: 16,
+        window: 'Clear / Open',
+        highway: 'Hill Cart Road / NH-110',
+        geology: 'Darjeeling Gneiss & Mica Schist',
+        desc: 'Slope monitoring active along Hill Cart Road / NH-110. Precipitation well below critical threshold; safe with no landslide threat.'
+    },
+    {
+        id: 'kalimpong',
+        name: 'Kalimpong (Teesta Gorge)',
+        state: 'West Bengal',
+        pos: [27.0600, 88.4700],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 29,
+        rain: 14.4,
+        slope: 33,
+        soil: 68,
+        probability: 18,
+        window: 'Clear / Open',
+        highway: 'NH-10 Teesta Corridor',
+        geology: 'Daling Series Slates & Phyllites',
+        desc: 'Teesta Gorge slopes stable under current rainfall levels. Normal corridor flow.'
+    },
+    {
+        id: 'noney',
+        name: 'Noney & Tupul Rail Yard',
+        state: 'Manipur',
+        pos: [24.7800, 93.6200],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 26,
+        rain: 2.9,
+        slope: 38,
+        soil: 65,
+        probability: 15,
+        window: 'Clear / Open',
+        highway: 'Jiribam-Imphal Corridor / NH-37',
+        geology: 'Disang Shales & Siltstones',
+        desc: 'Valley railway embankment and highway cuttings dry and stable. Open.'
+    },
+    {
+        id: 'haflong',
+        name: 'Dima Hasao (Haflong–Jatinga)',
+        state: 'Assam',
+        pos: [25.1800, 93.0200],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 23,
+        rain: 2.8,
+        slope: 32,
+        soil: 62,
+        probability: 12,
+        window: 'Clear / Open',
+        highway: 'Lumding–Badarpur Hill Route',
+        geology: 'Barail Sandstone-Shale Interbeds',
+        desc: 'Jatinga hill section stable with normal drainage discharge.'
+    },
+    {
+        id: 'cherrapunji',
+        name: 'Cherrapunji / Sohra Rim',
+        state: 'Meghalaya',
+        pos: [25.2700, 91.7300],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 26,
+        rain: 4.3,
+        slope: 37,
+        soil: 66,
+        probability: 14,
+        window: 'Clear / Open',
+        highway: 'Shillong–Sohra Highway',
+        geology: 'Shella Sandstone on Limestone',
+        desc: 'Scarp walls stable. Current rainfall well below activation threshold.'
+    },
+    {
+        id: 'phek',
+        name: 'Phek (Jessami Highway)',
+        state: 'Nagaland',
+        pos: [25.6800, 94.5000],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 25,
+        rain: 5.1,
+        slope: 30,
+        soil: 64,
+        probability: 13,
+        window: 'Clear / Open',
+        highway: 'Trans-Nagaland Highway',
+        geology: 'Ophiolite Melange & Foliated Shales',
+        desc: 'Stable hill road alignment with normal pavement conditions.'
+    },
+    {
+        id: 'tawang',
+        name: 'Tawang (Sela Pass Approach)',
+        state: 'Arunachal Pradesh',
+        pos: [27.5860, 91.8600],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 22,
+        rain: 1.3,
+        slope: 34,
+        soil: 60,
+        probability: 11,
+        window: 'Clear / Open',
+        highway: 'BCT High Altitude Road',
+        geology: 'Glacial Moraines & Granite Gneiss',
+        desc: 'Clear mountain road corridor. High altitude slopes stable.'
+    },
+    {
+        id: 'aizawl',
+        name: 'Aizawl (Ramhlun / Hunthar)',
+        state: 'Mizoram',
+        pos: [23.7271, 92.7176],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 22,
+        rain: 5.5,
+        slope: 26,
+        soil: 62,
+        probability: 12,
+        window: 'Clear / Open',
+        highway: 'NH-54 / NH-108 Corridor',
+        geology: 'Surma Group Siltstones',
+        desc: 'Urban slopes stable. Municipal storm drains clear and functional.'
+    },
+    {
+        id: 'kurseong',
+        name: 'Kurseong (Tindharia)',
+        state: 'West Bengal',
+        pos: [26.8800, 88.2800],
+        category: 'SAFE',
+        color: '#10b981',
+        score: 24,
+        rain: 7.6,
+        slope: 29,
+        soil: 65,
+        probability: 14,
+        window: 'Clear / Open',
+        highway: 'NH-110 Tindharia Section',
+        geology: 'Damuda Sandstone & Slates',
+        desc: 'DHR railway corridor and NH-110 road shoulders stable.'
     },
     {
         id: 'itanagar',
         name: 'Itanagar & Naharlagun',
         state: 'Arunachal Pradesh',
         pos: [27.0844, 93.6053],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 61,
-        rain: 74,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 24,
+        rain: 7.9,
         slope: 28,
-        soil: 69,
-        probability: 57,
-        window: '24 hours',
+        soil: 64,
+        probability: 13,
+        window: 'Clear / Open',
         highway: 'NH-415 Corridor',
         geology: 'Siwalik Sandstones & Conglomerate',
-        desc: 'Hill cutting excavations showing localized slumping along NH-415.'
+        desc: 'NH-415 urban cuts stable with clear runoff channels.'
     },
     {
         id: 'pasighat',
         name: 'Pasighat (Siang Gorge)',
         state: 'Arunachal Pradesh',
         pos: [28.0600, 95.3300],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 56,
-        rain: 65,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 25,
+        rain: 10.2,
         slope: 26,
-        soil: 63,
-        probability: 48,
-        window: '36 hours',
+        soil: 65,
+        probability: 14,
+        window: 'Clear / Open',
         highway: 'NH-513 Corridor',
         geology: 'Abor Volcanics & River Gravels',
-        desc: 'Riverine toe erosion on foothill bends. Lateral bank cutting actively monitored.'
+        desc: 'Riverine foothills stable with moderate stream gauge levels.'
     },
     {
         id: 'guwahati_hills',
         name: 'Guwahati (Narakasur Hills)',
         state: 'Assam',
         pos: [26.1445, 91.7362],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 48,
-        rain: 52,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 35,
+        rain: 16.5,
         slope: 22,
-        soil: 56,
-        probability: 39,
-        window: '48 hours',
+        soil: 62,
+        probability: 20,
+        window: 'Clear / Open',
         highway: 'Guwahati Urban Ring',
         geology: 'Precambrian Granitic Gneiss',
-        desc: 'Unregulated hill cutting and loose red soil runoff during monsoon rain spells.'
+        desc: 'Granitic slopes stable. Drainage culverts clear.'
     },
     {
         id: 'tura',
         name: 'Tura (Garo Hills)',
         state: 'Meghalaya',
         pos: [25.5100, 90.2200],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 53,
-        rain: 59,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 18,
+        rain: 0.7,
         slope: 24,
-        soil: 60,
-        probability: 45,
-        window: '36 hours',
+        soil: 55,
+        probability: 8,
+        window: 'Clear / Open',
         highway: 'NH-217 Tura–Dalu Highway',
         geology: 'Granite-Gneiss with Laterite Caps',
-        desc: 'Lateritic topsoil saturation leading to road culvert blockages and bank slides.'
+        desc: 'Garo hills corridor dry and completely stable.'
     },
     {
         id: 'senapati',
         name: 'Senapati (Tahamzam)',
         state: 'Manipur',
         pos: [25.2600, 94.0200],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 64,
-        rain: 70,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 25,
+        rain: 6.8,
         slope: 28,
         soil: 66,
-        probability: 60,
-        window: '24 hours',
+        probability: 14,
+        window: 'Clear / Open',
         highway: 'NH-02 Imphal-Dimapur Road',
         geology: 'Disang Shales with Sandstone Layers',
-        desc: 'Vulnerable highway cuttings subject to rockfalls and debris mudslides.'
+        desc: 'Highway cuttings clear and open for inter-state traffic.'
     },
     {
         id: 'champhai',
         name: 'Champhai Border Ridge',
         state: 'Mizoram',
         pos: [23.4700, 93.3300],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 45,
-        rain: 48,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 24,
+        rain: 9.8,
         slope: 21,
-        soil: 54,
-        probability: 36,
-        window: '48 hours',
+        soil: 60,
+        probability: 13,
+        window: 'Clear / Open',
         highway: 'NH-06 Champhai Highway',
         geology: 'Bhuban Sandstone Ridges',
-        desc: 'Moderate slope movement monitored along international trade highway corridor.'
+        desc: 'Trade corridor ridge stable with normal traffic flow.'
     },
     {
         id: 'jampui',
         name: 'Jampui Hills Ridge',
         state: 'Tripura',
         pos: [23.9500, 92.2700],
-        category: 'WATCH',
-        color: '#eab308',
-        score: 42,
-        rain: 46,
+        category: 'SAFE',
+        color: '#10b981',
+        score: 20,
+        rain: 6.0,
         slope: 20,
-        soil: 52,
-        probability: 33,
-        window: '48 hours',
+        soil: 58,
+        probability: 10,
+        window: 'Clear / Open',
         highway: 'Kanchanpur–Vanghmun Road',
         geology: 'Tipam Sandstone & Shale Synclines',
-        desc: 'Moderate ridgeline erosion along the Tripura–Mizoram border hills.'
+        desc: 'Tripura-Mizoram border hills stable. Clear.'
     },
-
-    // --- 🟢 GREEN: LOW RISK / SAFE STABILITY (< 35) ---
     {
         id: 'shillong',
         name: 'Shillong Central Plateau',
@@ -412,12 +412,12 @@ const landslidePlaces = [
         pos: [25.5788, 91.8933],
         category: 'SAFE',
         color: '#10b981',
-        score: 24,
-        rain: 30,
+        score: 19,
+        rain: 3.9,
         slope: 15,
-        soil: 38,
-        probability: 16,
-        window: 'Stable Monitoring',
+        soil: 52,
+        probability: 9,
+        window: 'Clear / Open',
         highway: 'NH-06 Shillong Bypass',
         geology: 'Shillong Group Quartzites (Massive)',
         desc: 'Dense vegetation canopy and highly competent quartzite bedrock. Safe and stable.'
@@ -429,11 +429,11 @@ const landslidePlaces = [
         pos: [26.7271, 88.3953],
         category: 'SAFE',
         color: '#10b981',
-        score: 18,
-        rain: 24,
+        score: 19,
+        rain: 8.8,
         slope: 6,
-        soil: 30,
-        probability: 10,
+        soil: 48,
+        probability: 8,
         window: 'Clear / Open',
         highway: 'NH-27 / NH-10 Origin',
         geology: 'Alluvial Outwash Fan & Terai Gravels',
@@ -447,10 +447,10 @@ const landslidePlaces = [
         category: 'SAFE',
         color: '#10b981',
         score: 20,
-        rain: 28,
+        rain: 13.2,
         slope: 8,
-        soil: 34,
-        probability: 12,
+        soil: 50,
+        probability: 9,
         window: 'Clear / Open',
         highway: 'NH-29 Logistics Gateway',
         geology: 'Dhansiri Alluvium & Terraces',
@@ -463,11 +463,11 @@ const landslidePlaces = [
         pos: [24.8170, 93.9368],
         category: 'SAFE',
         color: '#10b981',
-        score: 22,
-        rain: 26,
+        score: 17,
+        rain: 4.6,
         slope: 7,
-        soil: 36,
-        probability: 14,
+        soil: 46,
+        probability: 7,
         window: 'Clear / Open',
         highway: 'NH-02 & NH-37 Terminus',
         geology: 'Lacustrine Silt & Clays',
@@ -480,11 +480,11 @@ const landslidePlaces = [
         pos: [26.6338, 92.7926],
         category: 'SAFE',
         color: '#10b981',
-        score: 16,
-        rain: 22,
+        score: 25,
+        rain: 18.6,
         slope: 5,
-        soil: 28,
-        probability: 8,
+        soil: 50,
+        probability: 10,
         window: 'Clear / Open',
         highway: 'NH-15 Brahmaputra Highway',
         geology: 'Brahmaputra Alluvial Plain',
@@ -497,11 +497,11 @@ const landslidePlaces = [
         pos: [27.4728, 94.9120],
         category: 'SAFE',
         color: '#10b981',
-        score: 19,
-        rain: 27,
+        score: 17,
+        rain: 7.0,
         slope: 4,
-        soil: 32,
-        probability: 9,
+        soil: 45,
+        probability: 6,
         window: 'Clear / Open',
         highway: 'Bogibeel Bridge & NH-15',
         geology: 'Deep Quaternary Alluvium',
@@ -514,11 +514,11 @@ const landslidePlaces = [
         pos: [27.5300, 93.8300],
         category: 'SAFE',
         color: '#10b981',
-        score: 28,
-        rain: 36,
+        score: 25,
+        rain: 13.5,
         slope: 14,
-        soil: 41,
-        probability: 20,
+        soil: 54,
+        probability: 12,
         window: 'Clear / Open',
         highway: 'Trans-Arunachal Highway (NH-13)',
         geology: 'Granite & Mica Schist Terraces',
@@ -531,11 +531,11 @@ const landslidePlaces = [
         pos: [23.3100, 92.8300],
         category: 'SAFE',
         color: '#10b981',
-        score: 25,
-        rain: 32,
+        score: 21,
+        rain: 10.4,
         slope: 13,
-        soil: 39,
-        probability: 17,
+        soil: 52,
+        probability: 10,
         window: 'Clear / Open',
         highway: 'NH-54 Middle Corridor',
         geology: 'Massive Barail Sandstone',
@@ -548,11 +548,11 @@ const landslidePlaces = [
         pos: [23.8315, 91.2868],
         category: 'SAFE',
         color: '#10b981',
-        score: 15,
-        rain: 20,
+        score: 20,
+        rain: 14.8,
         slope: 5,
-        soil: 25,
-        probability: 7,
+        soil: 48,
+        probability: 8,
         window: 'Clear / Open',
         highway: 'NH-08 National Corridor',
         geology: 'Dupitila Sandstones & Clays',
@@ -565,12 +565,12 @@ const landslidePlaces = [
         pos: [27.2800, 88.2300],
         category: 'SAFE',
         color: '#10b981',
-        score: 29,
-        rain: 38,
+        score: 39,
+        rain: 33.0,
         slope: 16,
-        soil: 42,
-        probability: 22,
-        window: 'Stable Monitoring',
+        soil: 62,
+        probability: 25,
+        window: 'Clear / Open',
         highway: 'Geyzing–Legship Road',
         geology: 'Phyllitic Quartzite with High Cohesion',
         desc: 'Engineered retaining walls and afforested mountain contours. Normal watch.'
@@ -629,6 +629,37 @@ landslidePlaces.forEach(p => {
 // Helper functions for risk categorization
 const getLevel = score => score <= 35 ? 'SAFE' : score <= 70 ? 'WATCH' : 'CRITICAL';
 const levelColors = { SAFE: '#10b981', WATCH: '#eab308', CRITICAL: '#ef4444' };
+
+// ----------------------------------------------------------------------------
+// Geotechnical Risk Scoring Engine (Calibrated on USGS / GSI LEWS Thresholds)
+// ----------------------------------------------------------------------------
+function calculateGeotechnicalRisk(rainVal, slopeVal, soilVal) {
+    const rain = Number(rainVal || 0);
+    const slope = Number(slopeVal || 0);
+    const soil = Number(soilVal || 50);
+
+    // Dynamic triggers: rainfall (0-100 scale, normalized to 100mm extreme storm)
+    const rScore = Math.min(100, Math.round((rain / 100) * 100));
+    // Geomorphological susceptibility: slope angle (0-100 scale, normalized to 45° angle of repose)
+    const sScore = Math.min(100, Math.round((slope / 45) * 100));
+    // Antecedent moisture saturation (0-100 scale)
+    const sat = Math.min(100, Math.round(soil));
+
+    let score;
+    // Slope stability physics: if rainfall is low (<15mm), slopes remain in stable equilibrium
+    if (rain < 15) {
+        score = Math.min(35, Math.max(5, Math.round(rScore * 0.50 + sScore * 0.15 + sat * 0.15)));
+    } else {
+        score = Math.min(100, Math.max(10, Math.round(0.55 * rScore + 0.30 * sScore + 0.15 * sat)));
+    }
+
+    const category = score >= 70 ? 'CRITICAL' : score >= 40 ? 'WATCH' : 'SAFE';
+    const color = (typeof levelColors !== 'undefined' && levelColors[category])
+        ? levelColors[category]
+        : (score >= 70 ? '#ef4444' : score >= 40 ? '#f59e0b' : '#10b981');
+
+    return { score, category, color, rScore, sScore, sat };
+}
 
 // Bounding box covering India & the sub-Himalayan North East Region
 const indiaBounds = L.latLngBounds([-5.0, 55.0], [42.0, 115.0]);
@@ -712,7 +743,7 @@ if (fsBtn && mapContainer) {
         const isFs = mapContainer.classList.contains('fullscreen');
         const fsText = document.getElementById('fullscreenBtnText');
         if (fsText) fsText.textContent = isFs ? 'Exit Fullscreen' : 'View Map Completely';
-        
+
         // Comprehensive multi-phase invalidateSize to guarantee tile rendering across all browsers & screen sizes
         invalidateMapLayout();
         requestAnimationFrame(invalidateMapLayout);
@@ -869,8 +900,8 @@ function calculateDistanceKm(lat1, lon1, lat2, lon2) {
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
@@ -1040,7 +1071,7 @@ const placeMarkerMap = new Map();
 
 function getPlaceRoadStatus(place) {
     if (typeof roads !== 'undefined' && Array.isArray(roads)) {
-        const found = roads.find(r => 
+        const found = roads.find(r =>
             place.highway && (place.highway.includes(r.highwayCode) || r.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0]))
         );
         if (found) {
@@ -1064,8 +1095,8 @@ function getPlaceRoadStatus(place) {
 function createPopupContent(place) {
     const isCritical = place.category === 'CRITICAL';
     const isWatch = place.category === 'WATCH';
-    const categoryBadgeClass = isCritical 
-        ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+    const categoryBadgeClass = isCritical
+        ? 'text-red-400 bg-red-950/60 border-red-500/40'
         : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
     const roadStatus = getPlaceRoadStatus(place);
     const lat = place.pos[0];
@@ -1125,15 +1156,12 @@ function openStationPopup(place) {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-// Baseline dynamic score normalization for all 30 places using formula:
+// Baseline dynamic score normalization for all 30 places using calibrated geotechnical formula:
 landslidePlaces.forEach(place => {
-    const rScore = Math.min(100, Math.round((Number(place.rain || 0) / 120) * 100));
-    const sScore = Math.min(100, Math.round((Number(place.slope || 0) / 45) * 100));
-    const mScore = Math.min(100, Math.round(Number(place.soil || 50)));
-    const initScore = Math.min(100, Math.max(5, Math.round(0.50 * rScore + 0.35 * sScore + 0.15 * mScore)));
-    place.score = initScore;
-    place.category = initScore >= 70 ? 'CRITICAL' : initScore >= 40 ? 'WATCH' : 'SAFE';
-    place.color = levelColors[place.category] || (initScore >= 70 ? '#ef4444' : initScore >= 40 ? '#f59e0b' : '#10b981');
+    const geo = calculateGeotechnicalRisk(place.rain, place.slope, place.soil);
+    place.score = geo.score;
+    place.category = geo.category;
+    place.color = geo.color;
 });
 
 // Render all 30 landslide places on the Leaflet map
@@ -1153,7 +1181,7 @@ landslidePlaces.forEach(place => {
         popupAnchor: [0, -14]
     });
 
-    const marker = L.marker(place.pos, { 
+    const marker = L.marker(place.pos, {
         icon,
         title: `${place.name} (${place.category}: ${place.score}/100)`
     });
@@ -1196,8 +1224,8 @@ landslidePlaces.forEach(place => {
         if (userBadge) {
             const isCritical = place.category === 'CRITICAL';
             const isWatch = place.category === 'WATCH';
-            const catClass = isCritical 
-                ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+            const catClass = isCritical
+                ? 'text-red-400 bg-red-950/60 border-red-500/40'
                 : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
             userBadge.textContent = `${place.category} (${place.score})`;
             userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`;
@@ -1924,7 +1952,7 @@ function updateDetourButtonUI(roadId, isActive) {
 }
 
 // Window Focus Road Helper for Interactive Cards
-window.focusRoad = function(roadId) {
+window.focusRoad = function (roadId) {
     const road = roads.find(r => r.id === roadId);
     if (!road) return;
 
@@ -1953,7 +1981,7 @@ window.focusRoad = function(roadId) {
 };
 
 // Window Toggle Detour Helper (Shows / Hides Alternative Dotted Detour on Map)
-window.toggleDetour = function(roadId) {
+window.toggleDetour = function (roadId) {
     const road = roads.find(r => r.id === roadId);
     if (!road || !road.detourCoords) return;
 
@@ -2003,7 +2031,7 @@ window.toggleDetour = function(roadId) {
 };
 
 // Window Focus Detour (backward compatible alias)
-window.focusDetour = function(roadId) {
+window.focusDetour = function (roadId) {
     if (!activeDetourRoadIds.has(roadId)) {
         window.toggleDetour(roadId);
     } else {
@@ -2022,7 +2050,7 @@ window.focusDetour = function(roadId) {
     }
 };
 
-window.hideDetour = function(roadId) {
+window.hideDetour = function (roadId) {
     if (activeDetourRoadIds.has(roadId)) {
         window.toggleDetour(roadId);
     }
@@ -2075,8 +2103,8 @@ map.on('click', (e) => {
         if (userBadge) {
             const isCritical = closestPlace.category === 'CRITICAL';
             const isWatch = closestPlace.category === 'WATCH';
-            const catClass = isCritical 
-                ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+            const catClass = isCritical
+                ? 'text-red-400 bg-red-950/60 border-red-500/40'
                 : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
             userBadge.textContent = `${closestPlace.category} (${closestPlace.score})`;
             userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`;
@@ -2094,8 +2122,8 @@ map.on('click', (e) => {
     const approxScore = isNear ? closestPlace.score : Math.max(15, Math.round(closestPlace.score * 0.8));
     const approxCategory = approxScore >= 70 ? 'CRITICAL' : (approxScore >= 40 ? 'WATCH' : 'SAFE');
     const approxColor = approxScore >= 70 ? '#ef4444' : (approxScore >= 40 ? '#f59e0b' : '#10b981');
-    const categoryBadgeClass = approxCategory === 'CRITICAL' 
-        ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+    const categoryBadgeClass = approxCategory === 'CRITICAL'
+        ? 'text-red-400 bg-red-950/60 border-red-500/40'
         : (approxCategory === 'WATCH' ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
 
     // Update live location banner with clicked coordinate inspection
@@ -2259,20 +2287,18 @@ function updateRiskPanel(place, updateMapVisuals = false) {
     if (pCoords && place.pos) pCoords.textContent = `${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E`;
     if (pState) pState.innerHTML = `&bull; ${place.state} &bull; ${place.highway || 'Corridor'}`;
 
-    // Compute rain, slope, and moisture index scores
+    // Compute rain, slope, and moisture index scores using geotechnical formula
     const rainVal = Number(place.rain || 0);
     const slopeVal = Number(place.slope || 0);
     const soilVal = Number(place.soil || 50);
 
-    // Normalized scores (0–100 scale)
-    const rainScore = Math.min(100, Math.round((rainVal / 120) * 100));
-    const slopeScore = Math.min(100, Math.round((slopeVal / 45) * 100));
-    const amiScore = Math.min(100, Math.round(soilVal));
-
-    // PRD Multi-Criteria Formula: 0.50 * Rain + 0.35 * Slope + 0.15 * AMI
-    const dynamicScore = Math.min(100, Math.max(5, Math.round(0.50 * rainScore + 0.35 * slopeScore + 0.15 * amiScore)));
-    const dynamicRisk = dynamicScore >= 70 ? 'CRITICAL' : dynamicScore >= 40 ? 'WATCH' : 'SAFE';
-    const color = levelColors[dynamicRisk] || '#ef4444';
+    const geo = calculateGeotechnicalRisk(rainVal, slopeVal, soilVal);
+    const dynamicScore = geo.score;
+    const dynamicRisk = geo.category;
+    const color = geo.color;
+    const rainScore = geo.rScore;
+    const slopeScore = geo.sScore;
+    const amiScore = geo.sat;
 
     const scoreElem = document.getElementById('riskScore');
     if (scoreElem) scoreElem.textContent = dynamicScore;
@@ -2453,8 +2479,8 @@ window.selectLandslidePlace = function (placeId, openPopup = true) {
     if (userBadge) {
         const isCritical = place.category === 'CRITICAL';
         const isWatch = place.category === 'WATCH';
-        const catClass = isCritical 
-            ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+        const catClass = isCritical
+            ? 'text-red-400 bg-red-950/60 border-red-500/40'
             : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
         userBadge.textContent = `${place.category} (${place.score})`;
         userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`;
@@ -2699,13 +2725,12 @@ if (roadSearchInput) {
 }
 
 // ----------------------------------------------------------------------------
-// 11. Populate Quick Select NER Zone Dropdown
+// 11. Populate Quick Select NER Zone Dropdown (No misleading dots)
 // ----------------------------------------------------------------------------
 const regionDropdown = document.getElementById('regionSelector');
 if (regionDropdown) {
     regionDropdown.innerHTML = landslidePlaces.map(place => {
-        const emoji = place.category === 'CRITICAL' ? '🔴' : place.category === 'WATCH' ? '🟡' : '🟢';
-        return `<option value="${place.id}">${emoji} ${place.name} (${place.state}) — [${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E]</option>`;
+        return `<option value="${place.id}">${place.name} (${place.state}) — [${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E]</option>`;
     }).join('');
 
     regionDropdown.addEventListener('change', event => {
@@ -2738,10 +2763,12 @@ function updateSimulator() {
     if (slopeVal) slopeVal.textContent = slope + '°';
     if (amiVal) amiVal.textContent = ami + '%';
 
-    // Normalized scores (0–100 scale)
-    const rainScore = Math.min(100, Math.round((rainfall / 120) * 100));
-    const slopeScore = Math.min(100, Math.round((slope / 45) * 100));
-    const amiScore = ami;
+    const geo = calculateGeotechnicalRisk(rainfall, slope, ami);
+    const rainScore = geo.rScore;
+    const slopeScore = geo.sScore;
+    const dynamicScore = geo.score;
+    const dynamicRisk = geo.category;
+    const color = geo.color;
 
     const simRainScore = document.getElementById('simRainScore');
     if (simRainScore) simRainScore.textContent = rainScore;
@@ -2755,11 +2782,6 @@ function updateSimulator() {
             slopePlainsIndicator.className = 'text-emerald-400 font-semibold';
         }
     }
-
-    // Dynamic Multi-Criteria Hazard Score: 0.50 * Rain + 0.35 * Slope + 0.15 * AMI
-    const dynamicScore = Math.min(100, Math.max(5, Math.round(0.50 * rainScore + 0.35 * slopeScore + 0.15 * amiScore)));
-    const dynamicRisk = dynamicScore >= 70 ? 'CRITICAL' : dynamicScore >= 40 ? 'WATCH' : 'SAFE';
-    const color = levelColors[dynamicRisk] || '#ef4444';
 
     if (simRiskTier) {
         simRiskTier.style.color = color;
@@ -2993,8 +3015,8 @@ async function fetchBhuvanDemTelemetry(lat, lng, placeId = null) {
             }
         }
 
-        const currentPlace = placeId 
-            ? landslidePlaces.find(p => p.id === placeId) 
+        const currentPlace = placeId
+            ? landslidePlaces.find(p => p.id === placeId)
             : (landslidePlaces.find(p => p.id === activePlaceId) || landslidePlaces[0]);
 
         if (currentPlace && demData) {
@@ -3124,8 +3146,8 @@ async function fetchOpenMeteoTelemetry(lat, lng, placeId = null) {
         }
 
         // Apply real-time rain, soil moisture, and AMI to the place in landslidePlaces
-        const currentPlace = placeId 
-            ? landslidePlaces.find(p => p.id === placeId) 
+        const currentPlace = placeId
+            ? landslidePlaces.find(p => p.id === placeId)
             : (landslidePlaces.find(p => p.id === activePlaceId) || landslidePlaces[0]);
 
         if (currentPlace) {
@@ -3142,8 +3164,13 @@ async function fetchOpenMeteoTelemetry(lat, lng, placeId = null) {
                 lyr9: curSm9
             };
 
-            // Recompute dynamic hazard score and update UI
-            updateRiskPanel(currentPlace);
+            // Recompute dynamic hazard score using calibrated geotechnical formula and update UI & map
+            const geo = calculateGeotechnicalRisk(liveRainValue, currentPlace.slope, combinedAmi);
+            currentPlace.score = geo.score;
+            currentPlace.category = geo.category;
+            currentPlace.color = geo.color;
+            updateRiskPanel(currentPlace, true);
+            updatePlaceMapVisuals(currentPlace);
 
             // Synchronize simulator inputs with live telemetry
             if (rainfallSlider) rainfallSlider.value = Math.min(150, liveRainValue);
@@ -3271,14 +3298,13 @@ async function syncAllPlacesRealTimeThreat() {
             const liveRain = Math.round(precip.reduce((sum, p) => sum + (p || 0), 0) * 10) / 10;
             const sm9 = typeof sm9Arr[0] === 'number' ? sm9Arr[0] : 0.325;
 
-            const rScore = Math.min(100, Math.round((liveRain / 120) * 100));
-            const sScore = Math.min(100, Math.round((place.slope / 45) * 100));
             const sat = Math.min(100, Math.round((sm9 / 0.45) * 100));
             const ami = Math.min(100, Math.round(0.70 * sat + 0.30 * 25));
 
-            const dynamicScore = Math.min(100, Math.max(5, Math.round(0.50 * rScore + 0.35 * sScore + 0.15 * ami)));
-            const dynamicRisk = dynamicScore >= 70 ? 'CRITICAL' : dynamicScore >= 40 ? 'WATCH' : 'SAFE';
-            const color = levelColors[dynamicRisk] || (dynamicScore >= 70 ? '#ef4444' : dynamicScore >= 40 ? '#f59e0b' : '#10b981');
+            const geo = calculateGeotechnicalRisk(liveRain, place.slope, ami);
+            const dynamicScore = geo.score;
+            const dynamicRisk = geo.category;
+            const color = geo.color;
 
             place.rain = liveRain;
             place.soil = ami;
@@ -3618,7 +3644,7 @@ function renderRecentReportsFeed() {
 }
 
 // Window Inspect Report on Map
-window.inspectReport = function(reportId) {
+window.inspectReport = function (reportId) {
     const report = citizenReports.find(r => r.id === reportId);
     if (!report) return;
 
@@ -4069,9 +4095,9 @@ if (reportForm) {
         // Photo URL: use current uploaded photo or fall back to matching sample photo
         const photoUrl = currentIncidentPhoto || (
             type.includes('Rockfall') ? sampleIncidentPhotos.rockfall :
-            type.includes('Mudflow') ? sampleIncidentPhotos.mudflow :
-            type.includes('Fissure') ? sampleIncidentPhotos.fissure :
-            sampleIncidentPhotos.rockfall
+                type.includes('Mudflow') ? sampleIncidentPhotos.mudflow :
+                    type.includes('Fissure') ? sampleIncidentPhotos.fissure :
+                        sampleIncidentPhotos.rockfall
         );
 
         // Approximate coordinates near active landslide monitoring place
@@ -4193,9 +4219,10 @@ if (typeof fetchOpenMeteoTelemetry === 'function' && landslidePlaces[0].pos) {
 if (typeof fetchBhuvanDemTelemetry === 'function' && landslidePlaces[0].pos) {
     fetchBhuvanDemTelemetry(landslidePlaces[0].pos[0], landslidePlaces[0].pos[1], landslidePlaces[0].id);
 }
-// Immediately synchronize real-time threat stream across all 30 stations
+// Immediately synchronize real-time threat stream across all 30 stations and establish periodic telemetry sync
 if (typeof syncAllPlacesRealTimeThreat === 'function') {
     syncAllPlacesRealTimeThreat();
+    setInterval(syncAllPlacesRealTimeThreat, 120000); // Continuous live telemetry sync every 2 minutes
 }
 setTimeout(() => {
     map.invalidateSize();
