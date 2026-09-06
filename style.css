@@ -248,14 +248,19 @@ input[type=range] {
 .tab-view.active { display: block; }
 
 /* Custom Leaflet Pulsing Markers for Landslide Hazards */
+.landslide-custom-icon {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
 .landslide-pin {
     position: relative;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: pointer !important;
+    pointer-events: auto !important;
 }
 .landslide-pin-inner {
     width: 14px;
@@ -265,6 +270,8 @@ input[type=range] {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
     z-index: 2;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer !important;
+    pointer-events: auto !important;
 }
 .landslide-pin:hover .landslide-pin-inner {
     transform: scale(1.35);
@@ -286,11 +293,12 @@ input[type=range] {
 }
 .landslide-pulse {
     position: absolute;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     z-index: 1;
     animation: radar-pulse 2.2s infinite ease-out;
+    pointer-events: none !important;
 }
 .landslide-pin.red .landslide-pulse,
 .landslide-pin.critical .landslide-pulse {
@@ -378,82 +386,71 @@ input[type=range] {
     border-color: rgba(245, 158, 11, 0.7);
 }
 
-/* Custom Leaflet Popups */
+/* Custom Leaflet Popups - Ultra Compact & Responsive */
 .leaflet-popup-content-wrapper {
-    background: rgba(15, 23, 42, 0.96) !important;
-    border: 1px solid rgba(148, 163, 184, 0.3) !important;
-    border-radius: 10px !important;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65) !important;
+    background: rgba(15, 23, 42, 0.97) !important;
+    border: 1px solid rgba(148, 163, 184, 0.35) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75) !important;
     color: #e2e8f0 !important;
     padding: 0 !important;
+    max-width: 215px !important;
+}
+.leaflet-popup-content {
+    margin: 0 !important;
+    line-height: 1.35 !important;
+    max-width: 215px !important;
 }
 .leaflet-popup-tip {
     background: #0f172a !important;
 }
+.leaflet-popup-close-button {
+    color: #94a3b8 !important;
+    padding: 3px 5px !important;
+    top: 3px !important;
+    right: 4px !important;
+    font-size: 14px !important;
+    line-height: 14px !important;
+    width: 16px !important;
+    height: 16px !important;
+}
+.leaflet-popup-close-button:hover {
+    color: #ffffff !important;
+}
+.landslide-popup-compact,
 .landslide-popup-card {
-    min-width: 230px;
-    padding: 12px 14px;
-    font-size: 11px;
+    min-width: 170px;
+    max-width: 215px;
+    padding: 7px 9px;
+    font-size: 10.5px;
 }
 .landslide-popup-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.18);
 }
 .landslide-popup-title {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 11.5px;
     color: #ffffff;
-    line-height: 1.25;
+    line-height: 1.2;
 }
 .landslide-popup-state {
-    font-size: 10px;
+    font-size: 9px;
     color: #94a3b8;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 .landslide-popup-badge {
-    font-size: 9px;
+    font-size: 8.5px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 2px 6px;
     border-radius: 9999px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     flex-shrink: 0;
-}
-.landslide-popup-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    background: rgba(30, 41, 59, 0.65);
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    padding: 8px;
-    border-radius: 7px;
-}
-.landslide-popup-item span {
-    display: block;
-    color: #94a3b8;
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-.landslide-popup-item b {
-    color: #f8fafc;
-    font-size: 12px;
-}
-.landslide-popup-desc {
-    font-size: 10px;
-    color: #cbd5e1;
-    margin-top: 6px;
-    line-height: 1.4;
-    padding: 6px 8px;
-    background: rgba(15, 23, 42, 0.45);
-    border-left: 2px solid #38bdf8;
-    border-radius: 0 4px 4px 0;
 }
 .landslide-popup-action {
     display: block;
@@ -462,16 +459,30 @@ input[type=range] {
     background: #059669;
     color: #ffffff !important;
     font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-top: 8px;
-    font-size: 10px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-size: 9px;
     cursor: pointer;
     transition: background 0.2s ease;
     border: none;
 }
 .landslide-popup-action:hover {
     background: #10b981;
+}
+
+@media (max-width: 640px) {
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-content {
+        max-width: 195px !important;
+    }
+    .landslide-popup-compact,
+    .landslide-popup-card {
+        min-width: 155px;
+        max-width: 195px;
+        padding: 6px 8px;
+        font-size: 9.5px;
+    }
 }
 
 /* Landslide Hotspots Directory */
@@ -498,32 +509,7 @@ input[type=range] {
 .hotspot-card.watch { border-left-color: #eab308; }
 .hotspot-card.safe { border-left-color: #10b981; }
 
-.map-legend {
-    background: rgba(15, 23, 42, 0.94);
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    border-radius: 8px;
-    color: #f8fafc;
-    padding: 8px 12px;
-    font-size: 10px;
-    line-height: 1.55;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-}
-.legend-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 5px;
-}
-.legend-line {
-    display: inline-block;
-    width: 14px;
-    border-top: 3px solid;
-    vertical-align: middle;
-    margin-right: 5px;
-}
+
 
 .leaflet-control-layers { background: rgba(15, 23, 42, .92); border: 1px solid rgba(148,163,184,.35); border-radius: 8px; color: #f8fafc; font-size: 11px; box-shadow: 0 8px 22px rgba(0,0,0,.35); }
 .leaflet-control-layers-expanded { padding: 8px 10px; width: 142px; }
@@ -726,6 +712,7 @@ input[type=range] {
 }
 
 .light-mode .landslide-popup-content,
+.light-mode .landslide-popup-compact,
 .light-mode .landslide-popup-card { color: var(--light-text); }
 .light-mode .leaflet-popup-content-wrapper,
 .light-mode .leaflet-popup-tip { background: var(--light-surface) !important; color: var(--light-text) !important; }

@@ -753,7 +753,7 @@ window.addEventListener('resize', () => {
 // ----------------------------------------------------------------------------
 let indiaMaskLayer = null;
 let indiaBorderLayer = null;
-let maskState = 'solid'; // 'solid' (0.90), 'tint' (0.55), 'off' (0)
+let maskState = 'tint'; // Default to 'tint' for subtle non-intrusive dimming
 
 if (typeof indiaTerritoryRings !== 'undefined' && Array.isArray(indiaTerritoryRings)) {
     // Outer polygon wrapping the globe strictly within Web Mercator EPSG:3857 limit (85.0511)
@@ -772,12 +772,12 @@ if (typeof indiaTerritoryRings !== 'undefined' && Array.isArray(indiaTerritoryRi
 
     indiaMaskLayer = L.polygon(maskCoords, {
         renderer: maskCanvasRenderer,
-        fillColor: '#000000',
-        fillOpacity: 0.90,
+        fillColor: '#0f172a',
+        fillOpacity: 0.28, // Soft translucent slate dimming outside India
         stroke: true,
         color: '#0284c7',
-        weight: 1.8,
-        opacity: 0.85,
+        weight: 1.5,
+        opacity: 0.65,
         interactive: false
     }).addTo(map);
 
@@ -785,8 +785,8 @@ if (typeof indiaTerritoryRings !== 'undefined' && Array.isArray(indiaTerritoryRi
     indiaBorderLayer = L.polyline(indiaTerritoryRings[0], {
         renderer: maskCanvasRenderer,
         color: '#38bdf8',
-        weight: 2.2,
-        opacity: 0.95,
+        weight: 2.0,
+        opacity: 0.85,
         interactive: false,
         dashArray: '5 5',
         lineCap: 'round',
@@ -794,37 +794,55 @@ if (typeof indiaTerritoryRings !== 'undefined' && Array.isArray(indiaTerritoryRi
     }).addTo(map);
 }
 
-// Toggle India Blackout Mask Button
+// Toggle India Blackout Mask Button & State Manager
 const toggleMaskBtn = document.getElementById('toggleMaskBtn');
 const maskBtnText = document.getElementById('maskBtnText');
 
+function applyMaskState(state) {
+    maskState = state;
+    if (!indiaMaskLayer) return;
+
+    if (maskState === 'tint') {
+        indiaMaskLayer.setStyle({ fillColor: '#0f172a', fillOpacity: 0.28, opacity: 0.65 });
+        if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.85 });
+        if (maskBtnText) maskBtnText.textContent = 'India Focus: TINT';
+        if (toggleMaskBtn) {
+            toggleMaskBtn.classList.remove('text-gray-400', 'text-cyan-300');
+            toggleMaskBtn.classList.add('text-amber-300');
+        }
+    } else if (maskState === 'off') {
+        indiaMaskLayer.setStyle({ fillOpacity: 0, opacity: 0 });
+        if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.2 });
+        if (maskBtnText) maskBtnText.textContent = 'India Focus: OFF';
+        if (toggleMaskBtn) {
+            toggleMaskBtn.classList.remove('text-amber-300', 'text-cyan-300');
+            toggleMaskBtn.classList.add('text-gray-400');
+        }
+    } else if (maskState === 'solid') {
+        indiaMaskLayer.setStyle({ fillColor: '#000000', fillOpacity: 0.88, opacity: 0.85 });
+        if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.95 });
+        if (maskBtnText) maskBtnText.textContent = 'India Focus: ON';
+        if (toggleMaskBtn) {
+            toggleMaskBtn.classList.remove('text-amber-300', 'text-gray-400');
+            toggleMaskBtn.classList.add('text-cyan-300');
+        }
+    }
+}
+
+// Force apply initial tint state immediately
+applyMaskState('tint');
+
 if (toggleMaskBtn) {
     toggleMaskBtn.addEventListener('click', () => {
-        if (!indiaMaskLayer) return;
-
-        if (maskState === 'solid') {
-            maskState = 'tint';
-            indiaMaskLayer.setStyle({ fillOpacity: 0.55, opacity: 0.6 });
-            if (maskBtnText) maskBtnText.textContent = 'India Focus: TINT';
-            toggleMaskBtn.classList.remove('text-cyan-300');
-            toggleMaskBtn.classList.add('text-yellow-300');
-            if (typeof showToast === 'function') showToast('🌓 India Mask: Medium Tint (55%)');
-        } else if (maskState === 'tint') {
-            maskState = 'off';
-            indiaMaskLayer.setStyle({ fillOpacity: 0, opacity: 0 });
-            if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.2 });
-            if (maskBtnText) maskBtnText.textContent = 'India Focus: OFF';
-            toggleMaskBtn.classList.remove('text-yellow-300');
-            toggleMaskBtn.classList.add('text-gray-400');
-            if (typeof showToast === 'function') showToast('🌐 India Mask: Disabled (Open Global Relief)');
+        if (maskState === 'tint') {
+            applyMaskState('off');
+            if (typeof showToast === 'function') showToast('🌐 India Mask: Disabled');
+        } else if (maskState === 'off') {
+            applyMaskState('solid');
+            if (typeof showToast === 'function') showToast('🇮🇳 India Mask: Solid Focus (ON)');
         } else {
-            maskState = 'solid';
-            indiaMaskLayer.setStyle({ fillOpacity: 0.90, opacity: 0.85 });
-            if (indiaBorderLayer) indiaBorderLayer.setStyle({ opacity: 0.95 });
-            if (maskBtnText) maskBtnText.textContent = 'India Focus: ON';
-            toggleMaskBtn.classList.remove('text-gray-400');
-            toggleMaskBtn.classList.add('text-cyan-300');
-            if (typeof showToast === 'function') showToast('🇮🇳 India Mask: Active (Blackout Outside India)');
+            applyMaskState('tint');
+            if (typeof showToast === 'function') showToast('🌓 India Mask: Translucent Tint');
         }
     });
 }
@@ -916,7 +934,7 @@ function updateUserLocationUI(lat, lng, accuracy = 20) {
     const gpsDot = document.getElementById('gpsDot');
 
     if (locText) {
-        locText.innerHTML = `<span class="text-gray-400">Your Location:</span> <b class="text-white">${statusText}</b>`;
+        locText.innerHTML = `<span class="text-gray-400">Your Location:</span> <b class="text-white">${statusText}</b> <span class="text-cyan-300 font-mono text-[10px]">(${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E)</span>`;
     }
     if (badge) {
         badge.textContent = badgeText;
@@ -930,24 +948,22 @@ function updateUserLocationUI(lat, lng, accuracy = 20) {
 
     userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(userLocationLayer);
     userMarker.bindPopup(`
-        <div class="landslide-popup-card">
-            <div class="flex items-center justify-between">
-                <b class="text-cyan-400 text-xs">📍 YOUR CURRENT LOCATION</b>
+        <div class="landslide-popup-compact">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-700/60">
+                <b class="text-cyan-400 text-xs">📍 YOU ARE HERE</b>
                 <span class="text-[9px] px-1.5 py-0.5 rounded font-bold" style="background:${hazardColor}20;color:${hazardColor};border:1px solid ${hazardColor}50">
                     ${badgeText}
                 </span>
             </div>
-            <div class="text-xs text-gray-300 mt-2 leading-relaxed">
-                <b>Coordinates:</b> ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E<br>
-                <b>Nearest Sector:</b> ${closestPlace.name} (${closestPlace.state})<br>
-                <b>Proximity:</b> ${distanceKm} km to active monitoring zone<br>
-                <b>Geology:</b> ${closestPlace.geology}
+            <div class="text-[10px] text-gray-300 mt-1.5 leading-snug">
+                <div><b>Coords:</b> ${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E</div>
+                <div><b>Sector:</b> ${closestPlace.name} (${distanceKm} km)</div>
             </div>
-            <p class="text-[10px] text-gray-400 mt-1.5 pt-1.5 border-t border-slate-700">
-                ${hazardTier === 'CRITICAL' ? '⚠️ High risk of rockfall and debris accumulation on slopes. Exercise extreme caution.' : 'Normal monitoring conditions. Safe from immediate slope movement.'}
+            <p class="text-[9px] text-gray-400 mt-1 pt-1 border-t border-slate-800">
+                ${hazardTier === 'CRITICAL' ? '⚠️ High risk of rockfall nearby.' : 'Normal conditions. Slope stable.'}
             </p>
         </div>
-    `);
+    `, { maxWidth: 215, minWidth: 170, autoPanPadding: [15, 15] });
 
     userAccuracyCircle = L.circle([lat, lng], {
         radius: Math.min(accuracy * 12, 1500),
@@ -1022,32 +1038,91 @@ if (locateUserBtn) {
 // Map place instances
 const placeMarkerMap = new Map();
 
+function getPlaceRoadStatus(place) {
+    if (typeof roads !== 'undefined' && Array.isArray(roads)) {
+        const found = roads.find(r => 
+            place.highway && (place.highway.includes(r.highwayCode) || r.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0]))
+        );
+        if (found) {
+            return {
+                status: found.status,
+                isBlocked: found.blockageSeverity === 'CRITICAL',
+                isRestricted: found.blockageSeverity === 'WATCH',
+                summary: found.blockage || found.status,
+                eta: found.clearingEta
+            };
+        }
+    }
+    if (place.category === 'CRITICAL') {
+        return { status: 'ROAD BLOCKED', isBlocked: true, isRestricted: false, summary: 'Corridor debris & rockfall hazard', eta: 'Under clearing' };
+    } else if (place.category === 'WATCH') {
+        return { status: 'SINGLE-LANE RESTRICTED', isBlocked: false, isRestricted: true, summary: 'Single-lane controlled movement', eta: 'Open with escort' };
+    }
+    return { status: 'ROAD OPEN / CLEAR', isBlocked: false, isRestricted: false, summary: 'Corridor fully open', eta: 'Normal' };
+}
+
 function createPopupContent(place) {
+    const isCritical = place.category === 'CRITICAL';
+    const isWatch = place.category === 'WATCH';
+    const categoryBadgeClass = isCritical 
+        ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+        : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
+    const roadStatus = getPlaceRoadStatus(place);
+    const lat = place.pos[0];
+    const lng = place.pos[1];
+
     return `
-        <div class="landslide-popup-card">
-            <div class="landslide-popup-header">
-                <div>
-                    <div class="landslide-popup-title">${place.name}</div>
-                    <div class="landslide-popup-state">${place.state} &bull; ${place.highway}</div>
+        <div class="landslide-popup-compact">
+            <div class="flex items-start justify-between gap-1 pb-1 border-b border-slate-700/60">
+                <div class="min-w-0">
+                    <div class="font-bold text-white text-xs leading-tight truncate" title="${place.name}">${place.name}</div>
+                    <div class="text-[9.5px] text-gray-400 mt-0.5 truncate">${place.state} &bull; ${place.highway || 'Corridor'}</div>
                 </div>
-                <span class="landslide-popup-badge" style="background:${place.color}20;color:${place.color};border:1px solid ${place.color}50">
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider flex-shrink-0 ${categoryBadgeClass}">
                     ${place.category}
                 </span>
             </div>
-            <div class="landslide-popup-grid">
-                <div class="landslide-popup-item"><span>Risk Score</span><b style="color:${place.color}">${place.score}/100</b></div>
-                <div class="landslide-popup-item"><span>Live Rain</span><b>${place.rain} mm</b></div>
-                <div class="landslide-popup-item"><span>Bhuvan Slope</span><b>${place.slope}&deg; (${place.aspect || 'Face'})</b></div>
-                <div class="landslide-popup-item"><span>CartoDEM Elev</span><b>${(place.elevation || 1487).toLocaleString()} m</b></div>
-                <div class="landslide-popup-item"><span>Soil Saturation</span><b class="text-emerald-400">${place.saturationPct || 73}% Sat.</b></div>
-                <div class="landslide-popup-item"><span>Moisture AMI</span><b class="text-emerald-400">${place.soil || 72}/100</b></div>
+            <div class="flex items-center justify-between text-[9.5px] text-gray-300 py-1 border-b border-slate-800/80">
+                <span class="text-gray-400 flex items-center gap-1">📍 Coords:</span>
+                <span class="font-mono text-cyan-300 font-semibold">${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E</span>
             </div>
-            <div class="landslide-popup-desc">${place.desc}</div>
-            <button class="landslide-popup-action" onclick="window.selectLandslidePlace('${place.id}')">
-                Focus in Geotechnical Model
+            <div class="flex items-center justify-between text-[9.5px] py-1 border-b border-slate-800/80">
+                <span class="text-gray-400">Risk Factor:</span>
+                <b style="color:${place.color}" class="font-bold">${place.category} (${place.score}/100)</b>
+            </div>
+            <div class="py-1 text-[9.5px]">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-400">Road Lifeline:</span>
+                    <span class="font-bold text-[9px] px-1 py-0.5 rounded ${roadStatus.isBlocked ? 'text-red-300 bg-red-950/60 border border-red-500/40' : (roadStatus.isRestricted ? 'text-amber-300 bg-amber-950/60 border border-amber-500/40' : 'text-emerald-300 bg-emerald-950/60 border border-emerald-500/40')}">
+                        ${roadStatus.isBlocked ? '⛔ BLOCKED' : (roadStatus.isRestricted ? '⚠️ RESTRICTED' : '🟢 OPEN')}
+                    </span>
+                </div>
+                <div class="text-[9px] text-gray-400 truncate mt-0.5" title="${roadStatus.summary}">${roadStatus.summary}</div>
+            </div>
+            <button class="w-full py-1 mt-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[9.5px] font-semibold transition shadow-sm text-center block" onclick="window.selectLandslidePlace('${place.id}', false)">
+                Inspect Site Telemetry &rarr;
             </button>
         </div>
     `;
+}
+
+// Dedicated, shared Leaflet popup instance for all 30 landslide monitoring stations
+const stationPopup = L.popup({
+    maxWidth: 215,
+    minWidth: 170,
+    autoPanPadding: [12, 12],
+    offset: [0, -12],
+    closeButton: true,
+    autoClose: true
+});
+
+function openStationPopup(place) {
+    if (!place || !place.pos) return;
+    stationPopup
+        .setLatLng(place.pos)
+        .setContent(createPopupContent(place))
+        .openOn(map);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // Baseline dynamic score normalization for all 30 places using formula:
@@ -1068,17 +1143,20 @@ landslidePlaces.forEach(place => {
     const icon = L.divIcon({
         className: 'landslide-custom-icon',
         html: `
-            <div class="landslide-pin ${pinClass} ${place.category === 'CRITICAL' ? 'red' : place.category === 'WATCH' ? 'yellow' : 'green'}">
+            <div class="landslide-pin ${pinClass} ${place.category === 'CRITICAL' ? 'red' : place.category === 'WATCH' ? 'yellow' : 'green'}" title="${place.name}">
                 <div class="landslide-pulse" style="background:${color}33;border-color:${color}"></div>
                 <div class="landslide-pin-inner" style="background-color:${color};box-shadow:0 0 10px ${color}"></div>
             </div>
         `,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
         popupAnchor: [0, -14]
     });
 
-    const marker = L.marker(place.pos, { icon }).bindPopup(() => createPopupContent(place));
+    const marker = L.marker(place.pos, { 
+        icon,
+        title: `${place.name} (${place.category}: ${place.score}/100)`
+    });
 
     // Target layer based on category
     if (place.category === 'CRITICAL') {
@@ -1089,17 +1167,52 @@ landslidePlaces.forEach(place => {
         marker.addTo(safeLayer);
     }
 
-    // Add subtle risk watershed circle
+    // Add subtle risk watershed circle (non-interactive so it never absorbs map/marker clicks)
     const halo = L.circle(place.pos, {
         radius: Math.max(600, place.score * 70),
         color: place.color,
         weight: 1,
         fillColor: place.color,
-        fillOpacity: place.category === 'CRITICAL' ? 0.14 : place.category === 'WATCH' ? 0.08 : 0.03
+        fillOpacity: place.category === 'CRITICAL' ? 0.14 : place.category === 'WATCH' ? 0.08 : 0.03,
+        interactive: false
     }).addTo(halosLayer);
 
-    marker.on('click', () => {
-        selectLandslidePlace(place.id, false);
+    marker.on('click', (e) => {
+        if (e && e.originalEvent) {
+            e.originalEvent._stopped = true;
+            if (e.originalEvent.stopPropagation) e.originalEvent.stopPropagation();
+        }
+        activePlaceId = place.id;
+        updateRiskPanel(place, false);
+        const regSelect = document.getElementById('regionSelector');
+        if (regSelect) regSelect.value = place.id;
+
+        // Synchronize top location banner
+        const userLocText = document.getElementById('userLocationText');
+        const userBadge = document.getElementById('userHazardZoneBadge');
+        if (userLocText) {
+            userLocText.innerHTML = `<span class="text-gray-400">Selected:</span> <b class="text-white">${place.name}</b> <span class="text-cyan-300 font-mono text-[10px]">(${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E)</span>`;
+        }
+        if (userBadge) {
+            const isCritical = place.category === 'CRITICAL';
+            const isWatch = place.category === 'WATCH';
+            const catClass = isCritical 
+                ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+                : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
+            userBadge.textContent = `${place.category} (${place.score})`;
+            userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`;
+        }
+
+        // Reliably display station details popup directly at station coordinates
+        openStationPopup(place);
+
+        // Background telemetry queries
+        if (typeof fetchOpenMeteoTelemetry === 'function' && place.pos) {
+            fetchOpenMeteoTelemetry(place.pos[0], place.pos[1], place.id);
+        }
+        if (typeof fetchBhuvanDemTelemetry === 'function' && place.pos) {
+            fetchBhuvanDemTelemetry(place.pos[0], place.pos[1], place.id);
+        }
     });
 
     placeMarkerMap.set(place.id, { marker, halo, place });
@@ -1128,28 +1241,25 @@ function updatePlaceMapVisuals(place) {
         const newIcon = L.divIcon({
             className: 'landslide-custom-icon',
             html: `
-                <div class="landslide-pin ${pinClass} ${riskCategory === 'CRITICAL' ? 'red' : riskCategory === 'WATCH' ? 'yellow' : 'green'}">
+                <div class="landslide-pin ${pinClass} ${riskCategory === 'CRITICAL' ? 'red' : riskCategory === 'WATCH' ? 'yellow' : 'green'}" title="${place.name}">
                     <div class="landslide-pulse" style="background:${color}33;border-color:${color}"></div>
                     <div class="landslide-pin-inner" style="background-color:${color};box-shadow:0 0 10px ${color}"></div>
                 </div>
             `,
-            iconSize: [28, 28],
-            iconAnchor: [14, 14],
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
             popupAnchor: [0, -14]
         });
         marker.setIcon(newIcon);
 
-        // 2. Move marker to the appropriate layer group
+        // 2. Move marker to the appropriate layer group ONLY if the layer actually changed!
         if (typeof criticalLayer !== 'undefined' && typeof watchLayer !== 'undefined' && typeof safeLayer !== 'undefined') {
-            criticalLayer.removeLayer(marker);
-            watchLayer.removeLayer(marker);
-            safeLayer.removeLayer(marker);
-            if (riskCategory === 'CRITICAL') {
-                criticalLayer.addLayer(marker);
-            } else if (riskCategory === 'WATCH') {
-                watchLayer.addLayer(marker);
-            } else {
-                safeLayer.addLayer(marker);
+            const targetLayer = riskCategory === 'CRITICAL' ? criticalLayer : (riskCategory === 'WATCH' ? watchLayer : safeLayer);
+            if (targetLayer && !targetLayer.hasLayer(marker)) {
+                criticalLayer.removeLayer(marker);
+                watchLayer.removeLayer(marker);
+                safeLayer.removeLayer(marker);
+                targetLayer.addLayer(marker);
             }
         }
     }
@@ -1607,26 +1717,39 @@ window.activeDetourLayer = activeDetourLayer;
 window.activeDetourRoadIds = activeDetourRoadIds;
 
 // Dynamic Popup Content Generators
-function createHighwayPopupContent(road) {
+function createHighwayPopupContent(road, clickLatLng) {
     const isDetourActive = activeDetourRoadIds.has(road.id);
+    const isBlocked = road.blockageSeverity === 'CRITICAL';
+    const isRestricted = road.blockageSeverity === 'WATCH';
+    const lat = clickLatLng ? clickLatLng.lat : (road.blockagePoint ? road.blockagePoint[0] : road.coords[0][0]);
+    const lng = clickLatLng ? clickLatLng.lng : (road.blockagePoint ? road.blockagePoint[1] : road.coords[0][1]);
+    const badgeText = isBlocked ? '⛔ BLOCKED' : (isRestricted ? '⚠️ RESTRICTED' : '🟢 OPEN');
+    const badgeClass = isBlocked ? 'text-red-300 bg-red-950/60 border border-red-500/40' : (isRestricted ? 'text-amber-300 bg-amber-950/60 border border-amber-500/40' : 'text-emerald-300 bg-emerald-950/60 border border-emerald-500/40');
+
     return `
-        <div class="landslide-popup-card">
-            <div class="flex items-center justify-between">
-                <b class="text-white text-sm">${road.name}</b>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
-                    ${road.status}
+        <div class="landslide-popup-compact">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-700/60">
+                <b class="text-white text-xs truncate max-w-[130px]">${road.name}</b>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded ${badgeClass}">
+                    ${badgeText}
                 </span>
             </div>
-            <div class="text-xs text-gray-300 mt-2 leading-relaxed">
-                <b>Corridor:</b> ${road.highwayCode} &bull; ${road.state}<br>
-                <b>Authority:</b> ${road.agency}<br>
-                <b>Condition:</b> ${road.blockage}<br>
-                <span class="text-emerald-400"><b>Detour:</b> ${road.alternative}</span>
+            <div class="flex items-center justify-between text-[9.5px] text-gray-300 py-1 border-b border-slate-800/80">
+                <span class="text-gray-400">📍 Coords:</span>
+                <span class="font-mono text-cyan-300 font-semibold">${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E</span>
+            </div>
+            <div class="flex items-center justify-between text-[9.5px] py-1 border-b border-slate-800/80">
+                <span class="text-gray-400">Risk Factor:</span>
+                <b style="color:${road.color}" class="font-bold">${road.risk}</b>
+            </div>
+            <div class="py-1 text-[9.5px]">
+                <div class="text-[9px] text-gray-300 leading-snug"><b>Corridor:</b> ${road.highwayCode} &bull; ${road.state}</div>
+                <div class="text-[9px] text-gray-400 truncate mt-0.5" title="${road.blockage}"><b>Status:</b> ${road.blockage}</div>
             </div>
             ${road.hasDetour ? `
-                <button id="road-detour-btn-${road.id}" class="mt-2.5 w-full py-1.5 ${isDetourActive ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-500/40' : 'bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border-sky-500/40'} rounded border text-[10px] font-semibold transition flex items-center justify-center gap-1.5" onclick="window.toggleDetour('${road.id}')">
+                <button id="road-detour-btn-${road.id}" class="mt-1 w-full py-1 ${isDetourActive ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-500/40' : 'bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border-sky-500/40'} rounded border text-[9.5px] font-semibold transition flex items-center justify-center gap-1" onclick="window.toggleDetour('${road.id}')">
                     <i data-lucide="${isDetourActive ? 'eye-off' : 'corner-up-right'}" class="w-3 h-3 ${isDetourActive ? 'text-rose-400' : 'text-sky-400'}"></i>
-                    ${isDetourActive ? 'Hide Alternative Road' : 'Show Alternative Road'}
+                    ${isDetourActive ? 'Hide Detour' : 'Show Alternative Road'}
                 </button>
             ` : ''}
         </div>
@@ -1636,26 +1759,33 @@ function createHighwayPopupContent(road) {
 function createBlockagePopupContent(road) {
     const isCritical = road.blockageSeverity === 'CRITICAL';
     const isDetourActive = activeDetourRoadIds.has(road.id);
+    const lat = road.blockagePoint ? road.blockagePoint[0] : road.coords[0][0];
+    const lng = road.blockagePoint ? road.blockagePoint[1] : road.coords[0][1];
     return `
-        <div class="landslide-popup-card">
-            <div class="flex items-center justify-between">
-                <b class="${isCritical ? 'text-red-400' : 'text-amber-400'} text-xs font-bold">${isCritical ? '⛔ ROAD SEVERED / BLOCKED' : '⚠️ SINGLE-LANE RESTRICTED'}</b>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
+        <div class="landslide-popup-compact">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-700/60">
+                <b class="${isCritical ? 'text-red-400' : 'text-amber-400'} text-[10.5px] font-bold">${isCritical ? '⛔ ROAD BLOCKED' : '⚠️ SINGLE-LANE'}</b>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded" style="background:${road.color}20;color:${road.color};border:1px solid ${road.color}50">
                     ${road.risk}
                 </span>
             </div>
-            <div class="text-sm font-bold text-white mt-1">${road.name}</div>
-            <div class="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                <b>Location:</b> ${road.state}<br>
-                <b>Agency:</b> ${road.agency}<br>
-                <b>Obstruction:</b> ${road.blockage}
+            <div class="text-xs font-bold text-white mt-0.5 truncate">${road.name}</div>
+            <div class="flex items-center justify-between text-[9.5px] text-gray-300 py-1 border-b border-slate-800/80">
+                <span class="text-gray-400">📍 Coords:</span>
+                <span class="font-mono text-cyan-300 font-semibold">${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E</span>
             </div>
-            <div class="text-xs text-yellow-400 mt-1 font-semibold"><b>Clearance ETA:</b> ${road.clearingEta}</div>
-            <div class="text-xs text-emerald-400 mt-1 font-semibold"><b>Alternative Route:</b> ${road.alternative}</div>
+            <div class="flex items-center justify-between text-[9.5px] py-1 border-b border-slate-800/80">
+                <span class="text-gray-400">Risk Factor:</span>
+                <b class="${isCritical ? 'text-red-400' : 'text-amber-400'} font-bold">${road.risk}</b>
+            </div>
+            <div class="py-1 text-[9.5px] leading-snug">
+                <div><b>Obstruction:</b> ${road.blockage}</div>
+                <div class="text-amber-400 font-medium"><b>ETA:</b> ${road.clearingEta}</div>
+            </div>
             ${road.hasDetour ? `
-                <button id="blockage-detour-btn-${road.id}" class="mt-2.5 w-full py-1.5 ${isDetourActive ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-500/40' : 'bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border-sky-500/40'} rounded border text-[10px] font-semibold transition flex items-center justify-center gap-1.5 shadow-sm" onclick="window.toggleDetour('${road.id}')">
-                    <i data-lucide="${isDetourActive ? 'eye-off' : 'corner-up-right'}" class="w-3.5 h-3.5 ${isDetourActive ? 'text-rose-400' : 'text-sky-400'}"></i>
-                    ${isDetourActive ? 'Hide Alternative Road' : 'Show Alternative Road'}
+                <button id="blockage-detour-btn-${road.id}" class="mt-1 w-full py-1 ${isDetourActive ? 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border-rose-500/40' : 'bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border-sky-500/40'} rounded border text-[9.5px] font-semibold transition flex items-center justify-center gap-1 shadow-sm" onclick="window.toggleDetour('${road.id}')">
+                    <i data-lucide="${isDetourActive ? 'eye-off' : 'corner-up-right'}" class="w-3 h-3 ${isDetourActive ? 'text-rose-400' : 'text-sky-400'}"></i>
+                    ${isDetourActive ? 'Hide Detour' : 'Show Alternative Road'}
                 </button>
             ` : ''}
         </div>
@@ -1664,24 +1794,24 @@ function createBlockagePopupContent(road) {
 
 function createDetourPopupContent(road) {
     return `
-        <div class="landslide-popup-card">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                    <span class="text-sky-400">🛣️</span>
-                    <b class="text-sky-400 text-xs font-bold">ALTERNATIVE DETOUR ROUTE</b>
+        <div class="landslide-popup-compact">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-700/60">
+                <div class="flex items-center gap-1">
+                    <span>🛣️</span>
+                    <b class="text-sky-400 text-[10px] font-bold">DETOUR ROUTE</b>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-500/40">
-                    DOTTED BLUE
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-500/40">
+                    BLUE
                 </span>
             </div>
-            <div class="text-sm font-bold text-white mt-1">${road.detourName}</div>
-            <div class="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                <b>Bypasses Obstruction on:</b> <span class="text-white">${road.name}</span><br>
-                <b>Advisory:</b> ${road.alternative}<br>
-                <b>Permitted Traffic:</b> <span class="text-cyan-300 font-semibold">${road.detourVehicleType || 'Light vehicles & emergency transport'}</span>
+            <div class="text-xs font-bold text-white mt-1 truncate">${road.detourName}</div>
+            <div class="text-[9.5px] text-gray-300 mt-1 leading-snug">
+                <div><b>Bypasses:</b> ${road.name}</div>
+                <div><b>Advisory:</b> ${road.alternative}</div>
+                <div><b>Traffic:</b> <span class="text-cyan-300">${road.detourVehicleType || 'Light vehicles only'}</span></div>
             </div>
-            <button class="mt-2.5 w-full py-1.5 bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 rounded border border-rose-500/40 text-[10px] font-semibold transition flex items-center justify-center gap-1.5 shadow-sm" onclick="window.toggleDetour('${road.id}')">
-                <i data-lucide="eye-off" class="w-3.5 h-3.5 text-rose-400"></i> Hide Alternative Road
+            <button class="mt-1.5 w-full py-1 bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 rounded border border-rose-500/40 text-[9.5px] font-semibold transition flex items-center justify-center gap-1 shadow-sm" onclick="window.toggleDetour('${road.id}')">
+                <i data-lucide="eye-off" class="w-3 h-3 text-rose-400"></i> Hide Detour
             </button>
         </div>
     `;
@@ -1695,7 +1825,14 @@ const roadLines = roads.map(road => {
         opacity: 0.95,
         lineCap: 'round',
         lineJoin: 'round'
-    }).addTo(roadLayer).bindPopup(() => createHighwayPopupContent(road));
+    }).addTo(roadLayer).bindPopup((layer) => {
+        const clickLatLng = layer && layer.latlng ? layer.latlng : null;
+        return createHighwayPopupContent(road, clickLatLng);
+    }, {
+        maxWidth: 215,
+        minWidth: 170,
+        autoPanPadding: [12, 12]
+    });
 
     roadLinesMap.set(road.id, line);
 
@@ -1708,7 +1845,11 @@ const roadLines = roads.map(road => {
             opacity: 0.95,
             lineCap: 'round',
             lineJoin: 'round'
-        }).bindPopup(() => createDetourPopupContent(road));
+        }).bindPopup(() => createDetourPopupContent(road), {
+            maxWidth: 215,
+            minWidth: 170,
+            autoPanPadding: [15, 15]
+        });
 
         detourLinesMap.set(road.id, detourLine);
     }
@@ -1730,7 +1871,11 @@ const roadLines = roads.map(road => {
 
         const blockageMarker = L.marker(road.blockagePoint, { icon: blockageIcon })
             .addTo(roadLayer)
-            .bindPopup(() => createBlockagePopupContent(road));
+            .bindPopup(() => createBlockagePopupContent(road), {
+                maxWidth: 215,
+                minWidth: 170,
+                autoPanPadding: [15, 15]
+            });
 
         roadMarkersMap.set(road.id, blockageMarker);
     }
@@ -1888,45 +2033,169 @@ map.on('popupopen', () => {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 });
 
-// ----------------------------------------------------------------------------
-// 7. Floating Map Legend & Layer Controls
-// ----------------------------------------------------------------------------
-const legend = L.control({ position: 'bottomleft' });
-legend.onAdd = () => {
-    const div = L.DomUtil.create('div', 'map-legend');
-    div.innerHTML = `
-        <b style="font-size:11px;letter-spacing:0.04em">LANDSLIDE &amp; HIGHWAY KEY</b><br>
-        <span class="legend-dot" style="background:#ef4444"></span><b>Red</b>: Critical Hazard (&gt;70)<br>
-        <span class="legend-dot" style="background:#eab308"></span><b>Yellow</b>: Watch Advisory (35–70)<br>
-        <span class="legend-dot" style="background:#10b981"></span><b>Green</b>: Low / Safe (&lt;35)<br>
-        <span style="display:inline-block;margin-right:4px;">📍</span><b>Cyan</b>: Your Location<br>
-        <span style="display:inline-block;margin-right:4px;">⛔</span><b>Red Pin</b>: Blocked Highway (5 Routes)<br>
-        <span style="display:inline-block;margin-right:4px;">⚠️</span><b>Yellow Pin</b>: Single-Lane Watch (6 Routes)<br>
-        <span class="legend-line" style="border-top:3px solid #10b981"></span><b>Solid Green</b>: Open Arteries (NH-27/15)<br>
-        <span class="legend-line" style="border-top:3px dashed #38bdf8"></span><b>Blue Dotted</b>: Alternative Detour Road (Click to Show)
+// Interactive Click-on-Coordinate Inspector Popup
+const clickCoordPopup = L.popup({
+    maxWidth: 215,
+    minWidth: 170,
+    autoPanPadding: [12, 12]
+});
+
+map.on('click', (e) => {
+    // Avoid triggering if clicked on an existing marker or road popup already handled
+    if (e.originalEvent && e.originalEvent._stopped) return;
+    if (!e || !e.latlng) return;
+
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+
+    // Find nearest landslide monitoring station
+    let closestPlace = landslidePlaces[0];
+    let minDistance = calculateDistanceKm(lat, lng, closestPlace.pos[0], closestPlace.pos[1]);
+
+    landslidePlaces.forEach(p => {
+        const d = calculateDistanceKm(lat, lng, p.pos[0], p.pos[1]);
+        if (d < minDistance) {
+            minDistance = d;
+            closestPlace = p;
+        }
+    });
+
+    if (minDistance < 3.0 && closestPlace) {
+        // User clicked right on or immediately adjacent to a pre-existing station dot
+        activePlaceId = closestPlace.id;
+        updateRiskPanel(closestPlace, false);
+        const regSelect = document.getElementById('regionSelector');
+        if (regSelect) regSelect.value = closestPlace.id;
+
+        const userLocText = document.getElementById('userLocationText');
+        const userBadge = document.getElementById('userHazardZoneBadge');
+        if (userLocText) {
+            userLocText.innerHTML = `<span class="text-gray-400">Selected:</span> <b class="text-white">${closestPlace.name}</b> <span class="text-cyan-300 font-mono text-[10px]">(${closestPlace.pos[0].toFixed(4)}°N, ${closestPlace.pos[1].toFixed(4)}°E)</span>`;
+        }
+        if (userBadge) {
+            const isCritical = closestPlace.category === 'CRITICAL';
+            const isWatch = closestPlace.category === 'WATCH';
+            const catClass = isCritical 
+                ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+                : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
+            userBadge.textContent = `${closestPlace.category} (${closestPlace.score})`;
+            userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`;
+        }
+
+        openStationPopup(closestPlace);
+        return;
+    }
+
+    const isNear = minDistance < 35;
+    const placeName = isNear ? closestPlace.name : `NER Sector (${minDistance.toFixed(0)} km to ${closestPlace.name})`;
+    const placeState = closestPlace.state;
+    const roadStatus = getPlaceRoadStatus(closestPlace);
+
+    const approxScore = isNear ? closestPlace.score : Math.max(15, Math.round(closestPlace.score * 0.8));
+    const approxCategory = approxScore >= 70 ? 'CRITICAL' : (approxScore >= 40 ? 'WATCH' : 'SAFE');
+    const approxColor = approxScore >= 70 ? '#ef4444' : (approxScore >= 40 ? '#f59e0b' : '#10b981');
+    const categoryBadgeClass = approxCategory === 'CRITICAL' 
+        ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+        : (approxCategory === 'WATCH' ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
+
+    // Update live location banner with clicked coordinate inspection
+    const userLocText = document.getElementById('userLocationText');
+    const userBadge = document.getElementById('userHazardZoneBadge');
+    if (userLocText) {
+        userLocText.innerHTML = `<span class="text-gray-400">Inspecting:</span> <b class="text-white">${placeName}</b> <span class="text-cyan-300 font-mono text-[10px]">(${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E)</span>`;
+    }
+    if (userBadge) {
+        userBadge.textContent = `${approxCategory} (${approxScore})`;
+        userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${categoryBadgeClass}`;
+    }
+
+    const content = `
+        <div class="landslide-popup-compact">
+            <div class="flex items-start justify-between gap-1 pb-1 border-b border-slate-700/60">
+                <div class="min-w-0">
+                    <div class="font-bold text-white text-xs leading-tight truncate" title="${placeName}">${placeName}</div>
+                    <div class="text-[9.5px] text-gray-400 mt-0.5 truncate">${placeState} &bull; ${closestPlace.highway || 'NER Corridor'}</div>
+                </div>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider flex-shrink-0 ${categoryBadgeClass}">
+                    ${approxCategory}
+                </span>
+            </div>
+            <div class="flex items-center justify-between text-[9.5px] text-gray-300 py-1 border-b border-slate-800/80">
+                <span class="text-gray-400 flex items-center gap-1">📍 Coords:</span>
+                <span class="font-mono text-cyan-300 font-semibold">${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E</span>
+            </div>
+            <div class="flex items-center justify-between text-[9.5px] py-1 border-b border-slate-800/80">
+                <span class="text-gray-400">Risk Factor:</span>
+                <b style="color:${approxColor}" class="font-bold">${approxCategory} (${approxScore}/100)</b>
+            </div>
+            <div class="py-1 text-[9.5px]">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-400">Road Lifeline:</span>
+                    <span class="font-bold text-[9px] px-1 py-0.5 rounded ${roadStatus.isBlocked ? 'text-red-300 bg-red-950/60 border border-red-500/40' : (roadStatus.isRestricted ? 'text-amber-300 bg-amber-950/60 border border-amber-500/40' : 'text-emerald-300 bg-emerald-950/60 border border-emerald-500/40')}">
+                        ${roadStatus.isBlocked ? '⛔ BLOCKED' : (roadStatus.isRestricted ? '⚠️ RESTRICTED' : '🟢 OPEN')}
+                    </span>
+                </div>
+                <div class="text-[9px] text-gray-400 truncate mt-0.5" title="${roadStatus.summary}">${roadStatus.summary}</div>
+            </div>
+            <button class="w-full py-1 mt-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[9.5px] font-semibold transition shadow-sm text-center block" onclick="window.selectLandslidePlace('${closestPlace.id}', false)">
+                Inspect Site Telemetry &rarr;
+            </button>
+        </div>
     `;
-    return div;
-};
-legend.addTo(map);
+
+    clickCoordPopup
+        .setLatLng(e.latlng)
+        .setContent(content)
+        .openOn(map);
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+});
 
 // ----------------------------------------------------------------------------
-// 8. Map Filter Toolbar (All, Critical, Watch, Safe, Roads)
+// 7. Consolidated Map Filter Dropdown & Controls
 // ----------------------------------------------------------------------------
+const filterDropdownToggle = document.getElementById('filterDropdownToggle');
+const filterDropdownMenu = document.getElementById('filterDropdownMenu');
+const currentFilterLabel = document.getElementById('currentFilterLabel');
+
+if (filterDropdownToggle && filterDropdownMenu) {
+    filterDropdownToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        filterDropdownMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!filterDropdownMenu.contains(e.target) && !filterDropdownToggle.contains(e.target)) {
+            filterDropdownMenu.classList.add('hidden');
+        }
+    });
+}
+
 const mapFilterButtons = document.querySelectorAll('.map-filter');
 mapFilterButtons.forEach(button => {
     button.addEventListener('click', () => {
         mapFilterButtons.forEach(btn => {
-            btn.classList.remove('bg-emerald-600', 'text-white');
-            btn.classList.add('hover:bg-slate-800');
+            btn.classList.remove('bg-emerald-600/30', 'border-emerald-500/40');
         });
-        button.classList.add('bg-emerald-600', 'text-white');
-        button.classList.remove('hover:bg-slate-800');
+        button.classList.add('bg-emerald-600/30', 'border-emerald-500/40');
 
         const filter = button.dataset.filter;
         const countDisplay = document.getElementById('activeMapCount');
         const critCount = landslidePlaces.filter(p => p.category === 'CRITICAL').length;
         const watchCount = landslidePlaces.filter(p => p.category === 'WATCH').length;
         const safeCount = landslidePlaces.filter(p => p.category === 'SAFE').length;
+
+        // Update single filter button label and close dropdown
+        if (currentFilterLabel) {
+            if (filter === 'all') currentFilterLabel.textContent = `All NER (${landslidePlaces.length})`;
+            else if (filter === 'CRITICAL') currentFilterLabel.textContent = `Red Critical (${critCount})`;
+            else if (filter === 'WATCH') currentFilterLabel.textContent = `Yellow Watch (${watchCount})`;
+            else if (filter === 'SAFE') currentFilterLabel.textContent = `Green Safe (${safeCount})`;
+            else if (filter === 'ROADS') currentFilterLabel.textContent = 'Road Lifelines (15)';
+        }
+        if (filterDropdownMenu) {
+            filterDropdownMenu.classList.add('hidden');
+        }
 
         if (filter === 'all') {
             map.addLayer(criticalLayer);
@@ -1960,7 +2229,7 @@ mapFilterButtons.forEach(button => {
             map.addLayer(safeLayer);
             map.addLayer(roadLayer);
             map.addLayer(activeDetourLayer);
-            if (countDisplay) countDisplay.textContent = 'Showing 10 Low Hazard / Safe Zones (Green)';
+            if (countDisplay) countDisplay.textContent = `Showing ${safeCount} Low Hazard / Safe Zones (Green)`;
             map.flyTo([25.8, 92.8], 7.5, { duration: 0.8 });
         } else if (filter === 'ROADS') {
             map.removeLayer(criticalLayer);
@@ -1979,8 +2248,16 @@ mapFilterButtons.forEach(button => {
 // ----------------------------------------------------------------------------
 let activePlaceId = 'gangtok';
 
-function updateRiskPanel(place) {
+function updateRiskPanel(place, updateMapVisuals = false) {
     if (!place) return;
+
+    // Update preloaded place name, coordinates, and corridor header in riskPanel
+    const pName = document.getElementById('riskPlaceName');
+    const pCoords = document.getElementById('riskPlaceCoords');
+    const pState = document.getElementById('riskPlaceState');
+    if (pName) pName.textContent = place.name;
+    if (pCoords && place.pos) pCoords.textContent = `${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E`;
+    if (pState) pState.innerHTML = `&bull; ${place.state} &bull; ${place.highway || 'Corridor'}`;
 
     // Compute rain, slope, and moisture index scores
     const rainVal = Number(place.rain || 0);
@@ -2127,8 +2404,10 @@ function updateRiskPanel(place) {
     place.category = dynamicRisk;
     place.color = color;
 
-    // Dynamically update map marker pin and risk watershed halo
-    updatePlaceMapVisuals(place);
+    // Dynamically update map marker pin and risk watershed halo only if explicitly requested
+    if (updateMapVisuals) {
+        updatePlaceMapVisuals(place);
+    }
 
     // Highlight card in directory and update its live score and metrics
     document.querySelectorAll('.hotspot-card').forEach(card => {
@@ -2159,19 +2438,40 @@ window.selectLandslidePlace = function (placeId, openPopup = true) {
     if (!entry) return;
 
     const { marker, place } = entry;
-    updateRiskPanel(place);
+    updateRiskPanel(place, false);
 
     // Sync region dropdown
     const regSelect = document.getElementById('regionSelector');
     if (regSelect) regSelect.value = placeId;
 
-    // Fly to position
-    map.flyTo(place.pos, 9.5, { duration: 1.0 });
+    // Synchronize top location banner
+    const userLocText = document.getElementById('userLocationText');
+    const userBadge = document.getElementById('userHazardZoneBadge');
+    if (userLocText) {
+        userLocText.innerHTML = `<span class="text-gray-400">Selected:</span> <b class="text-white">${place.name}</b> <span class="text-cyan-300 font-mono text-[10px]">(${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E)</span>`;
+    }
+    if (userBadge) {
+        const isCritical = place.category === 'CRITICAL';
+        const isWatch = place.category === 'WATCH';
+        const catClass = isCritical 
+            ? 'text-red-400 bg-red-950/60 border-red-500/40' 
+            : (isWatch ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40');
+        userBadge.textContent = `${place.category} (${place.score})`;
+        userBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`;
+    }
 
     if (openPopup) {
-        window.setTimeout(() => {
-            marker.openPopup();
-        }, 600);
+        // Fly to position and open popup after moveend or fallback timer
+        map.flyTo(place.pos, Math.max(map.getZoom(), 9.5), { duration: 0.8 });
+        let popupOpened = false;
+        const doOpen = () => {
+            if (!popupOpened) {
+                popupOpened = true;
+                openStationPopup(place);
+            }
+        };
+        map.once('moveend', doOpen);
+        window.setTimeout(doOpen, 900);
     }
 
     // Automatically query real-time Open-Meteo rain & hourly prediction
@@ -2221,7 +2521,11 @@ function renderHotspotsDirectory(filterCategory = 'all', searchQuery = '') {
                             <span class="w-2 h-2 rounded-full" style="background:${badgeColor}"></span>
                             <b class="text-xs text-white">${place.name}</b>
                         </div>
-                        <p class="text-[10px] text-gray-400 mt-0.5">${place.state} &bull; <span class="text-gray-300">${place.highway}</span></p>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-cyan-300 font-mono text-[9.5px] font-semibold">📍 ${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E</span>
+                            <span class="text-gray-400 text-[10px]">&bull; ${place.state}</span>
+                        </div>
+                        <p class="text-[9.5px] text-gray-400 truncate mt-0.5">${place.highway}</p>
                     </div>
                     <span class="text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:${badgeColor}25;color:${badgeColor};border:1px solid ${badgeColor}40">
                         ${place.category}
@@ -2401,7 +2705,7 @@ const regionDropdown = document.getElementById('regionSelector');
 if (regionDropdown) {
     regionDropdown.innerHTML = landslidePlaces.map(place => {
         const emoji = place.category === 'CRITICAL' ? '🔴' : place.category === 'WATCH' ? '🟡' : '🟢';
-        return `<option value="${place.id}">${emoji} ${place.name} (${place.state})</option>`;
+        return `<option value="${place.id}">${emoji} ${place.name} (${place.state}) — [${place.pos[0].toFixed(4)}°N, ${place.pos[1].toFixed(4)}°E]</option>`;
     }).join('');
 
     regionDropdown.addEventListener('change', event => {
@@ -3870,7 +4174,17 @@ document.querySelectorAll('.top-nav-item').forEach(button => {
 // ----------------------------------------------------------------------------
 renderHotspotsDirectory('all');
 renderRoadsDirectory('all');
-updateRiskPanel(landslidePlaces[0]);
+const initDefaultPlace = landslidePlaces[0];
+updateRiskPanel(initDefaultPlace);
+const initialLocText = document.getElementById('userLocationText');
+const initialBadge = document.getElementById('userHazardZoneBadge');
+if (initialLocText) {
+    initialLocText.innerHTML = `<span class="text-gray-400">Preloaded Station:</span> <b class="text-white">${initDefaultPlace.name}</b> <span class="text-cyan-300 font-mono text-[10px]">(${initDefaultPlace.pos[0].toFixed(4)}°N, ${initDefaultPlace.pos[1].toFixed(4)}°E)</span>`;
+}
+if (initialBadge) {
+    initialBadge.textContent = `${initDefaultPlace.category} (${initDefaultPlace.score}/100)`;
+    initialBadge.className = `text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${initDefaultPlace.category === 'CRITICAL' ? 'text-red-400 bg-red-950/60 border border-red-500/40' : (initDefaultPlace.category === 'WATCH' ? 'text-amber-400 bg-amber-950/60 border border-amber-500/40' : 'text-emerald-400 bg-emerald-950/60 border border-emerald-500/40')}`;
+}
 // Immediately fetch real-time Open-Meteo rain telemetry & 24h hourly prediction for initial location (Gangtok NH-10)
 if (typeof fetchOpenMeteoTelemetry === 'function' && landslidePlaces[0].pos) {
     fetchOpenMeteoTelemetry(landslidePlaces[0].pos[0], landslidePlaces[0].pos[1], landslidePlaces[0].id);
