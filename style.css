@@ -653,6 +653,34 @@ input[type=range] {
 .light-mode .text-amber-400 { color: #9a4d00; }
 .light-mode .text-gray-500 { color: #52677b; }
 
+.light-mode #openMeteoSoilBadge,
+.light-mode #openMeteoAmiDecayBadge {
+    background-color: #087443;
+    color: #ffffff;
+    border-color: #087443;
+}
+
+.light-mode #sensSlope {
+    background-color: #b54708 !important;
+}
+
+.light-mode #telemetrySourceBadge .text-emerald-300 {
+    color: #ffffff;
+}
+
+.light-mode #openMeteoSoilBadge {
+    width: fit-content;
+    max-width: 100%;
+    padding: 2px 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 9px;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
 .light-mode .border-slate-700\/80,
 .light-mode .border-slate-700\/70,
 .light-mode .border-slate-800\/80,
@@ -819,6 +847,8 @@ input[type=range] {
 @media (max-width: 479px) {
     body { padding: .75rem; }
     header { margin-bottom: 1rem; gap: .75rem; }
+    header > div:first-child h1 { min-width: 0; flex-wrap: wrap; }
+    header > div:first-child > div:last-child h1 > span { white-space: normal !important; }
     .header-controls { gap: 6px; }
     .header-controls > button { padding-inline: .65rem; }
     .top-nav-item, .top-nav-alert { font-size: 10px; padding: 6px 5px; }
@@ -831,6 +861,118 @@ input[type=range] {
 
 @media (max-width: 1023px) {
     .leaflet-control-layers { margin-top: 5rem !important; }
+}
+
+/* Dashboard layout sizing: keep dense controls readable without changing their content. */
+*, *::before, *::after { box-sizing: border-box; }
+
+body, .glass-panel, #riskPanelContainer, #riskPanelContainer > *, #mapContainer {
+    max-width: 100%;
+    min-width: 0;
+}
+
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(.65rem, 1.5vw, 1rem);
+}
+
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 > div,
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 input[type="range"] {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 input[type="range"] {
+    display: block;
+    width: 100%;
+    overflow: visible;
+}
+
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 > div > .flex {
+    min-width: 0;
+    align-items: baseline;
+}
+
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 > div > .flex > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 > div > .flex > span:last-child {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+#riskPanel {
+    overflow: visible;
+}
+
+#riskPanel > .flex:first-child,
+#riskPanel > .mt-3,
+#riskPanel > .grid {
+    min-width: 0;
+}
+
+#riskPanel > .flex:first-child > div,
+#riskPanel > .flex:first-child > div:last-child,
+#riskPanel > .mt-3 > div {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#riskPanel > .flex:first-child > div:last-child {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+#riskPanel > .grid.grid-cols-4 > div,
+#riskPanel > .grid.grid-cols-4 > div > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#riskPanel > .grid.grid-cols-4 span,
+#riskPanel > .grid.grid-cols-4 b {
+    overflow-wrap: anywhere;
+}
+
+#riskPanelContainer > .grid.grid-cols-1.sm\:grid-cols-2 > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#forecastChart {
+    width: 100%;
+    max-width: 100%;
+}
+
+#hourlyForecastList,
+#regionSelector {
+    max-width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 767px) {
+    #riskPanelContainer > .glass-panel:first-child .grid.grid-cols-1.sm\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    #riskPanel > .flex:first-child > div:last-child,
+    #riskPanel > .mt-3 {
+        justify-content: flex-start;
+    }
+
+    #riskPanel > .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: .75rem;
+    }
+}
+
+@media (max-width: 479px) {
+    #riskPanel > .grid.grid-cols-4 {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ============================================================================
