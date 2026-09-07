@@ -95,6 +95,37 @@ body {
 .top-nav-alert { display: inline-flex; align-items: center; justify-content: center; color: #fbbf24; }
 .top-nav-alert.active { color: #fef3c7; background: rgba(245, 158, 11, .18); box-shadow: inset 0 0 0 1px rgba(245, 158, 11, .4); }
 .top-nav-alert-dot { position: absolute; top: 5px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: #ef4444; }
+.tab-button[data-tab="alertsPanel"]:hover,
+.tab-button[data-tab="alertsPanel"]:focus,
+.tab-button[data-tab="alertsPanel"]:active,
+.tab-button[data-tab="commuterFeedPanel"]:hover,
+.tab-button[data-tab="commuterFeedPanel"]:focus,
+.tab-button[data-tab="commuterFeedPanel"]:active {
+    color: #9ca3af !important;
+    background: rgba(51, 65, 85, .45) !important;
+}
+.tab-button[data-tab="alertsPanel"]:focus-visible,
+.tab-button[data-tab="commuterFeedPanel"]:focus-visible {
+    outline: 2px solid rgba(56, 189, 248, .8);
+    outline-offset: 2px;
+}
+.tab-button[data-tab="alertsPanel"]:hover svg,
+.tab-button[data-tab="alertsPanel"]:focus svg,
+.tab-button[data-tab="alertsPanel"]:active svg { color: #fbbf24 !important; }
+.tab-button[data-tab="commuterFeedPanel"]:hover svg,
+.tab-button[data-tab="commuterFeedPanel"]:focus svg,
+.tab-button[data-tab="commuterFeedPanel"]:active svg { color: #38bdf8 !important; }
+.tab-button[data-tab="alertsPanel"].bg-emerald-600,
+.tab-button[data-tab="alertsPanel"].bg-emerald-600:hover,
+.tab-button[data-tab="alertsPanel"].bg-emerald-600:focus,
+.tab-button[data-tab="alertsPanel"].bg-emerald-600:active,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:hover,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:focus,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:active {
+    color: #ffffff !important;
+    background-color: #059669 !important;
+}
 .header-controls { justify-content: flex-end; min-width: 0; }
 header > div:first-child > div:last-child { min-width: 0; }
 header > div:first-child > div:last-child h1 > span {
@@ -632,6 +663,32 @@ input[type=range] {
 .leaflet-control-layers-separator { border-top-color: #475569; }
 .forecast-chart { width: 100%; height: 92px; display: block; }
 .forecast-grid { stroke: #334155; stroke-width: 1; stroke-dasharray: 3 4; }
+#riskPanelContainer .glass-panel > div:has(> #hourlyForecastList) > div:first-child > span:first-child {
+    color: #6b9aaa;
+    font-weight: 700;
+}
+#riskPanelContainer .glass-panel > div:has(> #hourlyForecastList) > div:first-child > span:first-child svg {
+    color: #4f9aa8;
+}
+#hourlyForecastList {
+    border-top: 1px solid rgba(79, 154, 168, .24);
+    padding-top: 4px;
+}
+#hourlyForecastList .hourly-card {
+    background-color: rgba(30, 64, 78, .2);
+    border-color: rgba(79, 154, 168, .28);
+}
+#hourlyForecastList .hourly-card > div:first-child,
+#hourlyForecastList .hourly-card > div:nth-child(3),
+#hourlyForecastList .hourly-card > div:last-child span {
+    color: #9bb4bc;
+}
+#hourlyForecastList .hourly-card > div:nth-child(2) {
+    color: #83c5d1;
+}
+#hourlyForecastList .hourly-card > div:last-child {
+    border-color: rgba(79, 154, 168, .24);
+}
 .tab-view {
     display: none;
 }
@@ -825,6 +882,38 @@ input[type=range] {
     background-color: #059669 !important;
     color: #ffffff;
 }
+.light-mode .tab-button[data-tab="alertsPanel"],
+.light-mode .tab-button[data-tab="commuterFeedPanel"] {
+    color: var(--light-text-secondary);
+    background-color: #f5f9fb;
+}
+.light-mode .tab-button[data-tab="alertsPanel"]:hover,
+.light-mode .tab-button[data-tab="alertsPanel"]:focus,
+.light-mode .tab-button[data-tab="alertsPanel"]:active,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:hover,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:focus,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:active {
+    color: #075985 !important;
+    background-color: #e4f2f9 !important;
+    box-shadow: inset 0 0 0 1px #75b7d2;
+}
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600,
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600:hover,
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600:focus,
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600:active,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:hover,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:focus,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:active {
+    color: #ffffff !important;
+    background-color: #059669 !important;
+}
+.light-mode .tab-button[data-tab="alertsPanel"]:hover svg,
+.light-mode .tab-button[data-tab="alertsPanel"]:focus svg,
+.light-mode .tab-button[data-tab="alertsPanel"]:active svg { color: #b45309 !important; }
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:hover svg,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:focus svg,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:active svg { color: #0369a1 !important; }
 
 .light-mode .landslide-popup-content,
 .light-mode .landslide-popup-compact,
