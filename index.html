@@ -19,7 +19,7 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏔️</text></svg>">
 
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 
 <body class="p-4">
@@ -229,35 +229,16 @@
 
             <!-- 2. AI Geotechnical Landslide Model Panel (#riskPanel) -->
             <div id="riskPanel" class="glass-panel rounded-xl p-4 border border-slate-700/70 shadow-lg">
-                <div class="flex flex-wrap justify-between items-start gap-2 mb-2.5">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <p
-                                class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> MATHEMATICAL RISK
-                            </p>
-                            <span id="telemetrySourceBadge"
-                                class="text-[9px] px-1.5 py-0.2 rounded bg-sky-950/70 text-sky-300 border border-sky-500/40 font-mono">
-                            </span>
-                        </div>
-                        <p class="text-2xl font-bold text-white mt-0.5 flex items-baseline gap-2">
-                            <span id="riskScore">88</span><span class="text-gray-400 text-sm font-normal"> / 100</span>
-                            <span class="text-[11px] text-gray-400 font-normal">
-
-                            </span>
+                <!-- Header: Badge & Actions -->
+                <div class="flex flex-wrap justify-between items-center gap-2 pb-2 border-b border-slate-800/80 mb-2">
+                    <div class="flex items-center gap-2">
+                        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="cpu" class="w-3.5 h-3.5"></i> MATHEMATICAL RISK
                         </p>
-                        <!-- Selected Preloaded Location & Coordinates Header -->
-                        <div class="flex flex-wrap items-center gap-1.5 text-xs text-gray-300 mt-1.5">
-                            <span class="inline-flex items-center gap-1 text-[11px] text-gray-400">
-                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-red-400"></i> Location:
-                            </span>
-                            <b id="riskPlaceName" class="text-white font-semibold">Nongpoh</b>
-                            <span id="riskPlaceCoords"
-                                class="text-cyan-300 font-mono text-[11px] font-semibold bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">25.9032°N,
-                                91.8804°E</span>
-                            <span id="riskPlaceState" class="text-gray-400 text-[10.5px]">&bull; Meghalaya &bull;
-                                NH-6</span>
-                        </div>
+                        <span id="telemetrySourceBadge"
+                            class="text-[9px] px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-500/40 font-mono">
+                            Open-Meteo: SYNCED
+                        </span>
                     </div>
                     <div class="flex items-center gap-2">
                         <button id="fetchOpenMeteoBtn"
@@ -272,56 +253,68 @@
                     </div>
                 </div>
 
+                <!-- Centered Large Score Display -->
+                <div class="py-2 text-center">
+                    <div class="flex items-baseline justify-center gap-1.5">
+                        <span id="riskScore" class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">88</span>
+                        <span class="text-gray-400 text-sm sm:text-base font-normal">/ 100</span>
+                    </div>
+                    <!-- Selected Preloaded Location & Coordinates Header (Positioned Neatly Below Score) -->
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 text-xs text-gray-300 mt-1.5">
+                        <span class="inline-flex items-center gap-1 text-[11px] text-gray-400">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-red-400"></i> Location:
+                        </span>
+                        <b id="riskPlaceName" class="text-white font-semibold">Nongpoh</b>
+                        <span id="riskPlaceCoords"
+                            class="text-cyan-300 font-mono text-[11px] font-semibold bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">25.9032°N,
+                            91.8804°E</span>
+                        <span id="riskPlaceState" class="text-gray-400 text-[10.5px]">&bull; Meghalaya &bull;
+                            NH-6</span>
+                    </div>
+                </div>
+
                 <div class="metric-bar mb-3"><span id="riskGauge" style="width:88%;background:#ef4444"></span></div>
 
-                <!-- 4 Real-time PRD Metrics -->
-                <div
-                    class="grid grid-cols-4 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <div>
-                        <span class="text-[9px] text-gray-400 uppercase block">Rainfall (0.50)</span>
-                        <b id="riskRain" class="text-white text-xs font-semibold">112 mm</b>
-                        <span id="riskRainScoreSub" class="text-[9px] text-sky-400 block font-mono">Score: 93</span>
+                <!-- 4 Real-time PRD Metrics (Strictly 1 horizontal row on both mobile and desktop via flex-nowrap) -->
+                <div class="risk-metrics-row w-full text-center text-xs" style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; gap: 6px !important; box-sizing: border-box !important;">
+                    <!-- Box 1: Rainfall -->
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                        <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Rainfall</span>
+                        <b id="riskRain" class="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">112 mm</b>
+                        <span id="riskRainScoreSub" class="hidden"></span>
                     </div>
-                    <div>
-                        <div class="flex items-center justify-center gap-1">
-                            <span class="text-[9px] text-gray-400 uppercase">Slope (0.35)</span>
-                            <span id="bhuvanDemBadge"
-                                class="text-[8px] px-1 py-0.2 rounded bg-amber-950/70 text-amber-300 border border-amber-500/40 font-mono"
-                                title="ISRO Bhuvan CartoDEM 30m Grid">Bhuvan 30m</span>
-                        </div>
-                        <b id="riskSlope" class="text-white text-xs font-semibold">36°</b>
-                        <div class="text-[9px] text-gray-400 leading-tight">
-                            <span id="riskElevation" class="text-gray-300 font-mono">1,487 m</span> &bull; <span
-                                id="riskAspect" class="text-sky-300 font-mono">SE Face</span>
-                        </div>
-                        <span id="riskSlopeType" class="text-[9px] text-amber-400 block font-semibold">&ge;15° Hill
-                            Slope</span>
+
+                    <!-- Box 2: Slope -->
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                        <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Slope</span>
+                        <b id="riskSlope" class="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">36°</b>
+                        <span id="riskSlopeType" class="text-[8px] sm:text-[8.5px] text-amber-400 font-medium block truncate mt-0.5">&ge;15° Hill</span>
+                        <span id="bhuvanDemBadge" class="hidden"></span>
+                        <span id="riskElevation" class="hidden"></span>
+                        <span id="riskAspect" class="hidden"></span>
                     </div>
-                    <div>
-                        <div class="flex items-center justify-center gap-1">
-                            <span class="text-[9px] text-gray-400 uppercase">Moisture AMI (0.15)</span>
-                            <span id="openMeteoSoilBadge"
-                                class="text-[8px] px-1 py-0.2 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 font-mono"
-                                title="Open-Meteo Land Surface Hydrology (0–27cm Volumetric Soil Moisture)">Open-Meteo</span>
-                        </div>
-                        <b id="riskSoil" class="text-white text-xs font-semibold">73% Sat.</b>
-                        <span id="riskAmiScoreSub" class="text-[9px] text-emerald-400 block font-mono">0.329 m³/m³
-                            (0–27cm)</span>
+
+                    <!-- Box 3: Moisture -->
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                        <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Moisture</span>
+                        <b id="riskSoil" class="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">73% Sat.</b>
+                        <span id="riskAmiScoreSub" class="text-[8px] sm:text-[8.5px] text-emerald-400 font-mono block truncate mt-0.5">0.33 m³/m³</span>
+                        <span id="openMeteoSoilBadge" class="hidden"></span>
                     </div>
-                    <div>
-                        <span class="text-[9px] text-gray-400 uppercase block">Corridor Override</span>
-                        <b id="riskCorridorStatus" class="text-red-400 text-xs font-semibold">BLOCKED</b>
-                        <span id="riskCorridorSub" class="text-[9px] text-gray-400 block">NH-10 Snapped</span>
+
+                    <!-- Box 4: Corridor -->
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                        <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Corridor</span>
+                        <b id="riskCorridorStatus" class="text-red-400 text-xs sm:text-sm font-bold mt-0.5 truncate">BLOCKED</b>
+                        <span id="riskCorridorSub" class="text-[8px] sm:text-[8.5px] text-gray-400 block truncate mt-0.5">NH-10</span>
                     </div>
                 </div>
 
-                <div class="mt-3 pt-2.5 border-t border-slate-800 flex justify-between items-center text-xs">
-
-                </div>
+                <div class="mt-2 border-t border-slate-800/40"></div>
             </div>
 
             <!-- 3. Dual Analytics: Precipitation Forecast (SVG Chart) & Place Selector with Sensitivity -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
 
                 <!-- Precipitation Forecast SVG Chart -->
                 <div class="glass-panel rounded-xl p-3.5 border border-slate-700/70 shadow-lg">
@@ -368,9 +361,8 @@
                     </div>
                 </div>
 
-                <!-- Quick Select NER Zone & Sensitivity Factors -->
-                <div
-                    class="glass-panel rounded-xl p-3.5 border border-slate-700/70 shadow-lg flex flex-col justify-between">
+                <!-- Quick Select NER Zone & Sensitivity Factors (Compact, no stretching/gaps) -->
+                <div class="glass-panel rounded-xl p-3.5 border border-slate-700/70 shadow-lg space-y-2.5">
                     <div>
                         <div class="flex justify-between items-center gap-2 mb-1.5">
                             <label for="regionSelector"
