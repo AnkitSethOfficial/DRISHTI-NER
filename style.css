@@ -95,6 +95,37 @@ body {
 .top-nav-alert { display: inline-flex; align-items: center; justify-content: center; color: #fbbf24; }
 .top-nav-alert.active { color: #fef3c7; background: rgba(245, 158, 11, .18); box-shadow: inset 0 0 0 1px rgba(245, 158, 11, .4); }
 .top-nav-alert-dot { position: absolute; top: 5px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: #ef4444; }
+.tab-button[data-tab="alertsPanel"]:hover,
+.tab-button[data-tab="alertsPanel"]:focus,
+.tab-button[data-tab="alertsPanel"]:active,
+.tab-button[data-tab="commuterFeedPanel"]:hover,
+.tab-button[data-tab="commuterFeedPanel"]:focus,
+.tab-button[data-tab="commuterFeedPanel"]:active {
+    color: #9ca3af !important;
+    background: rgba(51, 65, 85, .45) !important;
+}
+.tab-button[data-tab="alertsPanel"]:focus-visible,
+.tab-button[data-tab="commuterFeedPanel"]:focus-visible {
+    outline: 2px solid rgba(56, 189, 248, .8);
+    outline-offset: 2px;
+}
+.tab-button[data-tab="alertsPanel"]:hover svg,
+.tab-button[data-tab="alertsPanel"]:focus svg,
+.tab-button[data-tab="alertsPanel"]:active svg { color: #fbbf24 !important; }
+.tab-button[data-tab="commuterFeedPanel"]:hover svg,
+.tab-button[data-tab="commuterFeedPanel"]:focus svg,
+.tab-button[data-tab="commuterFeedPanel"]:active svg { color: #38bdf8 !important; }
+.tab-button[data-tab="alertsPanel"].bg-emerald-600,
+.tab-button[data-tab="alertsPanel"].bg-emerald-600:hover,
+.tab-button[data-tab="alertsPanel"].bg-emerald-600:focus,
+.tab-button[data-tab="alertsPanel"].bg-emerald-600:active,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:hover,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:focus,
+.tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:active {
+    color: #ffffff !important;
+    background-color: #059669 !important;
+}
 .header-controls { justify-content: flex-end; min-width: 0; }
 header > div:first-child > div:last-child { min-width: 0; }
 header > div:first-child > div:last-child h1 > span {
@@ -199,6 +230,121 @@ header > div:first-child > div:last-child p { display: block; width: 100%; clear
 .light-mode .incident-timeline { border-color: var(--light-border); }
 .light-mode .timeline-track b { color: var(--light-green); }
 .light-mode .timeline-track span { color: var(--light-text-secondary); }
+
+/* Light-mode contrast for the complete CAP alert gateway. */
+.light-mode #alertsPanel {
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .bg-slate-900\/80,
+.light-mode #alertsPanel .bg-slate-900\/95 {
+    background: var(--light-surface-soft);
+    border-color: var(--light-border);
+}
+.light-mode #alertsPanel .bg-slate-900,
+.light-mode #alertsPanel .bg-slate-950 {
+    background: #eef4f8;
+    border-color: var(--light-border);
+}
+.light-mode #alertsPanel .text-white,
+.light-mode #alertsPanel h3,
+.light-mode #alertsPanel h4 {
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .text-gray-300,
+.light-mode #alertsPanel .text-gray-400,
+.light-mode #alertsPanel .text-gray-500 {
+    color: var(--light-text-secondary);
+}
+.light-mode #alertsPanel .border-slate-700,
+.light-mode #alertsPanel .border-slate-800 {
+    border-color: var(--light-border);
+}
+.light-mode #alertsPanel .text-amber-300,
+.light-mode #alertsPanel .text-amber-400 {
+    color: #9a4d00;
+}
+.light-mode #alertsPanel > div:first-child h3 > span {
+    background: #fff1cf;
+    border-color: #d99a22;
+    color: #7a3d00;
+}
+.light-mode #alertsPanel > div:first-child > div:last-child > span {
+    background: #e8f7ee;
+    border-color: #75b98e;
+    color: #086638;
+}
+.light-mode #alertsPanel select {
+    background: var(--light-surface);
+    color: var(--light-text);
+    border-color: var(--light-border-strong);
+}
+.light-mode #alertsPanel select option {
+    background: var(--light-surface);
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .bg-slate-950 label {
+    background: #e8f0f5;
+    border-color: var(--light-border);
+    color: var(--light-text);
+}
+.light-mode #alertsPanel .bg-slate-950 label span,
+.light-mode #alertsPanel label > span.text-white {
+    color: var(--light-text) !important;
+}
+.light-mode #alertsPanel #triggerBroadcastBtn {
+    background: #c56a00;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(154, 77, 0, .2);
+}
+.light-mode #alertsPanel #triggerBroadcastBtn:hover {
+    background: #a95500;
+}
+.light-mode #alertsPanel #copyCapBtn,
+.light-mode #alertsPanel #capFormatJsonBtn {
+    background: #dce7ee !important;
+    border: 1px solid var(--light-border-strong);
+    color: var(--light-text-secondary) !important;
+}
+.light-mode #alertsPanel #copyCapBtn:hover,
+.light-mode #alertsPanel #capFormatJsonBtn:hover {
+    background: #cbdbe5;
+    color: var(--light-text);
+}
+.light-mode #alertsPanel #capTemplateLangTag {
+    background: #fff1cf !important;
+    border-color: #d99a22 !important;
+    color: #7a3d00 !important;
+}
+.light-mode #alertsPanel #capSmsPreview,
+.light-mode #alertsPanel #capCodeBlock {
+    background: #f7fafc !important;
+    border-color: var(--light-border-strong) !important;
+    color: #075985 !important;
+}
+.light-mode #alertsPanel #capSmsPreview + div {
+    color: var(--light-text-secondary);
+}
+.light-mode #alertsPanel #capSmsPreview + div b,
+.light-mode #alertsPanel #capSmsPreview + div .text-emerald-400 {
+    color: var(--light-green);
+}
+.light-mode #alertsPanel #capFormatXmlBtn {
+    background: #087443 !important;
+    color: #ffffff !important;
+}
+.light-mode #alertsPanel #dispatchCountTag {
+    color: var(--light-text-secondary);
+}
+.light-mode #alertsPanel #dispatchLogsList {
+    color: var(--light-text);
+}
+.light-mode #alertsPanel #dispatchLogsList > * {
+    border-color: var(--light-border) !important;
+}
+.light-mode #alertsPanel #dispatchLogsList .text-gray-400,
+.light-mode #alertsPanel #dispatchLogsList .text-gray-500 {
+    color: var(--light-text-secondary);
+}
 
 /* Custom Slider Styling */
 input[type=range] {
@@ -517,6 +663,32 @@ input[type=range] {
 .leaflet-control-layers-separator { border-top-color: #475569; }
 .forecast-chart { width: 100%; height: 92px; display: block; }
 .forecast-grid { stroke: #334155; stroke-width: 1; stroke-dasharray: 3 4; }
+#riskPanelContainer .glass-panel > div:has(> #hourlyForecastList) > div:first-child > span:first-child {
+    color: #6b9aaa;
+    font-weight: 700;
+}
+#riskPanelContainer .glass-panel > div:has(> #hourlyForecastList) > div:first-child > span:first-child svg {
+    color: #4f9aa8;
+}
+#hourlyForecastList {
+    border-top: 1px solid rgba(79, 154, 168, .24);
+    padding-top: 4px;
+}
+#hourlyForecastList .hourly-card {
+    background-color: rgba(30, 64, 78, .2);
+    border-color: rgba(79, 154, 168, .28);
+}
+#hourlyForecastList .hourly-card > div:first-child,
+#hourlyForecastList .hourly-card > div:nth-child(3),
+#hourlyForecastList .hourly-card > div:last-child span {
+    color: #9bb4bc;
+}
+#hourlyForecastList .hourly-card > div:nth-child(2) {
+    color: #83c5d1;
+}
+#hourlyForecastList .hourly-card > div:last-child {
+    border-color: rgba(79, 154, 168, .24);
+}
 .tab-view {
     display: none;
 }
@@ -710,6 +882,38 @@ input[type=range] {
     background-color: #059669 !important;
     color: #ffffff;
 }
+.light-mode .tab-button[data-tab="alertsPanel"],
+.light-mode .tab-button[data-tab="commuterFeedPanel"] {
+    color: var(--light-text-secondary);
+    background-color: #f5f9fb;
+}
+.light-mode .tab-button[data-tab="alertsPanel"]:hover,
+.light-mode .tab-button[data-tab="alertsPanel"]:focus,
+.light-mode .tab-button[data-tab="alertsPanel"]:active,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:hover,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:focus,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:active {
+    color: #075985 !important;
+    background-color: #e4f2f9 !important;
+    box-shadow: inset 0 0 0 1px #75b7d2;
+}
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600,
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600:hover,
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600:focus,
+.light-mode .tab-button[data-tab="alertsPanel"].bg-emerald-600:active,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:hover,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:focus,
+.light-mode .tab-button[data-tab="commuterFeedPanel"].bg-emerald-600:active {
+    color: #ffffff !important;
+    background-color: #059669 !important;
+}
+.light-mode .tab-button[data-tab="alertsPanel"]:hover svg,
+.light-mode .tab-button[data-tab="alertsPanel"]:focus svg,
+.light-mode .tab-button[data-tab="alertsPanel"]:active svg { color: #b45309 !important; }
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:hover svg,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:focus svg,
+.light-mode .tab-button[data-tab="commuterFeedPanel"]:active svg { color: #0369a1 !important; }
 
 .light-mode .landslide-popup-content,
 .light-mode .landslide-popup-compact,
