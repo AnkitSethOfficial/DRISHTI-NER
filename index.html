@@ -19,6 +19,14 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏔️</text></svg>">
 
+    <!-- PWA Web App Manifest & Mobile Offline Capability -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DRISHTI-NER">
+
     <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 
@@ -56,7 +64,22 @@
             </div>
         </nav>
 
-        <div class="header-controls flex items-center gap-3 text-sm">
+        <div class="header-controls flex items-center gap-2.5 text-sm">
+            <!-- Dynamic Network Offline/Online Status Pill -->
+            <div id="networkStatusBadge"
+                class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-sm transition-all"
+                title="Application is online with live real-time telemetry">
+                <span id="networkStatusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="networkStatusText">Online</span>
+            </div>
+
+            <!-- Offline Outbox Queued Reports Pill -->
+            <div id="offlineQueueBadge"
+                class="hidden flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-950/80 border border-amber-500/50 text-amber-300 text-xs font-semibold shadow-sm cursor-pointer hover:bg-amber-900/90 transition"
+                title="Incident reports queued locally on device. Click to view or force sync.">
+                <i data-lucide="cloud-off" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span id="offlineQueueCount">0</span> Queued
+            </div>
 
             <select id="languageSelector" aria-label="Language"
                 class="bg-slate-800 text-gray-200 border border-slate-700 rounded-md px-2 py-1 text-xs">
@@ -1211,6 +1234,17 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="india-boundary.js"></script>
     <script src="script.js?v=5.0"></script>
+
+    <!-- Register PWA Service Worker for 100% Offline-First Operation -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('✅ DRISHTI Offline Service Worker active:', reg.scope))
+                    .catch(err => console.warn('⚠️ Service Worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
 
 </html>

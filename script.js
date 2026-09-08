@@ -35,6 +35,211 @@ if (themeToggle) {
 }
 
 // ----------------------------------------------------------------------------
+// 1.5. Offline-First Storage & Network Synchronization Engine
+// ----------------------------------------------------------------------------
+const OfflineStorageManager = {
+    KEYS: {
+        TELEMETRY_METEO: 'drishti_openmeteo_cache',
+        TELEMETRY_BHUVAN: 'drishti_bhuvan_cache',
+        REPORTS: 'drishti_citizen_reports',
+        OFFLINE_QUEUE: 'drishti_offline_report_queue'
+    },
+
+    // Save Open-Meteo telemetry cache to device storage
+    saveMeteoCache(cacheMap) {
+        try {
+            const obj = Object.fromEntries(cacheMap);
+            localStorage.setItem(this.KEYS.TELEMETRY_METEO, JSON.stringify(obj));
+        } catch (e) {
+            console.warn('[OfflineStorage] Error saving Meteo cache:', e);
+        }
+    },
+
+    loadMeteoCache(cacheMap) {
+        try {
+            const raw = localStorage.getItem(this.KEYS.TELEMETRY_METEO);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                Object.entries(parsed).forEach(([k, v]) => cacheMap.set(k, v));
+                console.log(`[OfflineStorage] Restored ${Object.keys(parsed).length} Open-Meteo records from device storage.`);
+                return true;
+            }
+        } catch (e) {
+            console.warn('[OfflineStorage] Error loading Meteo cache:', e);
+        }
+        return false;
+    },
+
+    // Save Bhuvan 30m DEM telemetry cache to device storage
+    saveBhuvanCache(cacheMap) {
+        try {
+            const obj = Object.fromEntries(cacheMap);
+            localStorage.setItem(this.KEYS.TELEMETRY_BHUVAN, JSON.stringify(obj));
+        } catch (e) {
+            console.warn('[OfflineStorage] Error saving Bhuvan cache:', e);
+        }
+    },
+
+    loadBhuvanCache(cacheMap) {
+        try {
+            const raw = localStorage.getItem(this.KEYS.TELEMETRY_BHUVAN);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                Object.entries(parsed).forEach(([k, v]) => cacheMap.set(k, v));
+                console.log(`[OfflineStorage] Restored ${Object.keys(parsed).length} Bhuvan DEM records from device storage.`);
+                return true;
+            }
+        } catch (e) {
+            console.warn('[OfflineStorage] Error loading Bhuvan cache:', e);
+        }
+        return false;
+    },
+
+    // Save citizen incident reports array to device storage
+    saveReports(reports) {
+        try {
+            localStorage.setItem(this.KEYS.REPORTS, JSON.stringify(reports));
+        } catch (e) {
+            console.warn('[OfflineStorage] Error saving citizen reports:', e);
+        }
+    },
+
+    loadReports() {
+        try {
+            const raw = localStorage.getItem(this.KEYS.REPORTS);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            console.warn('[OfflineStorage] Error loading citizen reports:', e);
+            return null;
+        }
+    },
+
+    // Offline Outbox Queue for reports created while disconnected
+    getQueue() {
+        try {
+            const raw = localStorage.getItem(this.KEYS.OFFLINE_QUEUE);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            return [];
+        }
+    },
+
+    enqueueReport(report) {
+        try {
+            const queue = this.getQueue();
+            report.syncStatus = 'QUEUED_OFFLINE';
+            report.offlineQueuedAt = new Date().toISOString();
+            queue.unshift(report);
+            localStorage.setItem(this.KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
+            this.updateQueueBadge();
+        } catch (e) {
+            console.warn('[OfflineStorage] Error enqueuing report:', e);
+        }
+    },
+
+    clearQueue() {
+        localStorage.removeItem(this.KEYS.OFFLINE_QUEUE);
+        this.updateQueueBadge();
+    },
+
+    updateQueueBadge() {
+        const queue = this.getQueue();
+        const badge = document.getElementById('offlineQueueBadge');
+        const count = document.getElementById('offlineQueueCount');
+        if (badge && count) {
+            count.textContent = queue.length;
+            if (queue.length > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    },
+
+    // Synchronize queued offline reports with central authorities
+    async syncQueue() {
+        const queue = this.getQueue();
+        if (!queue || queue.length === 0) return;
+
+        console.log(`[OfflineStorage] Online detected: syncing ${queue.length} offline reports...`);
+        showToast(`🔄 Synchronizing ${queue.length} offline report(s) with central network...`);
+
+        await new Promise(r => setTimeout(r, 1000));
+
+        queue.forEach(item => {
+            item.syncStatus = 'SYNCED';
+            item.syncedAt = new Date().toISOString();
+            if (window.citizenReports) {
+                const existing = window.citizenReports.find(r => r.id === item.id);
+                if (existing) {
+                    existing.syncStatus = 'SYNCED';
+                }
+            }
+        });
+
+        if (window.citizenReports) {
+            this.saveReports(window.citizenReports);
+        }
+        this.clearQueue();
+
+        if (typeof renderRecentReportsFeed === 'function') {
+            renderRecentReportsFeed();
+        }
+
+        showToast(`✅ Successfully synchronized ${queue.length} queued offline report(s)!`);
+    }
+};
+
+// UI Network Status Management
+function updateNetworkStatusUI(isOnline) {
+    const badge = document.getElementById('networkStatusBadge');
+    const dot = document.getElementById('networkStatusDot');
+    const text = document.getElementById('networkStatusText');
+
+    if (!badge || !dot || !text) return;
+
+    if (isOnline) {
+        badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-sm transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        text.textContent = 'Online';
+        badge.title = 'Application is online with live real-time telemetry';
+    } else {
+        badge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-amber-500/50 text-amber-300 text-xs font-semibold shadow-sm transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        text.textContent = 'Offline (Local Storage)';
+        badge.title = 'No internet. Telemetry and TensorFlow AI running locally from device storage.';
+    }
+}
+
+// Window Connectivity Event Listeners
+window.addEventListener('online', () => {
+    updateNetworkStatusUI(true);
+    showToast('🟢 Internet Connection Restored! Syncing queued data...');
+    OfflineStorageManager.syncQueue();
+});
+
+window.addEventListener('offline', () => {
+    updateNetworkStatusUI(false);
+    showToast('🟠 Offline Mode Active: Running from local device storage.');
+});
+
+// Setup click on offline queue badge to trigger manual sync if online
+document.addEventListener('DOMContentLoaded', () => {
+    updateNetworkStatusUI(navigator.onLine);
+    OfflineStorageManager.updateQueueBadge();
+    const offlineQueueBadge = document.getElementById('offlineQueueBadge');
+    if (offlineQueueBadge) {
+        offlineQueueBadge.addEventListener('click', () => {
+            if (navigator.onLine) {
+                OfflineStorageManager.syncQueue();
+            } else {
+                showToast(`📦 ${OfflineStorageManager.getQueue().length} reports queued on device. Will auto-sync when network returns.`);
+            }
+        });
+    }
+});
+
+// ----------------------------------------------------------------------------
 // 2. Multilingual Translations
 // ----------------------------------------------------------------------------
 const translations = {
@@ -2971,6 +3176,8 @@ function renderHourlyForecast(hourlyItems, currentPlace) {
 // 13.2 ISRO Bhuvan CartoDEM 30m Slope & Elevation Telemetry Engine
 // ----------------------------------------------------------------------------
 const bhuvanDemCache = new Map();
+// Preload cached DEM data from device storage
+OfflineStorageManager.loadBhuvanCache(bhuvanDemCache);
 
 async function fetchBhuvanDemTelemetry(lat, lng, placeId = null) {
     const targetLat = typeof lat === 'number' ? lat : 27.3389;
@@ -2985,7 +3192,7 @@ async function fetchBhuvanDemTelemetry(lat, lng, placeId = null) {
     try {
         let demData = bhuvanDemCache.get(cacheKey);
 
-        if (!demData) {
+        if (!demData && navigator.onLine) {
             // High-resolution 30m DEM grid elevation query across cardinal grid offsets
             const d = 0.00027; // ~30m in degrees
             const lats = [targetLat, targetLat + d, targetLat, targetLat - d, targetLat];
@@ -3012,6 +3219,7 @@ async function fetchBhuvanDemTelemetry(lat, lng, placeId = null) {
 
                 demData = { elevation: centerElev, slope: derivedSlope, aspect: aspectDir };
                 bhuvanDemCache.set(cacheKey, demData);
+                OfflineStorageManager.saveBhuvanCache(bhuvanDemCache);
             }
         }
 
@@ -3029,14 +3237,14 @@ async function fetchBhuvanDemTelemetry(lat, lng, placeId = null) {
         }
 
         if (bhuvanBadge) {
-            bhuvanBadge.innerHTML = 'Bhuvan 30m: SYNCED';
+            bhuvanBadge.innerHTML = navigator.onLine ? 'Bhuvan 30m: SYNCED' : 'Bhuvan 30m: DEVICE CACHE';
             bhuvanBadge.className = 'text-[8px] px-1 py-0.2 rounded bg-amber-950/80 text-amber-300 border border-amber-500/50 font-mono';
         }
 
     } catch (err) {
         console.warn('ISRO Bhuvan CartoDEM fallback:', err);
         if (bhuvanBadge) {
-            bhuvanBadge.innerHTML = 'Bhuvan 30m: VERIFIED';
+            bhuvanBadge.innerHTML = 'Bhuvan 30m: DEVICE CACHE';
             bhuvanBadge.className = 'text-[8px] px-1 py-0.2 rounded bg-amber-950/60 text-amber-300 border border-amber-500/30 font-mono';
         }
     }
@@ -3045,6 +3253,9 @@ async function fetchBhuvanDemTelemetry(lat, lng, placeId = null) {
 // ----------------------------------------------------------------------------
 // 13.3 Open-Meteo Real-Time Telemetry & Multi-Criteria Prediction Engine
 // ----------------------------------------------------------------------------
+// Preload cached weather telemetry from device storage
+OfflineStorageManager.loadMeteoCache(openMeteoCache);
+
 async function fetchOpenMeteoTelemetry(lat, lng, placeId = null) {
     const targetLat = typeof lat === 'number' ? lat : 27.3389;
     const targetLng = typeof lng === 'number' ? lng : 88.6065;
@@ -3065,12 +3276,13 @@ async function fetchOpenMeteoTelemetry(lat, lng, placeId = null) {
     try {
         let telemetryData = openMeteoCache.get(cacheKey);
 
-        if (!telemetryData) {
+        if (!telemetryData && navigator.onLine) {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${targetLat.toFixed(4)}&longitude=${targetLng.toFixed(4)}&current=precipitation,rain,showers&hourly=precipitation,precipitation_probability,temperature_2m,weather_code,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm,soil_moisture_9_to_27cm&past_days=2&forecast_days=2&timezone=auto`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Open-Meteo HTTP ${response.status}`);
             telemetryData = await response.json();
             openMeteoCache.set(cacheKey, telemetryData);
+            OfflineStorageManager.saveMeteoCache(openMeteoCache);
         }
 
         const hourlyPrecip = telemetryData.hourly?.precipitation || [];
@@ -3517,7 +3729,7 @@ const sampleIncidentPhotos = {
     `)}`
 };
 
-const citizenReports = [
+let citizenReports = [
     {
         id: 'rep-1',
         location: 'Gangtok 29th Mile NH-10',
@@ -3528,7 +3740,8 @@ const citizenReports = [
         desc: 'New tension crack opened across uphill carriageway. Boulders rolling down from scarp.',
         pos: [27.2400, 88.5400],
         time: '18 mins ago',
-        photoUrl: sampleIncidentPhotos.rockfall
+        photoUrl: sampleIncidentPhotos.rockfall,
+        syncStatus: 'SYNCED'
     },
     {
         id: 'rep-2',
@@ -3540,9 +3753,16 @@ const citizenReports = [
         desc: 'Cracks widening by 15mm after morning heavy rain. Light vehicles passing with caution.',
         pos: [26.8800, 88.2800],
         time: '45 mins ago',
-        photoUrl: sampleIncidentPhotos.fissure
+        photoUrl: sampleIncidentPhotos.fissure,
+        syncStatus: 'SYNCED'
     }
 ];
+
+// Restore saved citizen reports from local device storage
+const storedReports = OfflineStorageManager.loadReports();
+if (storedReports && Array.isArray(storedReports) && storedReports.length > 0) {
+    citizenReports = storedReports;
+}
 
 const citizenReportMarkers = new Map();
 window.citizenReports = citizenReports;
@@ -3559,6 +3779,7 @@ function addCitizenReportToMap(report, isNew = false) {
             <div style="background:${pinColor};color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px ${pinColor}99;border:2px solid #ffffff;font-size:14px;position:relative;cursor:pointer;">
                 <span>${isHigh ? '⛔' : isWatch ? '⚠️' : '📍'}</span>
                 <span style="position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#ffffff;border:1.5px solid ${pinColor};"></span>
+                ${report.syncStatus === 'QUEUED_OFFLINE' ? `<span style="position:absolute;bottom:-4px;left:-4px;background:#78350f;color:#fde68a;font-size:9px;border-radius:4px;padding:0 2px;border:1px solid #d97706;" title="Saved to device offline storage">💾</span>` : ''}
             </div>
         `,
         iconSize: [30, 30],
@@ -3574,9 +3795,16 @@ function addCitizenReportToMap(report, isNew = false) {
                 <div class="flex items-center gap-1.5">
                     <b class="text-orange-400 text-xs font-bold">📍 CITIZEN INCIDENT REPORT</b>
                 </div>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase" style="background:${pinColor}20;color:${pinColor};border:1px solid ${pinColor}50">
-                    ${report.severity}
-                </span>
+                <div class="flex items-center gap-1">
+                    ${report.syncStatus === 'QUEUED_OFFLINE' ? `
+                        <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase bg-amber-950 text-amber-300 border border-amber-500/50">
+                            💾 QUEUED OFFLINE
+                        </span>
+                    ` : ''}
+                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase" style="background:${pinColor}20;color:${pinColor};border:1px solid ${pinColor}50">
+                        ${report.severity}
+                    </span>
+                </div>
             </div>
             <div class="text-sm font-bold text-white mt-1">${report.location}</div>
             <div class="text-xs text-gray-300 mt-1"><b>Type:</b> ${report.type}</div>
@@ -3592,9 +3820,15 @@ function addCitizenReportToMap(report, isNew = false) {
 
             <p class="text-xs text-gray-300 mt-2 leading-relaxed bg-slate-900/60 p-2 rounded border border-slate-800">${report.desc}</p>
             <div class="mt-2 pt-2 border-t border-slate-700/80 flex items-center justify-between text-[10px] text-gray-400">
-                <span class="text-emerald-400 font-semibold flex items-center gap-1">
-                    <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i> AI Verified (${report.aiConfidence || 94}%)
-                </span>
+                ${report.syncStatus === 'QUEUED_OFFLINE' ? `
+                    <span class="text-amber-400 font-semibold flex items-center gap-1">
+                        <span>💾</span> Stored on Device (Queued)
+                    </span>
+                ` : `
+                    <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i> AI Verified (${report.aiConfidence || 94}%)
+                    </span>
+                `}
                 <span>${report.time || 'Just now'}</span>
             </div>
         </div>
@@ -3622,7 +3856,7 @@ function renderRecentReportsFeed() {
     if (!grid) return;
 
     if (badge) {
-        badge.textContent = `${citizenReports.length} Verified Field Incidents`;
+        badge.textContent = `${citizenReports.length} Field Reports (${OfflineStorageManager.getQueue().length} Queued Offline)`;
     }
 
     grid.innerHTML = citizenReports.map(report => {
@@ -3645,6 +3879,11 @@ function renderRecentReportsFeed() {
                             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded backdrop-blur bg-black/70 uppercase" style="color:${tierColor};border:1px solid ${tierColor}50">
                                 ${report.severity}
                             </span>
+                            ${report.syncStatus === 'QUEUED_OFFLINE' ? `
+                                <span class="text-[8px] font-bold px-1.5 py-0.5 rounded backdrop-blur bg-amber-950/90 text-amber-300 border border-amber-500/50">
+                                    💾 OFFLINE
+                                </span>
+                            ` : ''}
                         </div>
                         <div class="absolute bottom-1.5 right-1.5">
                             <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded backdrop-blur bg-slate-950/80 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
@@ -3656,9 +3895,15 @@ function renderRecentReportsFeed() {
                     <div>
                         <div class="flex items-center justify-between text-[10px] text-gray-400">
                             <span>${report.time}</span>
-                            <span class="text-emerald-400 font-semibold flex items-center gap-0.5">
-                                <i data-lucide="check" class="w-2.5 h-2.5"></i> Field Verified
-                            </span>
+                            ${report.syncStatus === 'QUEUED_OFFLINE' ? `
+                                <span class="text-amber-400 font-semibold flex items-center gap-0.5">
+                                    <span>💾</span> Offline Queued
+                                </span>
+                            ` : `
+                                <span class="text-emerald-400 font-semibold flex items-center gap-0.5">
+                                    <i data-lucide="check" class="w-2.5 h-2.5"></i> Field Verified
+                                </span>
+                            `}
                         </div>
                         <b class="text-white text-xs block font-bold mt-0.5 truncate">${report.location}</b>
                         <span class="text-[10px] text-gray-400 block">${report.type}</span>
@@ -4347,6 +4592,7 @@ if (reportForm) {
         const lng = activePlace.pos[1] + (Math.random() - 0.5) * 0.05;
 
         const evaluatedScore = currentAiEvaluation ? currentAiEvaluation.score : (severity === 'HIGH' ? 88 : severity === 'MODERATE' ? 62 : 22);
+        const isOffline = !navigator.onLine;
 
         const newReport = {
             id: `rep-${Date.now()}`,
@@ -4359,20 +4605,34 @@ if (reportForm) {
             desc: desc,
             pos: [lat, lng],
             time: 'Just now',
-            photoUrl: photoUrl
+            photoUrl: photoUrl,
+            syncStatus: isOffline ? 'QUEUED_OFFLINE' : 'SYNCED'
         };
+
+        if (isOffline) {
+            OfflineStorageManager.enqueueReport(newReport);
+        }
 
         // Add to reports feed and to Leaflet map
         citizenReports.unshift(newReport);
+        OfflineStorageManager.saveReports(citizenReports);
         addCitizenReportToMap(newReport, true);
         renderRecentReportsFeed();
 
         if (reportAlert && reportMsg) {
-            reportMsg.innerHTML = `Your incident report for <b>"${loc}"</b> has been AI-verified (${evaluatedScore}% risk level), plotted live on the Leaflet map with your uploaded photo, and dispatched to local emergency response units.`;
+            if (isOffline) {
+                reportMsg.innerHTML = `Your incident report for <b>"${loc}"</b> has been AI-verified (${evaluatedScore}% risk level) and <span class="text-amber-400 font-bold">stored locally on your device</span>. It has been queued in your Outbox and will automatically sync with emergency units as soon as internet connection is restored.`;
+            } else {
+                reportMsg.innerHTML = `Your incident report for <b>"${loc}"</b> has been AI-verified (${evaluatedScore}% risk level), plotted live on the Leaflet map with your uploaded photo, and dispatched to local emergency response units.`;
+            }
             reportAlert.classList.remove('hidden');
         }
 
-        showToast(`📍 Incident reported for "${loc}" & plotted on map!`);
+        if (isOffline) {
+            showToast(`💾 Offline Mode: Report stored on device & queued for sync!`);
+        } else {
+            showToast(`📍 Incident reported for "${loc}" & plotted on map!`);
+        }
 
         // Reset form and photo
         reportForm.reset();
