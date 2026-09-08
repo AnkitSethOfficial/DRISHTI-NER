@@ -49,16 +49,10 @@
                         class="w-3.5 h-3.5 inline mr-1"></i> Live Terrain Map</button>
                 <button data-nav="risk" class="top-nav-item"><i data-lucide="activity"
                         class="w-3.5 h-3.5 inline mr-1"></i> Geotechnical Model</button>
-                <button data-nav="hotspots" class="top-nav-item"><i data-lucide="map-pin"
-                        class="w-3.5 h-3.5 inline mr-1"></i> Landslide Directory</button>
                 <button data-nav="roadsPanel" class="top-nav-item"><i data-lucide="route"
                         class="w-3.5 h-3.5 inline mr-1"></i> Road Lifelines</button>
                 <button data-nav="reportPanel" class="top-nav-item"><i data-lucide="flag"
                         class="w-3.5 h-3.5 inline mr-1"></i> Citizen Report</button>
-                <button data-nav="alertsPanel" class="top-nav-item"><i data-lucide="bell-ring"
-                        class="w-3.5 h-3.5 inline mr-1 text-amber-400"></i> Alert Gateway (CAP)</button>
-                <button data-nav="commuterFeedPanel" class="top-nav-item"><i data-lucide="navigation"
-                        class="w-3.5 h-3.5 inline mr-1 text-sky-400"></i> Commuter Feed</button>
             </div>
         </nav>
 
@@ -240,11 +234,10 @@
                         <div class="flex items-center gap-2">
                             <p
                                 class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> 3-Factor Geotechnical Risk Engine
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> MATHEMATICAL RISK
                             </p>
                             <span id="telemetrySourceBadge"
                                 class="text-[9px] px-1.5 py-0.2 rounded bg-sky-950/70 text-sky-300 border border-sky-500/40 font-mono">
-                                Open-Meteo: SYNCED
                             </span>
                         </div>
                         <p class="text-2xl font-bold text-white mt-0.5 flex items-baseline gap-2">
@@ -323,13 +316,7 @@
                 </div>
 
                 <div class="mt-3 pt-2.5 border-t border-slate-800 flex justify-between items-center text-xs">
-                    <div>
-                        <span class="text-gray-400 text-[10px] block uppercase">Mathematical Risk Status</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-gray-400 text-[10px] block uppercase">Early Warning Lead Time</span>
-                        <b id="riskWindow" class="text-white font-semibold">12–24 hours advance</b>
-                    </div>
+
                 </div>
             </div>
 
@@ -390,7 +377,7 @@
                                 class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
                                 <i data-lucide="target" class="w-3.5 h-3.5 text-sky-400"></i> Quick Select Place
                             </label>
-                            <span class="text-[9px] text-gray-500">Fly to Place</span>
+
                         </div>
                         <select id="regionSelector"
                             class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-gray-200 cursor-pointer focus:outline-none focus:border-emerald-500 mb-2"></select>
@@ -445,11 +432,6 @@
                                 <b id="soilLyr9" class="text-amber-300">0.329</b>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center text-[9px] text-gray-400 mt-1.5">
-                            <span>*Shear failure plane (&phi; &approx; 0.45)</span>
-                            <span id="soilPorePressureStatus" class="text-amber-400 font-semibold">Elevated Pore
-                                Saturation</span>
-                        </div>
                     </div>
                 </div>
 
@@ -467,10 +449,7 @@
 
         <!-- Navigation Tabs -->
         <div class="flex gap-2 border-b border-slate-800 pb-2 overflow-x-auto scrollbar-hide">
-            <button data-tab="hotspots"
-                class="tab-button flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow-sm flex-shrink-0">
-                <i data-lucide="map-pin" class="w-4 h-4"></i> <span>Landslide Directory (30 Zones)</span>
-            </button>
+
             <button data-tab="roadsPanel"
                 class="tab-button flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-gray-400 px-4 py-2 rounded-lg text-xs font-semibold transition flex-shrink-0">
                 <i data-lucide="route" class="w-4 h-4 text-sky-400"></i> <span>Highway Lifelines &amp; Blockages (15
@@ -486,50 +465,11 @@
                 <i data-lucide="bell-ring" class="w-4 h-4 text-amber-400"></i> <span>Multi-Channel Alert Gateway (CAP
                     SMS/IVR)</span>
             </button>
-            <button data-tab="commuterFeedPanel"
-                class="tab-button flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-gray-400 px-4 py-2 rounded-lg text-xs font-semibold transition flex-shrink-0">
-                <i data-lucide="navigation" class="w-4 h-4 text-sky-400"></i> <span>Commuter Highway Feed &amp;
-                    Detours</span>
-            </button>
+
         </div>
 
         <!-- Tab 1: Landslide Directory -->
-        <div id="hotspots"
-            class="tab-view active glass-panel rounded-xl p-5 border border-slate-700/70 shadow-lg min-h-[460px]">
-            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-                <div>
-                    <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                        <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
-                        NER Monitored Landslide Zones
-                    </h3>
-                    <p class="text-[11px] text-gray-400">Select any place to focus map view and display geotechnical
-                        telemetry</p>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <button data-dir-filter="all"
-                        class="dir-filter-btn active text-[10px] px-2.5 py-1 rounded bg-emerald-600 text-white font-semibold">All
-                        (30)</button>
-                    <button data-dir-filter="CRITICAL"
-                        class="dir-filter-btn text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-red-400 border border-red-500/30 font-semibold">Red
-                        (9)</button>
-                    <button data-dir-filter="WATCH"
-                        class="dir-filter-btn text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-yellow-500/30 font-semibold">Yellow
-                        (11)</button>
-                    <button data-dir-filter="SAFE"
-                        class="dir-filter-btn text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-semibold">Green
-                        (10)</button>
-                </div>
-            </div>
 
-            <div class="mb-3">
-                <input id="hotspotSearch" type="text" placeholder="Search by place name, state, or highway corridor..."
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
-            </div>
-
-            <div id="hotspotsList" class="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                <!-- Dynamic rendering of 30 places -->
-            </div>
-        </div>
 
         <!-- Tab 2: National Highway Lifelines & Road Blockage Advisory -->
         <div id="roadsPanel"
