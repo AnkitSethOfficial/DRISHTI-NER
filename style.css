@@ -738,6 +738,48 @@ input[type=range] {
     min-width: 0;
 }
 
+#mapLayerButtonGroup {
+    backdrop-filter: blur(8px);
+}
+
+.map-layer-btn {
+    user-select: none;
+    cursor: pointer;
+}
+
+.map-layer-btn:hover:not(.active) {
+    background-color: rgba(51, 65, 85, 0.6);
+}
+
+.map-layer-btn.active {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+.light-mode #mapLayerButtonGroup {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.light-mode .map-layer-btn {
+    color: #64748b;
+}
+
+.light-mode .map-layer-btn:hover:not(.active) {
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.light-mode .map-layer-btn.active {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border-color: #6ee7b7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.map-toolbar button {
+    cursor: pointer;
+}
+
 .map-toolbar>.flex:first-child>div:last-child {
     flex: 0 0 auto;
 }

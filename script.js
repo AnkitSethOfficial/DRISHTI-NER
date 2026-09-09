@@ -908,15 +908,45 @@ const tileLayers = {
 // Default basemap: Natural Terrain Topo (vibrant terrain textures, green patches, elevation relief)
 let currentBasemap = tileLayers.topo.addTo(map);
 
-// Basemap Switcher Handler
+// Basemap Switcher Handler (Segmented Icon Buttons & Select Sync)
 const layerSelector = document.getElementById('mapLayerSelector');
+const mapLayerBtns = document.querySelectorAll('.map-layer-btn');
+
+function switchBasemap(layerKey) {
+    if (!layerKey || !tileLayers[layerKey]) return;
+    map.removeLayer(currentBasemap);
+    currentBasemap = tileLayers[layerKey];
+    currentBasemap.addTo(map);
+
+    mapLayerBtns.forEach(btn => {
+        const isActive = btn.dataset.layerBtn === layerKey;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        if (isActive) {
+            btn.classList.add('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/50', 'shadow-sm');
+            btn.classList.remove('text-slate-400', 'border-transparent');
+        } else {
+            btn.classList.remove('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/50', 'shadow-sm');
+            btn.classList.add('text-slate-400', 'border-transparent');
+        }
+    });
+
+    if (layerSelector && layerSelector.value !== layerKey) {
+        layerSelector.value = layerKey;
+    }
+}
+
 if (layerSelector) {
     layerSelector.addEventListener('change', event => {
-        map.removeLayer(currentBasemap);
-        currentBasemap = tileLayers[event.target.value] || tileLayers.topo;
-        currentBasemap.addTo(map);
+        switchBasemap(event.target.value);
     });
 }
+
+mapLayerBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        switchBasemap(btn.dataset.layerBtn);
+    });
+});
 
 // Reset Map View Button (Re-focus on user's location)
 const resetBtn = document.getElementById('resetMapView');
@@ -948,6 +978,10 @@ if (fsBtn && mapContainer) {
         const isFs = mapContainer.classList.contains('fullscreen');
         const fsText = document.getElementById('fullscreenBtnText');
         if (fsText) fsText.textContent = isFs ? 'Exit Fullscreen' : 'View Map Completely';
+        fsBtn.setAttribute('title', isFs ? 'Exit Fullscreen Map' : 'Toggle Fullscreen Map View');
+        fsBtn.setAttribute('aria-label', isFs ? 'Exit Fullscreen Map' : 'Toggle Fullscreen Map View');
+        fsBtn.innerHTML = `<i data-lucide="${isFs ? 'minimize-2' : 'maximize-2'}" class="w-3.5 h-3.5"></i><span id="fullscreenBtnText" class="sr-only">${isFs ? 'Exit Fullscreen' : 'Full'}</span>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         // Comprehensive multi-phase invalidateSize to guarantee tile rendering across all browsers & screen sizes
         invalidateMapLayout();
@@ -964,6 +998,12 @@ document.addEventListener('keydown', (e) => {
         mapContainer.classList.remove('fullscreen');
         const fsText = document.getElementById('fullscreenBtnText');
         if (fsText) fsText.textContent = 'View Map Completely';
+        if (fsBtn) {
+            fsBtn.setAttribute('title', 'Toggle Fullscreen Map View');
+            fsBtn.setAttribute('aria-label', 'Toggle Fullscreen Map View');
+            fsBtn.innerHTML = `<i data-lucide="maximize-2" class="w-3.5 h-3.5"></i><span id="fullscreenBtnText" class="sr-only">Full</span>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
         invalidateMapLayout();
         setTimeout(invalidateMapLayout, 150);
         setTimeout(invalidateMapLayout, 300);
@@ -1045,6 +1085,8 @@ function applyMaskState(state) {
         if (toggleMaskBtn) {
             toggleMaskBtn.classList.remove('text-gray-400', 'text-cyan-300');
             toggleMaskBtn.classList.add('text-amber-300');
+            toggleMaskBtn.setAttribute('title', 'India Focus: TINT (Click to toggle OFF)');
+            toggleMaskBtn.setAttribute('aria-label', 'India Focus: TINT');
         }
     } else if (maskState === 'off') {
         indiaMaskLayer.setStyle({ fillOpacity: 0, opacity: 0 });
@@ -1053,6 +1095,8 @@ function applyMaskState(state) {
         if (toggleMaskBtn) {
             toggleMaskBtn.classList.remove('text-amber-300', 'text-cyan-300');
             toggleMaskBtn.classList.add('text-gray-400');
+            toggleMaskBtn.setAttribute('title', 'India Focus: OFF (Click to toggle ON)');
+            toggleMaskBtn.setAttribute('aria-label', 'India Focus: OFF');
         }
     } else if (maskState === 'solid') {
         indiaMaskLayer.setStyle({ fillColor: '#000000', fillOpacity: 0.88, opacity: 0.85 });
@@ -1061,6 +1105,8 @@ function applyMaskState(state) {
         if (toggleMaskBtn) {
             toggleMaskBtn.classList.remove('text-amber-300', 'text-gray-400');
             toggleMaskBtn.classList.add('text-cyan-300');
+            toggleMaskBtn.setAttribute('title', 'India Focus: SOLID ON (Click to toggle TINT)');
+            toggleMaskBtn.setAttribute('aria-label', 'India Focus: SOLID ON');
         }
     }
 }
@@ -2418,13 +2464,25 @@ mapFilterButtons.forEach(button => {
         const watchCount = landslidePlaces.filter(p => p.category === 'WATCH').length;
         const safeCount = landslidePlaces.filter(p => p.category === 'SAFE').length;
 
-        // Update single filter button label and close dropdown
+        // Update single filter button label and badge and close dropdown
+        const currentFilterBadge = document.getElementById('currentFilterBadge');
         if (currentFilterLabel) {
-            if (filter === 'all') currentFilterLabel.textContent = `All NER (${landslidePlaces.length})`;
-            else if (filter === 'CRITICAL') currentFilterLabel.textContent = `Red Critical (${critCount})`;
-            else if (filter === 'WATCH') currentFilterLabel.textContent = `Yellow Watch (${watchCount})`;
-            else if (filter === 'SAFE') currentFilterLabel.textContent = `Green Safe (${safeCount})`;
-            else if (filter === 'ROADS') currentFilterLabel.textContent = 'Road Lifelines (15)';
+            if (filter === 'all') {
+                currentFilterLabel.textContent = `All NER (${landslidePlaces.length})`;
+                if (currentFilterBadge) currentFilterBadge.textContent = `${landslidePlaces.length}`;
+            } else if (filter === 'CRITICAL') {
+                currentFilterLabel.textContent = `Red Critical (${critCount})`;
+                if (currentFilterBadge) currentFilterBadge.textContent = `${critCount}`;
+            } else if (filter === 'WATCH') {
+                currentFilterLabel.textContent = `Yellow Watch (${watchCount})`;
+                if (currentFilterBadge) currentFilterBadge.textContent = `${watchCount}`;
+            } else if (filter === 'SAFE') {
+                currentFilterLabel.textContent = `Green Safe (${safeCount})`;
+                if (currentFilterBadge) currentFilterBadge.textContent = `${safeCount}`;
+            } else if (filter === 'ROADS') {
+                currentFilterLabel.textContent = 'Road Lifelines (15)';
+                if (currentFilterBadge) currentFilterBadge.textContent = '15';
+            }
         }
         if (filterDropdownMenu) {
             filterDropdownMenu.classList.add('hidden');
@@ -3481,7 +3539,11 @@ async function syncAllPlacesRealTimeThreat() {
     const syncStatus = document.getElementById('realtimeThreatSyncStatus');
 
     if (syncBtnText) syncBtnText.textContent = 'Syncing...';
-    if (syncBtn) syncBtn.disabled = true;
+    if (syncBtn) {
+        syncBtn.disabled = true;
+        const icon = syncBtn.querySelector('i[data-lucide], svg');
+        if (icon) icon.classList.add('animate-spin');
+    }
     if (syncStatus) {
         syncStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block animate-ping mr-1"></span>Threat Stream: Polling...';
         syncStatus.className = 'text-yellow-300 font-mono text-[9px] flex items-center gap-1';
@@ -3570,8 +3632,12 @@ async function syncAllPlacesRealTimeThreat() {
         // Fallback: recompute with formula on place properties
         landslidePlaces.forEach(p => updatePlaceMapVisuals(p));
     } finally {
-        if (syncBtnText) syncBtnText.textContent = 'Live Threat Sync';
-        if (syncBtn) syncBtn.disabled = false;
+        if (syncBtnText) syncBtnText.textContent = 'Sync';
+        if (syncBtn) {
+            syncBtn.disabled = false;
+            const icon = syncBtn.querySelector('i[data-lucide], svg');
+            if (icon) icon.classList.remove('animate-spin');
+        }
     }
 }
 
