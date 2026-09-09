@@ -692,7 +692,7 @@
                                 <span>ON-DEVICE SPAM FILTER: SUBMISSION DROPPED</span>
                             </div>
                             <p class="text-[11px] text-gray-300 leading-snug">
-                                TensorFlow.js classified this photo as <b>Clear_Road_And_Spam</b>. To conserve critical
+                                <span id="spamWarningReason">TensorFlow.js classified this photo as <b>Spam / Non-Hazard</b>.</span> To conserve critical
                                 satellite &amp; 2G bandwidth, non-hazard images are blocked on the client device before
                                 network transmission.
                             </p>
@@ -802,12 +802,12 @@
                             </div>
                         </div>
 
-                        <!-- In-Browser TensorFlow.js 3-Class Risk Evaluation Interface -->
+                        <!-- In-Browser TensorFlow.js 4-Class Risk Evaluation Interface -->
                         <div id="aiRiskCard" class="bg-slate-950/80 rounded-lg p-3 border border-slate-800 space-y-2.5">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                                    <b class="text-white text-xs">IN-BROWSER TENSORFLOW.JS CLASSIFICATION</b>
+                                    <b class="text-white text-xs">IN-BROWSER TENSORFLOW.JS CLASSIFICATION (4-CLASS)</b>
                                 </div>
                                 <span id="aiRiskBadge"
                                     class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-gray-400 border border-slate-700">
@@ -815,8 +815,8 @@
                                 </span>
                             </div>
 
-                            <!-- 3-Class Probabilities Grid -->
-                            <div class="grid grid-cols-3 gap-1.5 text-[10px] pt-1">
+                            <!-- 4-Class Probabilities Grid -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] pt-1">
                                 <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800 text-center">
                                     <span class="text-gray-400 block truncate">Landslide_Debris</span>
                                     <b id="tfProbDebris" class="text-gray-300 text-xs">--%</b>
@@ -826,8 +826,12 @@
                                     <b id="tfProbFissure" class="text-gray-300 text-xs">--%</b>
                                 </div>
                                 <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800 text-center">
-                                    <span class="text-gray-400 block truncate">Clear_Road_Spam</span>
+                                    <span class="text-gray-400 block truncate">Clear_Road</span>
                                     <b id="tfProbSpam" class="text-gray-300 text-xs">--%</b>
+                                </div>
+                                <div class="bg-slate-900/80 p-1.5 rounded border border-rose-500/30 text-center">
+                                    <span class="text-rose-400 font-medium block truncate">Human (Spam)</span>
+                                    <b id="tfProbHuman" class="text-gray-300 text-xs">--%</b>
                                 </div>
                             </div>
 
@@ -861,7 +865,7 @@
                                 </span>
                                 <span class="text-[9px] text-gray-500">1-click Edge AI Test</span>
                             </div>
-                            <div class="grid grid-cols-4 gap-1.5">
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                                 <button type="button" data-sample="rockfall"
                                     class="sample-photo-card p-1 rounded-lg bg-slate-950 border border-slate-800 text-left transition hover:border-sky-400"
                                     title="Debris on 36° slope -> RED Override">
@@ -901,6 +905,15 @@
                                     <span class="text-[9px] text-gray-300 block truncate mt-1 font-medium">Clear Road /
                                         Spam</span>
                                     <span class="text-[8px] text-rose-400 font-bold block">DROPPED CLIENT</span>
+                                </button>
+                                <button type="button" data-sample="human"
+                                    class="sample-photo-card p-1 rounded-lg bg-slate-950 border border-rose-500/40 text-left transition hover:border-rose-400"
+                                    title="Human / selfie photo -> Dropped On-Device (SPAM)">
+                                    <div
+                                        class="h-10 rounded bg-rose-950/50 border border-rose-500/40 flex items-center justify-center text-xs">
+                                        👤</div>
+                                    <span class="text-[9px] text-gray-300 block truncate mt-1 font-medium">Human Selfie</span>
+                                    <span class="text-[8px] text-rose-400 font-bold block">DROPPED (SPAM)</span>
                                 </button>
                             </div>
                         </div>

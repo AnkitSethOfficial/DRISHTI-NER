@@ -3664,7 +3664,7 @@ function showToast(message) {
 // 15. Citizen Incident Reporting & AI Vision Risk Evaluation Engine
 // ----------------------------------------------------------------------------
 const sampleIncidentPhotos = {
-    rockfall: `data:image/svg+xml;utf8,${encodeURIComponent(`
+    rockfall: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
             <defs>
                 <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -3696,7 +3696,7 @@ const sampleIncidentPhotos = {
             <text x="24" y="320" fill="#94a3b8" font-family="sans-serif" font-size="11">NH-10 Corridor &bull; Massive Boulders Across Roadway</text>
         </svg>
     `)}`,
-    fissure: `data:image/svg+xml;utf8,${encodeURIComponent(`
+    fissure: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
             <defs>
                 <linearGradient id="fissureSky" x1="0" y1="0" x2="0" y2="1">
@@ -3716,7 +3716,7 @@ const sampleIncidentPhotos = {
             <text x="24" y="320" fill="#94a3b8" font-family="sans-serif" font-size="11">Hill Cart Road &bull; 40mm Asphalt Shear Movement</text>
         </svg>
     `)}`,
-    mudflow: `data:image/svg+xml;utf8,${encodeURIComponent(`
+    mudflow: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
             <defs>
                 <linearGradient id="mudSky" x1="0" y1="0" x2="0" y2="1">
@@ -3738,7 +3738,7 @@ const sampleIncidentPhotos = {
             <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">Kurseong Ravine &bull; Fluid Saturated Mud Torrent</text>
         </svg>
     `)}`,
-    stable: `data:image/svg+xml;utf8,${encodeURIComponent(`
+    stable: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
             <defs>
                 <linearGradient id="stableSky" x1="0" y1="0" x2="0" y2="1">
@@ -3758,7 +3758,7 @@ const sampleIncidentPhotos = {
             <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">Gangtok Bypass &bull; Retaining Wall Intact &amp; Safe</text>
         </svg>
     `)}`,
-    plains: `data:image/svg+xml;utf8,${encodeURIComponent(`
+    plains: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
             <defs>
                 <linearGradient id="plainSky" x1="0" y1="0" x2="0" y2="1">
@@ -3776,7 +3776,7 @@ const sampleIncidentPhotos = {
             <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">Siliguri Outer Bypass &bull; Flat Terrain Structural Asphalt Crack (PWD)</text>
         </svg>
     `)}`,
-    clear: `data:image/svg+xml;utf8,${encodeURIComponent(`
+    clear: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
             <defs>
                 <linearGradient id="clearSky" x1="0" y1="0" x2="0" y2="1">
@@ -3792,8 +3792,31 @@ const sampleIncidentPhotos = {
             <text x="32" y="42" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold">🌿 CLEAR ROAD / NO HAZARD</text>
             <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">NH-10 Free Corridor &bull; Normal Vehicle Traffic Flow (Spam Filtered)</text>
         </svg>
+    `)}`,
+    human: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+            <defs>
+                <linearGradient id="bgSelfie" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#0f172a"/>
+                    <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+            </defs>
+            <rect width="600" height="340" fill="url(#bgSelfie)"/>
+            <!-- Human Head / Portrait -->
+            <circle cx="300" cy="120" r="55" fill="#fed7aa"/>
+            <path d="M 235,110 Q 300,45 365,110 Q 340,70 300,70 Q 260,70 235,110 Z" fill="#1e293b"/>
+            <circle cx="280" cy="115" r="7" fill="#1e293b"/>
+            <circle cx="320" cy="115" r="7" fill="#1e293b"/>
+            <path d="M 285,145 Q 300,160 315,145" stroke="#ef4444" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <!-- Body / Shoulders -->
+            <path d="M 180,340 Q 200,200 300,200 Q 400,200 420,340 Z" fill="#2563eb"/>
+            <rect x="20" y="20" width="220" height="34" rx="6" fill="#f43f5e" opacity="0.95"/>
+            <text x="32" y="42" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold">👤 HUMAN / SELFIE (SPAM)</text>
+            <text x="24" y="320" fill="#cbd5e1" font-family="sans-serif" font-size="11">Non-Disaster Image &bull; Human Portrait (Blocked by Edge AI)</text>
+        </svg>
     `)}`
 };
+window.sampleIncidentPhotos = sampleIncidentPhotos;
 
 let citizenReports = [
     {
@@ -4082,40 +4105,60 @@ async function initCitizenVisionModel() {
 }
 
 /**
- * Intelligent fallback classifier for offline / low-spec devices
+ * Intelligent fallback classifier for offline / low-spec devices (4 Classes)
  */
 function getFallbackProbabilities(sampleKeyOrType) {
     const text = String(sampleKeyOrType || '').toLowerCase();
+    if (text.includes('human') || text.includes('selfie') || text.includes('person')) {
+        return { debris: 0.02, fissure: 0.03, clear: 0.05, human: 0.90 };
+    }
     if (text.includes('clear') || text.includes('no hazard') || text.includes('spam')) {
-        return { debris: 0.04, fissure: 0.05, spam: 0.91 };
+        return { debris: 0.04, fissure: 0.05, clear: 0.88, human: 0.03 };
     }
     if (text.includes('fissure') || text.includes('crack')) {
-        return { debris: 0.11, fissure: 0.85, spam: 0.04 };
+        return { debris: 0.11, fissure: 0.82, clear: 0.04, human: 0.03 };
     }
     if (text.includes('rockfall') || text.includes('debris') || text.includes('mudflow')) {
-        return { debris: 0.91, fissure: 0.06, spam: 0.03 };
+        return { debris: 0.88, fissure: 0.06, clear: 0.03, human: 0.03 };
     }
-    return { debris: 0.82, fissure: 0.14, spam: 0.04 };
+    return { debris: 0.78, fissure: 0.14, clear: 0.04, human: 0.04 };
 }
 
 /**
  * Preprocess image & run inference with tf.tidy to avoid WebGL memory leaks
+ * 4-Class Architecture:
  * Class 0: Landslide_Debris
  * Class 1: Road_Fissures
- * Class 2: Clear_Road_Spam
+ * Class 2: Clear_Road
+ * Class 3: Human (Spam)
  */
 async function classifyIncidentImageWithTf(imageElement, sampleKeyHint = null) {
     if (!citizenVisionModel) {
         await initCitizenVisionModel();
     }
 
-    // Wait until image is rendered and has dimensions
-    if (imageElement && (!imageElement.complete || imageElement.naturalWidth === 0)) {
-        await new Promise(resolve => {
-            imageElement.onload = () => resolve();
-            imageElement.onerror = () => resolve();
-            setTimeout(resolve, 500);
-        });
+    // Wait until image is rendered, decoded, and has valid dimensions
+    if (imageElement) {
+        if (typeof imageElement.decode === 'function') {
+            try {
+                await imageElement.decode();
+            } catch (e) {
+                // If decode fails or image is loading, fallback to onload listener
+                if (!imageElement.complete || imageElement.naturalWidth === 0) {
+                    await new Promise(resolve => {
+                        imageElement.onload = () => resolve();
+                        imageElement.onerror = () => resolve();
+                        setTimeout(resolve, 800);
+                    });
+                }
+            }
+        } else if (!imageElement.complete || imageElement.naturalWidth === 0) {
+            await new Promise(resolve => {
+                imageElement.onload = () => resolve();
+                imageElement.onerror = () => resolve();
+                setTimeout(resolve, 800);
+            });
+        }
     }
 
     if (!citizenVisionModel) {
@@ -4128,7 +4171,22 @@ async function classifyIncidentImageWithTf(imageElement, sampleKeyHint = null) {
         offscreen.width = 224;
         offscreen.height = 224;
         const ctx = offscreen.getContext('2d');
-        ctx.drawImage(imageElement, 0, 0, 224, 224);
+
+        let drawSource = imageElement;
+        if (imageElement && imageElement.src && imageElement.src.startsWith('data:image/svg+xml')) {
+            const svgImg = new Image();
+            svgImg.crossOrigin = 'anonymous';
+            await new Promise((resolve) => {
+                svgImg.onload = () => resolve();
+                svgImg.onerror = () => resolve();
+                svgImg.src = imageElement.src;
+            });
+            if (svgImg.complete && svgImg.naturalWidth > 0) {
+                drawSource = svgImg;
+            }
+        }
+
+        ctx.drawImage(drawSource, 0, 0, 224, 224);
 
         // Run tensor operations in tf.tidy() to automatically free intermediate tensors
         const inputTensor = tf.tidy(() => {
@@ -4139,15 +4197,18 @@ async function classifyIncidentImageWithTf(imageElement, sampleKeyHint = null) {
         });
 
         const predTensor = citizenVisionModel.predict(inputTensor);
-        const rawOutput = await predTensor.data(); // Float32Array [prob0, prob1, prob2]
+        const rawOutput = await predTensor.data(); // Float32Array [prob0, prob1, prob2, prob3]
 
         inputTensor.dispose();
         predTensor.dispose();
 
+        // 4-Class Output mapping with support for 3 or 4 classes dynamically
+        const is4Class = rawOutput.length >= 4;
         return {
             debris: Math.max(0, Math.min(1, rawOutput[0] || 0)),
             fissure: Math.max(0, Math.min(1, rawOutput[1] || 0)),
-            spam: Math.max(0, Math.min(1, rawOutput[2] || 0))
+            clear: Math.max(0, Math.min(1, rawOutput[2] || 0)),
+            human: is4Class ? Math.max(0, Math.min(1, rawOutput[3] || 0)) : 0
         };
     } catch (err) {
         console.warn('TensorFlow.js inference error, applying robust heuristic fallback:', err);
@@ -4198,9 +4259,11 @@ function clearIncidentPhoto() {
     const tfProbDebris = document.getElementById('tfProbDebris');
     const tfProbFissure = document.getElementById('tfProbFissure');
     const tfProbSpam = document.getElementById('tfProbSpam');
+    const tfProbHuman = document.getElementById('tfProbHuman');
     if (tfProbDebris) { tfProbDebris.textContent = '--%'; tfProbDebris.className = 'text-gray-300 text-xs'; }
     if (tfProbFissure) { tfProbFissure.textContent = '--%'; tfProbFissure.className = 'text-gray-300 text-xs'; }
     if (tfProbSpam) { tfProbSpam.textContent = '--%'; tfProbSpam.className = 'text-gray-300 text-xs'; }
+    if (tfProbHuman) { tfProbHuman.textContent = '--%'; tfProbHuman.className = 'text-gray-300 text-xs'; }
 
     const spamWarningBanner = document.getElementById('spamWarningBanner');
     if (spamWarningBanner) spamWarningBanner.classList.add('hidden');
@@ -4216,12 +4279,12 @@ function clearIncidentPhoto() {
     }
 }
 
-// In-Browser TensorFlow.js 3-Class Risk Assessment Engine
+// In-Browser TensorFlow.js 4-Class Risk Assessment Engine
 async function runAiVisionRiskAssessment() {
     if (!currentIncidentPhoto || !photoPreviewImg) return;
 
     if (aiRiskBadge) {
-        aiRiskBadge.innerHTML = '<span class="animate-pulse text-cyan-300">TensorFlow.js Inferencing...</span>';
+        aiRiskBadge.innerHTML = '<span class="animate-pulse text-cyan-300">TensorFlow.js Inferencing (4-Class)...</span>';
     }
 
     // Run inference via TensorFlow.js
@@ -4229,24 +4292,31 @@ async function runAiVisionRiskAssessment() {
 
     const pDebris = Math.round((probs.debris || 0) * 100);
     const pFissure = Math.round((probs.fissure || 0) * 100);
-    const pSpam = Math.round((probs.spam || 0) * 100);
+    const pClear = Math.round((probs.clear !== undefined ? probs.clear : probs.spam || 0) * 100);
+    const pHuman = Math.round((probs.human || 0) * 100);
+    const maxProb = Math.max(pDebris, pFissure, pClear, pHuman);
 
-    // Update 3-Class Probabilities Grid in UI
+    // Update 4-Class Probabilities Grid in UI
     const tfProbDebris = document.getElementById('tfProbDebris');
     const tfProbFissure = document.getElementById('tfProbFissure');
     const tfProbSpam = document.getElementById('tfProbSpam');
+    const tfProbHuman = document.getElementById('tfProbHuman');
 
     if (tfProbDebris) {
         tfProbDebris.textContent = `${pDebris}%`;
-        tfProbDebris.className = (pDebris >= pFissure && pDebris >= pSpam) ? 'text-red-400 text-xs font-bold' : 'text-gray-300 text-xs';
+        tfProbDebris.className = (pDebris === maxProb && pDebris > 0) ? 'text-red-400 text-xs font-bold' : 'text-gray-300 text-xs';
     }
     if (tfProbFissure) {
         tfProbFissure.textContent = `${pFissure}%`;
-        tfProbFissure.className = (pFissure > pDebris && pFissure >= pSpam) ? 'text-yellow-400 text-xs font-bold' : 'text-gray-300 text-xs';
+        tfProbFissure.className = (pFissure === maxProb && pFissure > 0) ? 'text-yellow-400 text-xs font-bold' : 'text-gray-300 text-xs';
     }
     if (tfProbSpam) {
-        tfProbSpam.textContent = `${pSpam}%`;
-        tfProbSpam.className = (pSpam > pDebris && pSpam > pFissure) ? 'text-rose-400 text-xs font-bold' : 'text-gray-300 text-xs';
+        tfProbSpam.textContent = `${pClear}%`;
+        tfProbSpam.className = (pClear === maxProb && pClear > 0) ? 'text-emerald-400 text-xs font-bold' : 'text-gray-300 text-xs';
+    }
+    if (tfProbHuman) {
+        tfProbHuman.textContent = `${pHuman}%`;
+        tfProbHuman.className = (pHuman === maxProb && pHuman > 0) ? 'text-rose-400 text-xs font-bold' : 'text-gray-300 text-xs';
     }
 
     const spamWarningBanner = document.getElementById('spamWarningBanner');
@@ -4256,24 +4326,64 @@ async function runAiVisionRiskAssessment() {
     const isPlainsCase = currentIncidentPhotoSourceHint === 'plains' || (photoMetaText && photoMetaText.textContent.includes('PLAINS')) || (document.getElementById('reportLocation') && document.getElementById('reportLocation').value.includes('Plain'));
 
     // Categorization logic based on highest softmax output
-    if (pSpam > 50 || (pSpam >= pDebris && pSpam >= pFissure && !isPlainsCase)) {
-        // SPAM / CLEAR ROADWAY DETECTED
+    // 1. HUMAN DETECTED (USER MANDATE: If the model says Human, it is SPAM)
+    if (pHuman >= 40 || (pHuman === maxProb && pHuman > 20)) {
+        currentAiEvaluation = {
+            score: 5,
+            tier: 'LOW',
+            tierColor: '#f43f5e',
+            isSpam: true,
+            class: 'Human',
+            confidence: pHuman
+        };
+
+        if (aiRiskBadge) {
+            aiRiskBadge.textContent = `DROPPED CLIENT / HUMAN SPAM (${pHuman}%)`;
+            aiRiskBadge.style.color = '#f43f5e';
+            aiRiskBadge.style.background = 'rgba(244, 63, 94, 0.15)';
+            aiRiskBadge.style.borderColor = 'rgba(244, 63, 94, 0.4)';
+        }
+        if (spamWarningBanner) {
+            spamWarningBanner.classList.remove('hidden');
+            const reasonEl = document.getElementById('spamWarningReason');
+            if (reasonEl) {
+                reasonEl.innerHTML = `TensorFlow.js classified this photo as <b>Human / Selfie (${pHuman}%)</b>.`;
+            }
+        }
+        if (reportSeveritySelect) reportSeveritySelect.value = 'LOW';
+        if (reportTypeSelect) reportTypeSelect.value = 'Clear Roadway / No Hazard';
+        if (slopeCrossCheckText) {
+            slopeCrossCheckText.innerHTML = '<span class="text-rose-400 font-bold">🛑 On-Device Filter (Human Detected):</span> Subject identified as a human selfie or non-hazard image. Dropped on device to conserve emergency satellite bandwidth.';
+        }
+        if (corridorSnappingText) {
+            corridorSnappingText.textContent = 'No Snapping (Human Selfie Dropped)';
+            corridorSnappingText.className = 'text-rose-400 font-semibold';
+        }
+    }
+    // 2. CLEAR ROADWAY / NON-HAZARD SPAM
+    else if (pClear > 50 || (pClear === maxProb && !isPlainsCase)) {
         currentAiEvaluation = {
             score: 10,
             tier: 'LOW',
             tierColor: '#10b981',
             isSpam: true,
             class: 'Clear_Road_Spam',
-            confidence: pSpam
+            confidence: pClear
         };
 
         if (aiRiskBadge) {
-            aiRiskBadge.textContent = `DROPPED CLIENT / SPAM (${pSpam}%)`;
+            aiRiskBadge.textContent = `DROPPED CLIENT / SPAM (${pClear}%)`;
             aiRiskBadge.style.color = '#f43f5e';
             aiRiskBadge.style.background = 'rgba(244, 63, 94, 0.15)';
             aiRiskBadge.style.borderColor = 'rgba(244, 63, 94, 0.4)';
         }
-        if (spamWarningBanner) spamWarningBanner.classList.remove('hidden');
+        if (spamWarningBanner) {
+            spamWarningBanner.classList.remove('hidden');
+            const reasonEl = document.getElementById('spamWarningReason');
+            if (reasonEl) {
+                reasonEl.innerHTML = `TensorFlow.js classified this photo as <b>Clear Road / No Hazard (${pClear}%)</b>.`;
+            }
+        }
         if (reportSeveritySelect) reportSeveritySelect.value = 'LOW';
         if (reportTypeSelect) reportTypeSelect.value = 'Clear Roadway / No Hazard';
         if (slopeCrossCheckText) {
@@ -4492,6 +4602,10 @@ sampleButtons.forEach(btn => {
             if (reportTypeSelect) reportTypeSelect.value = 'Retaining Wall Failure';
             if (locInput) locInput.value = 'Pakyong Airport Bypass Ridge';
             if (descInput) descInput.value = 'Inspected retaining wall; structure intact with normal drainage weeps.';
+        } else if (sampleKey === 'human') {
+            if (reportTypeSelect) reportTypeSelect.value = 'Clear Roadway / No Hazard';
+            if (locInput) locInput.value = 'NH-10 Teesta Bridge (Selfie / Non-Hazard)';
+            if (descInput) descInput.value = 'Citizen selfie / portrait submitted; no slope failure or road obstruction.';
         }
 
         setIncidentPhoto(sampleSvg, `Sample Incident: ${sampleKey.toUpperCase()}`, sampleKey);
@@ -4628,9 +4742,12 @@ if (reportForm) {
     reportForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Edge AI Spam Filter Guard: Block non-hazard / clear road submissions
+        // Edge AI Spam Filter Guard: Block non-hazard / clear road / human selfie submissions
         if (currentAiEvaluation && currentAiEvaluation.isSpam) {
-            showToast('🛑 Report Dropped: Classified as Clear Road / Spam by on-device Edge AI.');
+            const spamMsg = currentAiEvaluation.class === 'Human'
+                ? '🛑 Report Dropped: Classified as Human / Selfie Spam by on-device Edge AI.'
+                : '🛑 Report Dropped: Classified as Clear Road / Spam by on-device Edge AI.';
+            showToast(spamMsg);
             const spamBanner = document.getElementById('spamWarningBanner');
             if (spamBanner) {
                 spamBanner.classList.remove('hidden');
