@@ -255,7 +255,8 @@
                 <!-- Header: Badge & Actions -->
                 <div class="flex flex-wrap justify-between items-center gap-2 pb-2 border-b border-slate-800/80 mb-2">
                     <div class="flex items-center gap-2">
-                        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                        <p
+                            class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
                             <i data-lucide="cpu" class="w-3.5 h-3.5"></i> MATHEMATICAL RISK
                         </p>
                         <span id="telemetrySourceBadge"
@@ -264,22 +265,16 @@
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button id="fetchOpenMeteoBtn"
-                            class="px-2 py-1 bg-sky-600/25 hover:bg-sky-600/40 text-sky-300 border border-sky-500/40 rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-sm"
-                            title="Query live Open-Meteo API for current coordinates">
-                            <i data-lucide="cloud-download" class="w-3 h-3 text-sky-400"></i> Fetch Open-Meteo
-                        </button>
-                        <span id="riskLevel"
-                            class="text-xs font-bold text-red-400 border border-red-400/40 bg-red-950/30 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                            CRITICAL (70-100)
-                        </span>
+
+
                     </div>
                 </div>
 
                 <!-- Centered Large Score Display -->
                 <div class="py-2 text-center">
                     <div class="flex items-baseline justify-center gap-1.5">
-                        <span id="riskScore" class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">88</span>
+                        <span id="riskScore"
+                            class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">88</span>
                         <span class="text-gray-400 text-sm sm:text-base font-normal">/ 100</span>
                     </div>
                     <!-- Selected Preloaded Location & Coordinates Header (Positioned Neatly Below Score) -->
@@ -299,37 +294,48 @@
                 <div class="metric-bar mb-3"><span id="riskGauge" style="width:88%;background:#ef4444"></span></div>
 
                 <!-- 4 Real-time PRD Metrics (Strictly 1 horizontal row on both mobile and desktop via flex-nowrap) -->
-                <div class="risk-metrics-row w-full text-center text-xs" style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; gap: 6px !important; box-sizing: border-box !important;">
+                <div class="risk-metrics-row w-full text-center text-xs"
+                    style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; gap: 6px !important; box-sizing: border-box !important;">
                     <!-- Box 1: Rainfall -->
-                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center"
+                        style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
                         <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Rainfall</span>
                         <b id="riskRain" class="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">112 mm</b>
                         <span id="riskRainScoreSub" class="hidden"></span>
                     </div>
 
                     <!-- Box 2: Slope -->
-                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center"
+                        style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
                         <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Slope</span>
                         <b id="riskSlope" class="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">36°</b>
-                        <span id="riskSlopeType" class="text-[8px] sm:text-[8.5px] text-amber-400 font-medium block truncate mt-0.5">&ge;15° Hill</span>
+                        <span id="riskSlopeType"
+                            class="text-[8px] sm:text-[8.5px] text-amber-400 font-medium block truncate mt-0.5">&ge;15°
+                            Hill</span>
                         <span id="bhuvanDemBadge" class="hidden"></span>
                         <span id="riskElevation" class="hidden"></span>
                         <span id="riskAspect" class="hidden"></span>
                     </div>
 
                     <!-- Box 3: Moisture -->
-                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center"
+                        style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
                         <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Moisture</span>
                         <b id="riskSoil" class="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">73% Sat.</b>
-                        <span id="riskAmiScoreSub" class="text-[8px] sm:text-[8.5px] text-emerald-400 font-mono block truncate mt-0.5">0.33 m³/m³</span>
+                        <span id="riskAmiScoreSub"
+                            class="text-[8px] sm:text-[8.5px] text-emerald-400 font-mono block truncate mt-0.5">0.33
+                            m³/m³</span>
                         <span id="openMeteoSoilBadge" class="hidden"></span>
                     </div>
 
                     <!-- Box 4: Corridor -->
-                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+                    <div class="bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 flex flex-col justify-center text-center"
+                        style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
                         <span class="text-[9px] text-gray-400 uppercase font-semibold block truncate">Corridor</span>
-                        <b id="riskCorridorStatus" class="text-red-400 text-xs sm:text-sm font-bold mt-0.5 truncate">BLOCKED</b>
-                        <span id="riskCorridorSub" class="text-[8px] sm:text-[8.5px] text-gray-400 block truncate mt-0.5">NH-10</span>
+                        <b id="riskCorridorStatus"
+                            class="text-red-400 text-xs sm:text-sm font-bold mt-0.5 truncate">BLOCKED</b>
+                        <span id="riskCorridorSub"
+                            class="text-[8px] sm:text-[8.5px] text-gray-400 block truncate mt-0.5">NH-10</span>
                     </div>
                 </div>
 
