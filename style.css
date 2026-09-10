@@ -1475,27 +1475,68 @@ input[type=range] {
 }
 
 #hourlyForecastList {
-    border-top: 1px solid rgba(79, 154, 168, .24);
-    padding-top: 4px;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    border-top: none !important;
+    padding-top: 0 !important;
+    width: 100% !important;
+    overflow-x: visible !important;
+}
+
+/* Hide all odd hours (+1h, +3h, +5h, ..., +23h) so ONLY 12 even hours (+2h to +24h) are shown */
+#hourlyForecastList .hourly-card:nth-child(odd) {
+    display: none !important;
 }
 
 #hourlyForecastList .hourly-card {
-    background-color: rgba(30, 64, 78, .2);
-    border-color: rgba(79, 154, 168, .28);
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 6px;
+    padding: 3px 2px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    transition: all 0.18s ease-in-out;
+    cursor: pointer;
+    text-align: center;
 }
 
-#hourlyForecastList .hourly-card>div:first-child,
-#hourlyForecastList .hourly-card>div:nth-child(3),
-#hourlyForecastList .hourly-card>div:last-child span {
-    color: #9bb4bc;
+#hourlyForecastList .hourly-card:hover {
+    transform: translateY(-1px) scale(1.02);
+    border-color: rgba(56, 189, 248, 0.6);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    background: rgba(30, 41, 59, 0.9);
 }
 
-#hourlyForecastList .hourly-card>div:nth-child(2) {
-    color: #83c5d1;
+#hourlyForecastList .hourly-card.ring-2,
+#hourlyForecastList .hourly-card.selected-hour {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
+    background: rgba(14, 116, 144, 0.3) !important;
 }
 
-#hourlyForecastList .hourly-card>div:last-child {
-    border-color: rgba(79, 154, 168, .24);
+/* Hide secondary soil saturation string from card to make it compact */
+#hourlyForecastList .hourly-card > div:nth-child(3) {
+    display: none !important;
+}
+
+#hourlyForecastList .hourly-card > div:first-child {
+    font-size: 8px !important;
+    margin-bottom: 1px !important;
+}
+
+#hourlyForecastList .hourly-card > div:nth-child(2) {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+}
+
+#hourlyForecastList .hourly-card > div:last-child {
+    font-size: 7.5px !important;
+    margin-top: 2px !important;
+    padding-top: 2px !important;
+    border-color: rgba(79, 154, 168, 0.24);
 }
 
 .tab-view {
@@ -2414,6 +2455,7 @@ body,
 }
 
 @media (max-width: 479px) {
+
     /* Keep all 4 metric boxes strictly in 1 horizontal line on compact phone screens */
     #riskPanel .risk-metrics-row,
     #riskPanel>.grid.grid-cols-4 {
