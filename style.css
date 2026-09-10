@@ -1539,6 +1539,16 @@ input[type=range] {
     border-color: rgba(79, 154, 168, 0.24);
 }
 
+/* Solid background for map filter dropdown menu */
+#filterDropdownMenu {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+    opacity: 1 !important;
+    border: 1px solid rgba(51, 65, 85, 0.9) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8) !important;
+    z-index: 1000 !important;
+}
+
 .tab-view {
     display: none;
 }
