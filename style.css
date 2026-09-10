@@ -1105,10 +1105,16 @@ input[type=range] {
 
 .tab-view {
     display: none;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .tab-view.active {
-    display: block;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Custom Leaflet Pulsing Markers for Landslide Hazards */

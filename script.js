@@ -2563,15 +2563,49 @@ function updateRiskPanel(place, updateMapVisuals = false) {
     const slopeScore = geo.sScore;
     const amiScore = geo.sat;
 
+    const mathTitle = document.getElementById('mathRiskTitle');
+    if (mathTitle) {
+        mathTitle.style.setProperty('color', color, 'important');
+    }
+    const mathIcon = document.getElementById('mathRiskIcon');
+    if (mathIcon) {
+        mathIcon.style.setProperty('color', color, 'important');
+    }
+
     const scoreElem = document.getElementById('riskScore');
-    if (scoreElem) scoreElem.textContent = dynamicScore;
+    if (scoreElem) {
+        scoreElem.textContent = dynamicScore;
+        scoreElem.style.setProperty('color', color, 'important');
+        scoreElem.style.textShadow = `0 0 24px ${color}66`;
+    }
 
     const levelElem = document.getElementById('riskLevel');
     if (levelElem) {
-        levelElem.textContent = dynamicRisk === 'CRITICAL' ? 'CRITICAL (70–100)' : dynamicRisk === 'WATCH' ? 'WATCH (40–69)' : 'SAFE (0–39)';
+        const levelText = dynamicRisk === 'CRITICAL' ? 'CRITICAL (70–100) • BAD' : (dynamicRisk === 'WATCH' ? 'WATCH (40–69) • MODERATE' : 'SAFE (0–39) • GOOD');
+        levelElem.textContent = levelText;
         levelElem.style.color = color;
         levelElem.style.borderColor = color + '60';
         levelElem.style.background = color + '20';
+    }
+
+    const condBadge = document.getElementById('riskConditionBadge');
+    const condText = document.getElementById('riskConditionText');
+    const condDot = document.getElementById('riskConditionDot');
+    if (condBadge && condText) {
+        condBadge.style.color = color;
+        condBadge.style.borderColor = color + '55';
+        condBadge.style.background = color + '18';
+        if (condDot) {
+            condDot.style.background = color;
+            condDot.className = `w-2 h-2 rounded-full ${dynamicRisk === 'CRITICAL' ? 'animate-ping' : (dynamicRisk === 'WATCH' ? 'animate-pulse' : '')}`;
+        }
+        if (dynamicRisk === 'CRITICAL') {
+            condText.textContent = 'BAD • CRITICAL DANGER';
+        } else if (dynamicRisk === 'WATCH') {
+            condText.textContent = 'MODERATE • WATCH ADVISORY';
+        } else {
+            condText.textContent = 'GOOD • SAFE STABLE';
+        }
     }
 
     const gaugeElem = document.getElementById('riskGauge');
@@ -2580,14 +2614,34 @@ function updateRiskPanel(place, updateMapVisuals = false) {
         gaugeElem.style.background = color;
     }
 
+    // Dynamic color coding for Rainfall (Green = Good/Low, Yellow = Moderate, Red = Bad/Heavy)
     const rainElem = document.getElementById('riskRain');
-    if (rainElem) rainElem.textContent = rainVal + ' mm';
+    const rainStatus = document.getElementById('riskRainStatus');
+    const rainColor = rainVal >= 75 ? '#ef4444' : (rainVal >= 35 ? '#f59e0b' : '#10b981');
+    if (rainElem) {
+        rainElem.textContent = rainVal + ' mm';
+        rainElem.style.color = rainColor;
+    }
+    if (rainStatus) {
+        rainStatus.textContent = rainVal >= 75 ? 'Heavy (Bad)' : (rainVal >= 35 ? 'Moderate' : 'Good (Low)');
+        rainStatus.style.color = rainColor;
+    }
 
     const rainScoreSub = document.getElementById('riskRainScoreSub');
     if (rainScoreSub) rainScoreSub.textContent = `Score: ${rainScore}`;
 
+    // Dynamic color coding for Slope (Green = Good/Gentle, Yellow = Moderate, Red = Bad/Steep)
     const slopeElem = document.getElementById('riskSlope');
-    if (slopeElem) slopeElem.textContent = slopeVal + '°';
+    const slopeStatus = document.getElementById('riskSlopeStatus');
+    const slopeColor = slopeVal >= 35 ? '#ef4444' : (slopeVal >= 20 ? '#f59e0b' : '#10b981');
+    if (slopeElem) {
+        slopeElem.textContent = slopeVal + '°';
+        slopeElem.style.color = slopeColor;
+    }
+    if (slopeStatus) {
+        slopeStatus.textContent = slopeVal >= 35 ? 'Steep (Bad)' : (slopeVal >= 20 ? 'Moderate' : 'Good (Gentle)');
+        slopeStatus.style.color = slopeColor;
+    }
 
     const slopeTypeElem = document.getElementById('riskSlopeType');
     if (slopeTypeElem) {
@@ -2606,9 +2660,19 @@ function updateRiskPanel(place, updateMapVisuals = false) {
     const aspectElem = document.getElementById('riskAspect');
     if (aspectElem) aspectElem.textContent = place.aspect || 'SE Face';
 
+    // Dynamic color coding for Moisture Saturation (Green = Good/Normal, Yellow = Moderate, Red = Bad/Saturated)
     const satPct = place.saturationPct || (place.volMoisture ? Math.min(100, Math.round((place.volMoisture / 0.45) * 100)) : Math.min(100, Math.round(amiScore * 0.95)));
     const soilElem = document.getElementById('riskSoil');
-    if (soilElem) soilElem.textContent = satPct + '% Sat.';
+    const soilStatus = document.getElementById('riskSoilStatus');
+    const soilColor = satPct >= 75 ? '#ef4444' : (satPct >= 50 ? '#f59e0b' : '#10b981');
+    if (soilElem) {
+        soilElem.textContent = satPct + '% Sat.';
+        soilElem.style.color = soilColor;
+    }
+    if (soilStatus) {
+        soilStatus.textContent = satPct >= 75 ? 'Saturated (Bad)' : (satPct >= 50 ? 'Moderate' : 'Good (Stable)');
+        soilStatus.style.color = soilColor;
+    }
 
     const amiScoreSub = document.getElementById('riskAmiScoreSub');
     if (amiScoreSub) {
